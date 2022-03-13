@@ -1,7 +1,7 @@
 Scrummaster rotáció:
 1. hét (03.07 - 03.13): Szálkai Olivér Dávid
-2. hét (03.14 - 03.20): Tóth Kristóf (SONXZF)
-3. hét (03.21 - 03.27): Tóth Kristóf (YPENKF)
+2. hét (03.14 - 03.20): Tóth Kristóf (YPENKF)
+3. hét (03.21 - 03.27): Tóth Kristóf (SONXZF)
 
 Ki mit csinált:
 1. hét (03.07 - 03.13)
