@@ -14,6 +14,8 @@ Ki mit csinált:
 2. hét (03.09 - 03.16)
     
     Tóth Kristóf (SONXZF): Tornyok lehelyezése egérrel (Mouse adapter), save game
+
     Tóth Kristóf (YPENKF): Aktiv játékos jelölése, torony választás gombbal, elérhető mezők megjelenítése torony építésekor
+    
     Szálkai Olivér: Tornyok és ahhoz tartozó mechanikák bővítése
     
