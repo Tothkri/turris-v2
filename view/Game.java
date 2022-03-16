@@ -1,12 +1,12 @@
 package view;
 
 import java.awt.CardLayout;
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class Game {
+
     private GameWindow gw;
     private StartScreen ss;
 
@@ -16,36 +16,38 @@ public class Game {
     private final int width;
     private final int height;
 
-    public Game(){
-        width = 1280; height = 720;
+    public Game() {
+        width = 1920;
+        height = 1080;
 
         frame = new JFrame("Tower Defense Game");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        frame.setUndecorated(true);
+        frame.setVisible(true);
         container = new JPanel();
         CardLayout cardLayout = new CardLayout();
-        
 
         container.setLayout(cardLayout);
 
-        ss = new StartScreen(width,height);
-        
+        ss = new StartScreen(width, height);
 
         container.setLayout(cardLayout);
-        container.add(ss,"1");
+        container.add(ss, "1");
 
         /**
-         * Checks if the player names are correct:
-         * They are not the same
+         * Checks if the player names are correct: They are not the same 
          * They cannot be empty
          */
         ss.getStartButton().addActionListener((ActionEvent ae) -> {
-            if(!ss.isCorrect()) return;
-            
-            gw = new GameWindow(width,height,ss.getP1Name().getText(),ss.getP2Name().getText(), ss.getSelectedRadioButton());
-            container.add(gw,"2");
+            if (!ss.isCorrect()) {
+                return;
+            }
+
+            gw = new GameWindow(width, height, ss.getP1Name().getText(), ss.getP2Name().getText(), ss.getSelectedRadioButton());
+            container.add(gw, "2");
             cardLayout.show(container, "2");
         });
-        
 
         frame.setResizable(false);
         frame.getContentPane().add(container);
