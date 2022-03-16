@@ -17,6 +17,6 @@ Ki mit csinált:
 
     Tóth Kristóf (YPENKF): Aktiv játékos jelölése, torony választás gombbal, elérhető mezők megjelenítése torony építésekor
     
-    Szálkai Olivér: Tornyok és ahhoz tartozó mechanikák bővítése
+    Szálkai Olivér Dávid (ONLQ05): Tornyok és ahhoz tartozó mechanikák bővítése
     
 3. hét (03.16 - 03.23)
