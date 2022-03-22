@@ -23,7 +23,7 @@ Ki mit csinált:
 
     Tóth Kristóf (SONXZF): Út nehézség kialakítása és legjobb út számítása, egyéb mechanikák
 
-    Tóth Kristóf (YPENKF): Load & Save game, bugok javítása
+    Tóth Kristóf (YPENKF): Load & Save game, torony rombolás/fejlesztés, elérhető rombolható/fejleszthető tornyok jelőlése
     
     Szálkai Olivér Dávid (ONLQ05): GUI kialakítása (StartScreen)
 
