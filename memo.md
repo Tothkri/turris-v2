@@ -20,3 +20,10 @@ Ki mit csinált:
     Szálkai Olivér Dávid (ONLQ05): Tornyok és ahhoz tartozó mechanikák bővítése
     
 3. hét (03.16 - 03.23)
+
+    Tóth Kristóf (SONXZF): Út nehézség kialakítása és legjobb út számítása, egyéb mechanikák
+
+    Tóth Kristóf (YPENKF): Load & Save game, bugok javítása
+    
+    Szálkai Olivér Dávid (ONLQ05): GUI kialakítása (StartScreen)
+
