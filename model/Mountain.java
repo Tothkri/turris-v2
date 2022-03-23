@@ -1,8 +1,6 @@
-
 package model;
 
 import java.awt.Image;
-
 
 public class Mountain extends Sprite{
 

@@ -1,8 +1,7 @@
-
 package model;
 
+import java.awt.Graphics2D;
 import java.awt.Image;
-
 
 public abstract class Sprite {
 
@@ -19,6 +18,7 @@ public abstract class Sprite {
         this.width = width;
         this.img = img;
     }
+    public Sprite(){}
 
     
 
@@ -61,7 +61,8 @@ public abstract class Sprite {
     public void setImg(Image img) {
         this.img = img;
     }
-    
-    
-    
+    public void draw(Graphics2D g2) {
+
+        g2.drawImage(img, x, y, height, width, null);
+    }
 }

@@ -1,7 +1,7 @@
-
 package model;
 
 import java.awt.Image;
+import javax.swing.ImageIcon;
 
 public abstract class Tower extends Sprite{
     
@@ -11,6 +11,7 @@ public abstract class Tower extends Sprite{
     protected double attack_speed;
     protected int hp;
     protected int price;
+    protected int demolishedIn;
 
     public Tower(String type, int power, int range, double attack_speed, int hp, int price, int x, int y, int height, int width, Image img) {
         super(x, y, height, width, img);
@@ -20,6 +21,7 @@ public abstract class Tower extends Sprite{
         this.attack_speed = attack_speed;
         this.hp = hp;
         this.price = price;
+        this.demolishedIn = -1;
     }
 
     public String getType() {
@@ -70,7 +72,20 @@ public abstract class Tower extends Sprite{
         this.price = price;
     }
     
-    
-    
+    public void upgrade(){
+        //temporary, just place holders
+        this.hp = 5000;
+        this.attack_speed = 2.0;
+    }
+    public void demolish(){
+        demolishedIn = 4;//2 whole round
+        img = new ImageIcon("src/res/Destroyed.png").getImage();
+    }
+    public int getDemolishedIn(){
+        return demolishedIn;
+    }
+    public void setDemolishedIn(int x){
+        demolishedIn -= x;
+    }
     
 }

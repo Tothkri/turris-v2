@@ -1,33 +1,27 @@
-
 package model;
 
 import java.awt.Image;
-import java.util.HashMap;
+import java.util.ArrayList;
 
+public abstract class Unit extends Sprite {
 
-public abstract class Unit extends Sprite{
-    
     protected String type;
     protected int distance;
     protected int power;
     protected int hp;
     protected int price;
-    protected HashMap<Integer, Integer> way;
-    
-    
-    protected void move(int x, int y)
-    {
-        
+    protected ArrayList<Node> way;
+
+    protected void move(int x, int y) {
+        this.x = x;
+        this.y = y;
     }
-    protected HashMap<Integer,Integer> findWay(){
-        HashMap<Integer,Integer> hm=new HashMap<>();
-        return hm;
-    }
-    public boolean collides(Sprite s){
+
+    public boolean collides(Sprite s) {
         return false;
     }
 
-    public Unit(String type, int distance, int power, int hp, int price, HashMap<Integer, Integer> way, int x, int y, int height, int width, Image img) {
+    public Unit(String type, int distance, int power, int hp, int price, int x, int y, int height, int width, Image img, ArrayList<Node> way) {
         super(x, y, height, width, img);
         this.type = type;
         this.distance = distance;
@@ -36,8 +30,6 @@ public abstract class Unit extends Sprite{
         this.price = price;
         this.way = way;
     }
-
-    
 
     public String getType() {
         return type;
@@ -79,18 +71,12 @@ public abstract class Unit extends Sprite{
         this.price = price;
     }
 
-    public HashMap<Integer, Integer> getWay() {
+    public ArrayList<Node> getWay() {
         return way;
     }
 
-    public void setWay(HashMap<Integer, Integer> way) {
+    public void setWay(ArrayList<Node> way) {
         this.way = way;
     }
 
-    
-
- 
-    
-    
-    
 }

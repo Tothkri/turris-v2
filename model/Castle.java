@@ -10,8 +10,9 @@ public class Castle extends Sprite{
 
     public Castle(int x, int y, int height, int width, Image img, int hp) {
         super(x, y, height, width, img);
-        this.hp=hp;
+        this.hp = hp;
     }
+    public Castle(){super(); hp = 500;}
 
     public int getHp() {
         return hp;
