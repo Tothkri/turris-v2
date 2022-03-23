@@ -47,16 +47,30 @@ public class GameWindow extends JPanel implements ActionListener {
         super();
     }
     
+    /**
+    * új board létrehozása
+    * @param width
+    * @param height
+    * @param p1Name
+    * @param p2Name
+    * @param selectedMap
+    */
     public GameWindow(int width, int height, String p1Name, String p2Name, int selectedMap) {
         super();
         board = new Board(selectedMap, p1Name, p2Name, width, height);
         board.getModel().setRound(1);
+
         //players have 50% chance to start the game
         Random rand = new Random();
         board.getModel().setActivePlayer(rand.nextInt(2));
         constructor(width,height);
     }
     
+    /**
+    * játéktér konstruktora
+    * @param width
+    * @param height
+    */
     public void constructor(int width, int height){
         buttonAction = "";
         int time = (int) System.currentTimeMillis();
@@ -160,8 +174,11 @@ public class GameWindow extends JPanel implements ActionListener {
             board.getModel().setSelectableTowers();
         });
 
-        board.addMouseListener(new MouseAdapter() // after selecting tower type, players must click where they want to place it
-        {
+        /**
+        * torony típusának kiválasztását követően a felhasználónak
+        * ki kell választania a játéktéren, hogy hova akarja lehelyezni
+        */
+        board.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int x = e.getX() / (board.getModel().getSize() / 30);
@@ -182,7 +199,6 @@ public class GameWindow extends JPanel implements ActionListener {
                 }
                 board.repaint();
                 playerDataUpdate();
-
             }
         });
 
@@ -199,29 +215,20 @@ public class GameWindow extends JPanel implements ActionListener {
             }
 
         });
-
-        //this.add(timeLabel);
         timer.start();
         
         activePlayerPanelSetter();
     }
 
+    /**
+    * játéktérre lehelyezett egységek és tornyok közötti harc leszimulálása
+    */
     public void simulation() {
         for (int q = 0; q < 2; q++) {
             for (Unit u : board.getModel().getPlayers()[q].getUnits()) {
                 ArrayList<Node> way = u.getWay();
                 for (int i = 0; i < u.getDistance() && !way.isEmpty(); i++) {
                     Node next = way.get(0);
-                    /*while(u.getX()!=next.getX()*(board.getModel().getSize()/30)
-                        &&u.getY()!=next.getY()*(board.getModel().getSize()/30)){
-                    int dirX=u.getX()<next.getX()*(board.getModel().getSize()/30) ? 1:
-                            u.getX()==next.getX()*(board.getModel().getSize()/30) ? 0: -1;
-                    int dirY=u.getY()<next.getY()*(board.getModel().getSize()/30) ? 1:
-                            u.getY()==next.getY()*(board.getModel().getSize()/30) ? 0: -1;
-                    u.setX(u.getX()+dirX);
-                    u.setY(u.getY()+dirY);
-                }
-                     */
 
                     u.setX(next.getX() * (board.getModel().getSize() / 30));
                     u.setY(next.getY() * (board.getModel().getSize() / 30));
@@ -232,9 +239,8 @@ public class GameWindow extends JPanel implements ActionListener {
                     board.repaint();
                     startAnimation();
                 }
-
-                //u.setWay(board.getModel().getPlayers()[q].findWay());
             }
+
             for (int i = 0; i < board.getModel().getPlayers()[q].getUnits().size(); i++) {
                 ArrayList<Node> way = board.getModel().getPlayers()[q].getUnits().get(i).getWay();
                 if (way.isEmpty()) {
@@ -252,7 +258,6 @@ public class GameWindow extends JPanel implements ActionListener {
                     --i;
                 }
             }
-
             //remove units who reached Castle after dealing damage to it
         }
 
@@ -260,7 +265,7 @@ public class GameWindow extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        // your coded here
+        // your code here
     }
 
     public void startAnimation() {
@@ -276,20 +281,23 @@ public class GameWindow extends JPanel implements ActionListener {
     private void timerActionPerformed(ActionEvent e) {
         // TODO repeated code goes here
     }
+
     public Board getBoard(){
         return board;
     }
+
     public void towerPlaceAction(String sc) {
         selectedTower = sc;
         buttonAction = "placeTower";
         board.getModel().setSelectables();
     }
 
-    /*
-    now it's the other player's round
-    both players get 100 coins
-    after every 2 rounds, the simulation starts
-     */
+    /**
+    * ez a metódus vált a játékosok között a körök végén
+    * minden kör végén mindkét játékos kap 100-100 coint
+    * minden kör végén (vagyis amikor már egyik és másik játékos is lehelyezte a ltornyait és egyégeit)
+    * lefut a csatának a szimulációja
+    */
     public void newRound() {
         Model model = board.getModel();
         model.setSelectables(new ArrayList<>());
@@ -328,6 +336,7 @@ public class GameWindow extends JPanel implements ActionListener {
                 }
             }
         }
+
         ArrayList<Tower> p1Towers = board.getModel().getPlayers()[0].getTowers();
         for(int i = p1Towers.size() - 1; i >= 0;i--){
             if(p1Towers.get(i).getDemolishedIn() != -1){
@@ -339,11 +348,12 @@ public class GameWindow extends JPanel implements ActionListener {
                 }
             }
         }
+
         board.getModel().getPlayers()[0].setTowers(p1Towers);
         ArrayList<Tower> p2Towers = board.getModel().getPlayers()[1].getTowers();
         for(int i = p2Towers.size() - 1; i >= 0;i--){
             if(p2Towers.get(i).getDemolishedIn() != -1){
-                p2Towers.get(i).setDemolishedIn(1);//demolishedIn - 1
+                p2Towers.get(i).setDemolishedIn(1); //demolishedIn - 1
                 if(p2Towers.get(i).getDemolishedIn() == 0){
                     board.getModel().getTerrain().remove(p2Towers.get(i));
                     board.getModel().getPosition()[(p2Towers.get(i).getX() / 30)][(p2Towers.get(i).getY() / 30)] = 'F';
@@ -354,12 +364,18 @@ public class GameWindow extends JPanel implements ActionListener {
         board.getModel().getPlayers()[1].setTowers(p2Towers);
     }
 
+    /**
+    * játék vége
+    */
     public void gameOver() {
         JOptionPane.showInputDialog(
                 winner + " won, congratulations!");
         System.exit(0);
     }
 
+    /**
+    * játék mentése
+    */
     public void saveGame() {
         String filename;
     
@@ -370,10 +386,10 @@ public class GameWindow extends JPanel implements ActionListener {
 
     }
 
+    /**
+    * az egységek és tornyok lehelyezésére használt UI
+    */
     public final void setPanels() {
-        /*this.add(exitButton);
-        this.add(saveButton);
-         */
         JPanel p1Panel = new JPanel();
         JPanel p2Panel = new JPanel();
         p1Data = new JLabel();
@@ -460,6 +476,10 @@ public class GameWindow extends JPanel implements ActionListener {
         this.add(rounds, gbc);
     }
 
+    /**
+    * vált az egyik és másik játékos UI-ja között, hogy melyik aktív
+    * függően attól, hogy melyikőjük köre van jelenleg
+    */
     public final void activePlayerPanelSetter() {
         if (board.getModel().getActivePlayer() == 0) {
             for (var button : p2TowerButtons) {
@@ -490,6 +510,9 @@ public class GameWindow extends JPanel implements ActionListener {
         }
     }
 
+    /**
+    * játékosok adatainak frissítése a felhasználói felületen
+    */
     public void playerDataUpdate() {
         Player p1 = board.getModel().getPlayers()[0];
         Player p2 = board.getModel().getPlayers()[1];
@@ -511,9 +534,14 @@ public class GameWindow extends JPanel implements ActionListener {
                 + "</html>"
         );
     }
+
+    /**
+    * Getterek, setterek
+    */
     public void setBoard(Board bd){
         board = bd;
     }
+
     public JLabel getRounds(){
         return rounds;
     }
