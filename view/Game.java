@@ -43,10 +43,18 @@ public class Game {
             if (!ss.isCorrect()) {
                 return;
             }
-
             gw = new GameWindow(width, height, ss.getP1Name().getText(), ss.getP2Name().getText(), ss.getSelectedRadioButton());
             container.add(gw, "2");
             cardLayout.show(container, "2");
+        });
+        ss.getLoadButton().addActionListener(ae ->{
+            gw = new GameWindow();
+            ss.loadGame(gw);
+            gw.constructor(width,height);
+            container.add(gw,"2");
+            cardLayout.show(container, "2");
+            gw.playerDataUpdate();
+            gw.getRounds().setText("Round: " + gw.getBoard().getModel().getRound());
         });
 
         frame.setResizable(false);

@@ -20,7 +20,11 @@ public class Board extends JPanel {
         this.width = width;
         this.height = height;
     }
-
+    public Board(int width, int height){
+        this.width = width;
+        this.height = height;
+        this.setPreferredSize(new Dimension(height - 150, height - 150));
+    }
     public Model getModel() {
         return model;
     }
@@ -37,13 +41,28 @@ public class Board extends JPanel {
         Graphics2D g2 = (Graphics2D) grphcs;
         grphcs.drawImage(new ImageIcon("src/res/Background.png").getImage(), 0, 0, height - 150, height - 150, null);
         ArrayList<Sprite> terrain = model.getTerrain();
+
+        ArrayList<Unit> p1units = model.getPlayers()[0].getUnits();
+        ArrayList<Unit> p2units = model.getPlayers()[1].getUnits();
         ArrayList<Sprite> selectables = model.getSelectables();
         for (Sprite s : terrain) {
             s.draw(g2);
         }
-        if(!selectables.isEmpty())
-            for(Sprite s : selectables){
+        if (!selectables.isEmpty()) {
+            for (Sprite s : selectables) {
                 s.draw(g2);
             }
+        }
+        if (!p1units.isEmpty()) {
+            for (Unit u : p1units) {
+                u.draw(g2);
+            }
+        }
+
+        if (!p2units.isEmpty()) {
+            for (Unit u : p2units) {
+                u.draw(g2);
+            }
+        }
     }
 }
