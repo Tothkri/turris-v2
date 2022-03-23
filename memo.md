@@ -21,7 +21,7 @@ Ki mit csinált:
     
 3. hét (03.16 - 03.23)
 
-    Tóth Kristóf (SONXZF): Út nehézség kialakítása és legjobb út számítása, egyéb mechanikák
+    Tóth Kristóf (SONXZF): Út nehézség kialakítása és legjobb út számítása, tornyok nem zárhatják el az utat
 
     Tóth Kristóf (YPENKF): Load & Save game, torony rombolás/fejlesztés, elérhető rombolható/fejleszthető tornyok jelőlése
     
