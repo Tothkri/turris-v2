@@ -36,8 +36,8 @@ public class Game {
         container.add(ss, "1");
 
         /**
-         * Checks if the player names are correct: They are not the same 
-         * They cannot be empty
+         * megnézi, hogy helyesek-e a felhasználók által beírt nevek 
+         * a textboxok nem maradhatnak üresen
          */
         ss.getStartButton().addActionListener((ActionEvent ae) -> {
             if (!ss.isCorrect()) {
@@ -47,6 +47,10 @@ public class Game {
             container.add(gw, "2");
             cardLayout.show(container, "2");
         });
+
+        /**
+         * mentett játék betöltésére használt gomb
+         */
         ss.getLoadButton().addActionListener(ae ->{
             gw = new GameWindow();
             ss.loadGame(gw);
