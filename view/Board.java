@@ -14,17 +14,35 @@ public class Board extends JPanel {
     private final int width;
     private final int height;
 
+    /**
+    * board kapott paraméterek szerinti beállítása
+    * @param selectedMap
+    * @param p1Name
+    * @param p2Name
+    * @param width
+    * @param height
+    */
     public Board(int selectedMap, String p1Name, String p2Name, int width, int height) {
         model = new Model(selectedMap, p1Name, p2Name, height - 150);
         this.setPreferredSize(new Dimension(height - 150, height - 150));
         this.width = width;
         this.height = height;
     }
+
+    /**
+    * board méretének beállítása
+    * @param width
+    * @param height
+    */
     public Board(int width, int height){
         this.width = width;
         this.height = height;
         this.setPreferredSize(new Dimension(height - 150, height - 150));
     }
+
+    /**
+    * Getterek, setterek
+    */
     public Model getModel() {
         return model;
     }
@@ -33,9 +51,11 @@ public class Board extends JPanel {
         model = m;
     }
 
+    /**
+    * Sprite-ok kirajzolása a játékteren
+    */
     @Override
     protected void paintComponent(Graphics grphcs) {
-
         //painting the whole board
         super.paintComponent(grphcs);
         Graphics2D g2 = (Graphics2D) grphcs;
@@ -48,11 +68,13 @@ public class Board extends JPanel {
         for (Sprite s : terrain) {
             s.draw(g2);
         }
+
         if (!selectables.isEmpty()) {
             for (Sprite s : selectables) {
                 s.draw(g2);
             }
         }
+
         if (!p1units.isEmpty()) {
             for (Unit u : p1units) {
                 u.draw(g2);
