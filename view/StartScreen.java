@@ -48,6 +48,12 @@ public class StartScreen extends JPanel {
     private final Image Tower = new ImageIcon("src/res/Tower.png").getImage();
     private final Image Castle = new ImageIcon("src/res/Castle.png").getImage();
 
+    /**
+    * Játék kezdőképernyője
+    * @param width
+    * @param height
+    * @return
+    */
     public StartScreen(int width, int height) {
         super();
         this.width = width;
@@ -62,17 +68,25 @@ public class StartScreen extends JPanel {
         setPanels();
     }
     
+
+    /**
+    * Játék betöltése
+    * @param gw
+    * @return
+    */
     public void loadGame(GameWindow gw){
         File userDir = new File(System.getProperty("user.dir"));
         File[] allfile = userDir.listFiles();
         String fileName = "";
         int size = height - 150;
         Model model = new Model(size);
+
         for (int i = 0; i < allfile.length; i++) {
             if(allfile[i].getName().contains("txt")){
                 fileName = allfile[i].getName();
             }
         }
+
         try{
             File myObj = new File(fileName);
             Scanner myReader = new Scanner(myObj);
@@ -91,23 +105,34 @@ public class StartScreen extends JPanel {
                     if(castleCount == 3){
                         c1 = new Castle(j * (size / 30), 2 * (size / 30), (size / 15), (size / 15), Castle, 300);
                     }
+
                     if(castleCount == 7){
                         c2 = new Castle(j * (size / 30), 26 * (size / 30), (size / 15), (size / 15), Castle, 300);
                     }
+
                     if(data.charAt(j) == 'F'){
                         model.getPosition()[j][i] = 'F';
-                    }else if(data.charAt(j) == 'M'){
+                    } else if(data.charAt(j) == 'M') {
                         model.getPosition()[j][i] = 'M';
                         model.addTerrainElement(new Mountain(j * (size / 30), i * (size / 30), (size / 30), (size / 30), Mountain));
-                    }else if(data.charAt(j) == 'L'){
+                    } else if(data.charAt(j) == 'L') {
                         model.getPosition()[j][i] = 'L';
                         model.addTerrainElement(new Lake(j * (size / 30), i * (size / 30), (size / 30), (size / 30), Lake));
-                    }else if(data.charAt(j) == 'T'){
+                    } else if(data.charAt(j) == 'T') {
                         model.getPosition()[j][i] = 'T';
                     }
                 }
             }
-            //active,selmap, playername money, castles, fields, round
+
+            /**
+            * Térkép kiválasztása
+            * kezdő játékos kiválasztása
+            * játékosok neveinek beállítása
+            * játékosok pénzeinek kiosztása
+            * kastélyok lehelyezése
+            * terepakadályok lehelyezése
+            * jelenlegi kör beállítása
+            */
             model.setMap(Integer.parseInt(myReader.nextLine()));
             model.setActivePlayer(Integer.parseInt(myReader.nextLine()));
             model.setRound(Integer.parseInt(myReader.nextLine()));
@@ -140,7 +165,7 @@ public class StartScreen extends JPanel {
                         
                         model.getPlayers()[0].addTower(f);
                         model.addTerrainElement(f);
-                    }else if(arr[5].equals("Rapid")){
+                    } else if(arr[5].equals("Rapid")) {
                         String png = "Tower";
                         
                         if(!arr[11].equals("-1")) png = "destroyed";
@@ -153,7 +178,7 @@ public class StartScreen extends JPanel {
                         
                         model.getPlayers()[0].addTower(f);
                         model.addTerrainElement(f);
-                    }else if(arr[5].equals("Sniper")){
+                    } else if(arr[5].equals("Sniper")) {
                         String png = "Tower";
                         
                         if(!arr[11].equals("-1")) png = "destroyed";
@@ -233,6 +258,9 @@ public class StartScreen extends JPanel {
         }
     }
 
+    /**
+    * Játék kezdőoldalának vizuális beállítása
+    */
     public void setPanels() {
 
         this.setPreferredSize(new Dimension(width, height));
@@ -261,16 +289,19 @@ public class StartScreen extends JPanel {
         p2NameRow.setLayout(new FlowLayout());
         
         
-        //Colors
+        /**
+        * játék oldalán használt színek
+        */
         Color hunterGreen   = new Color(63, 122, 77);
         Color algaeGreen    = new Color(105, 168, 120);
         Color veryLightGray = new Color(220, 220, 220);
         
         this.setBackground(algaeGreen);
-        ////////////////////////////////////////////////////////////////////////
         
-        
-        //Game Name panel
+
+        /**
+        * Game Name panel
+        */
         gameNameRow.add(gameName);
         gameNameRow.setBorder(new EmptyBorder(30, 10, 10, 10));
         gameNameRow.setBackground(Color.LIGHT_GRAY);
@@ -282,10 +313,11 @@ public class StartScreen extends JPanel {
         gbc.gridy = 0;
         
         this.add(gameNameRow, gbc);
-        ////////////////////////////////////////////////////////////////////////
         
-        
-        //Player Name
+
+        /**
+        * Player Name
+        */
         playerNames.setFont             (new Font("Calibri", Font.PLAIN, 70));
         
         playerNamesRow.add(playerNames);
@@ -297,10 +329,11 @@ public class StartScreen extends JPanel {
         gbc.gridx = 0;
         gbc.gridy = 1;
         this.add(playerNamesRow, gbc);
-        ////////////////////////////////////////////////////////////////////////
         
         
-        //P1 name input
+        /**
+        * Player1 name input
+        */
         p1NameLabel.setFont             (new Font("Calibri", Font.PLAIN, 50));
         
         p1NameRow.add(p1NameLabel);
@@ -316,10 +349,11 @@ public class StartScreen extends JPanel {
         gbc.gridx = 0;
         gbc.gridy = 2;
         this.add(p1NameRow, gbc);
-        ////////////////////////////////////////////////////////////////////////
         
         
-        //P2 name input
+        /**
+        * Player2 name input
+        */
         p2NameLabel.setFont             (new Font("Calibri", Font.PLAIN, 50));
         
         p2NameRow.add(p2NameLabel);
@@ -335,10 +369,11 @@ public class StartScreen extends JPanel {
         gbc.gridx = 0;
         gbc.gridy = 3;
         this.add(p2NameRow, gbc);
-        ////////////////////////////////////////////////////////////////////////
         
         
-        //Map label
+        /**
+        * Map label
+        */
         pickMap.setFont                     (new Font("Calibri", Font.PLAIN, 70));
         
         pickMapLabelRow.add(pickMap);
@@ -350,10 +385,11 @@ public class StartScreen extends JPanel {
         gbc.gridx = 0;
         gbc.gridy = 4;
         this.add(pickMapLabelRow, gbc);
-        ////////////////////////////////////////////////////////////////////////
         
 
-        //Map selection
+        /**
+        * Map selection
+        */
         ButtonGroup group = new ButtonGroup();
         map1.setSelected(true);
         
@@ -361,7 +397,9 @@ public class StartScreen extends JPanel {
         group.add(map2);
         group.add(map3);
         
-        //Map 1
+        /**
+        * Map 1
+        */
         map1.setFont               (new Font("Calibri", Font.PLAIN, 50));
         map1.setPreferredSize      (new Dimension(700, 80));
         map1.setBorder             (new EmptyBorder(20, 40, 0, 0));
@@ -372,7 +410,9 @@ public class StartScreen extends JPanel {
         gbc.gridy = 5;
         this.add(map1, gbc);
 
-        //Map 2
+        /**
+        * Map 2
+        */
         map2.setFont               (new Font("Calibri", Font.PLAIN, 50));
         map2.setPreferredSize      (new Dimension(700, 80));
         map2.setBorder             (new EmptyBorder(20, 40, 0, 0));
@@ -383,7 +423,9 @@ public class StartScreen extends JPanel {
         gbc.gridy = 6;
         this.add(map2, gbc);
 
-        //Map 3
+        /**
+        * Map 3
+        */
         map3.setFont               (new Font("Calibri", Font.PLAIN, 50));
         map3.setPreferredSize      (new Dimension(700, 80));
         map3.setBorder             (new EmptyBorder(20, 40, 0, 0));
@@ -393,10 +435,11 @@ public class StartScreen extends JPanel {
         gbc.gridx = 0;
         gbc.gridy = 7;
         this.add(map3, gbc);
-        ////////////////////////////////////////////////////////////////////////
 
         
-        //Load game 
+        /**
+        * Load game
+        */
         loadGameLabel.setFont                  (new Font("Calibri", Font.PLAIN, 70));
         
         loadGameLabelRow.setPreferredSize      (new Dimension(700, 100));
@@ -408,10 +451,11 @@ public class StartScreen extends JPanel {
         gbc.gridx = 0;
         gbc.gridy = 8;
         this.add(loadGameLabelRow, gbc);
-        ////////////////////////////////////////////////////////////////////////
         
 
-        //Load game button
+        /**
+        * Load game button
+        */
         loadButton.setFont                  (new Font("Calibri", Font.PLAIN, 35));
         loadButton.setPreferredSize         (new Dimension(400, 55));
         loadButton.setBorder                (new EmptyBorder(13, 0, 0, 0));
@@ -425,10 +469,11 @@ public class StartScreen extends JPanel {
         gbc.gridx = 0;
         gbc.gridy = 9;
         this.add(loadGameButtonRow, gbc);
-        ////////////////////////////////////////////////////////////////////////
         
         
-        //Start button label
+        /**
+        * Start button label
+        */
         startGameLabel.setFont                  (new Font("Calibri", Font.PLAIN, 70));
         
         startGameLabelRow.setPreferredSize      (new Dimension(700, 100));
@@ -440,10 +485,11 @@ public class StartScreen extends JPanel {
         gbc.gridx = 1;
         gbc.gridy = 8;
         this.add(startGameLabelRow, gbc);
-        ////////////////////////////////////////////////////////////////////////
         
         
-        //Start Button
+        /**
+        * Start button
+        */
         startButton.setFont                     (new Font("Calibri", Font.PLAIN, 35));
         startButton.setPreferredSize            (new Dimension(400, 55));
         startButton.setBorder                   (new EmptyBorder(13, 0, 0, 0));
@@ -457,12 +503,12 @@ public class StartScreen extends JPanel {
         gbc.gridx = 1;
         gbc.gridy = 9;
         this.add(startGameButtonRow, gbc);
-        ////////////////////////////////////////////////////////////////////////
     }
+
 
     /**
      * Checks if the names are correct or not
-     *
+     * @param
      * @return correct or not
      */
     public boolean isCorrect() {
@@ -474,6 +520,7 @@ public class StartScreen extends JPanel {
         } else {
             p1Name.setBackground(Color.white);
         }
+
         if (p2Name.getText().equals("")) {
             p2Name.setBackground(Color.red);
             p2Name.setText("");
@@ -489,6 +536,10 @@ public class StartScreen extends JPanel {
         return f;
     }
 
+
+    /**
+     * Getterek, setterek
+     */
     public JButton getStartButton() {
         return startButton;
     }
@@ -504,6 +555,10 @@ public class StartScreen extends JPanel {
         return p2Name;
     }
 
+
+    /**
+     * Rádiógombok beállítása
+     */
     public int getSelectedRadioButton() {
         if (map1.isSelected()) {
             return 1;
