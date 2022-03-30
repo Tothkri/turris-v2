@@ -7,5 +7,12 @@ public class Fortified extends Tower{
     public Fortified(String type, int power, int range, double attack_speed, 
             int hp, int price, int x, int y, int height, int width, Image img) {
         super(type, power, range, attack_speed, hp, price, x, y, height, width, img);
-    } 
+    }
+    public void upgrade(){
+        level++;
+        if(level == 2){
+            hp += 30;
+        }else
+            hp += 45;
+    }
 }
