@@ -273,7 +273,7 @@ public class Model {
                 if (players[i].getTowers() != null) {
                     for (Tower t : players[i].getTowers()) {
                         writer.write("T " + t.x + " " + t.y + " " + t.width + " " + t.height + " " + t.getType() + " "
-                                + t.getPower() + " " + t.getRange() + " " + t.getAttack_speed() + " " + t.getHp() + " " + t.getPrice() + " " + t.getDemolishedIn());
+                                + t.getPower() + " " + t.getRange() + " " + t.getAttack_speed() + " " + t.getHp() + " " + t.getPrice() + " " + t.getDemolishedIn() + " " + t.getLevel());
                         writer.write(System.getProperty("line.separator"));
                     }
                 }
@@ -376,7 +376,7 @@ public class Model {
         
         ArrayList<Tower> enemyTowers=players[(actPlayer+1)%2].getTowers();
         
-        System.out.println("enemy towers: "+enemyTowers.toString());
+        //System.out.println("enemy towers: "+enemyTowers.toString());
         
         if(enemyTowers.size()>0){
             for(Tower t : enemyTowers){

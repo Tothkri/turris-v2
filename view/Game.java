@@ -2,8 +2,10 @@ package view;
 
 import java.awt.CardLayout;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JOptionPane;
 
 public class Game {
 
@@ -53,12 +55,16 @@ public class Game {
          */
         ss.getLoadButton().addActionListener(ae ->{
             gw = new GameWindow();
-            ss.loadGame(gw);
+            try{
+                ss.loadGame(gw);
+            }catch(IOException e){
+                JOptionPane.showMessageDialog(null, "No saved games found!", "Warning", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
             gw.constructor(width,height);
             container.add(gw,"2");
             cardLayout.show(container, "2");
             gw.playerDataUpdate();
-            gw.getRounds().setText("Round: " + gw.getBoard().getModel().getRound());
         });
 
         frame.setResizable(false);

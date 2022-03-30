@@ -15,8 +15,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -47,14 +45,15 @@ public class GameWindow extends JPanel implements ActionListener {
     private JButton[] p2UnitButtons;
     private JLabel p1Data;
     private JLabel p2Data;
-    //private JLabel rounds;
-    //private JLabel timeLabel = new JLabel();
     private JLabel timeAndRoundLabel = new JLabel();
     private JLabel activePlayerLabel = new JLabel();
     private String selectedTower;
     private String buttonAction;
     private int ticks;
     private String winner = "";
+    private int FPS = 60;
+    private boolean simulationTime = false;
+    private ArrayList<Integer> distances;
 
     public GameWindow() {
         super();
@@ -73,6 +72,7 @@ public class GameWindow extends JPanel implements ActionListener {
     public void constructor(int width, int height) {
         buttonAction = "";
         setSize(width, height);
+        distances = new ArrayList<>();
         this.setPreferredSize(new Dimension(width, height));
         exitButton = new JButton("Exit game");
         exitButton.addActionListener((event) -> System.exit(0));
@@ -248,6 +248,33 @@ public class GameWindow extends JPanel implements ActionListener {
                 ToolTipManager.sharedInstance().setEnabled(false);
             }
 
+            if(simulationTime){
+                simulationTime = simulation();
+            }else{
+                distances.clear();
+                for (int q = 0; q < 2; q++) {
+                    int defender = Math.abs(q * 4 - 4);
+                    Model model = board.getModel();
+                    for (Unit u : model.getPlayers()[q].getUnits()) {
+                        distances.add(u.getDistance());
+                        int minDistance = 10000;
+                        ArrayList<Node> bestway = new ArrayList<>();
+
+                        for (int i = 0; i < 4; i++) {
+                            ArrayList<String> wayString = model.getPlayers()[q].findWay(u.getX() / (model.getSize() / 30), u.getY() / (model.getSize() / 30),
+                                    model.getCastleCoordinates()[i + defender][0], model.getCastleCoordinates()[i + defender][1], model.getPlayers()[q].getDifficulty(model, u.getType()));
+
+                            if (minDistance > board.getModel().wayDiff(q, wayString, u.getType())) {
+                                ArrayList<Node> newWay = board.getModel().getPlayers()[q].convertWay(wayString);
+                                minDistance = board.getModel().wayDiff(q, wayString, u.getType());
+                                bestway = newWay;
+                            }
+                        }
+                        u.setWay(bestway);
+                    }
+                }
+            }
+
             ticks--;
             if (!board.getModel().isOver()) {
                 int newtime = (ticks + 1) / 2;
@@ -256,7 +283,7 @@ public class GameWindow extends JPanel implements ActionListener {
                 } else {
                     //timeSec = (int) (System.currentTimeMillis() - time) / 1000;
                     //timeLabel.setText("Time " + timeSec + " s,");
-                    timeAndRoundLabel.setText("Time left: " + newtime + " s, round: " + board.getModel().getRound());
+                    timeAndRoundLabel.setText("Time left: " + (ticks + 1) / 2 + " s, round: " + (board.getModel().getRound() + 1)/ 2);
                     activePlayerLabel.setText("Active player: "
                             + board.getModel().getPlayers()[board.getModel().getActivePlayer()].getName());
                 }
@@ -278,61 +305,57 @@ public class GameWindow extends JPanel implements ActionListener {
         return ticks;
     }
 
-    public void simulation() {
+    public boolean simulation() {
+        boolean moreDistance = false;
         for (int q = 0; q < 2; q++) {
             if (board.getModel().getPlayers()[q].getUnits().size() != 0) {
                 ArrayList<Unit> units=board.getModel().getPlayers()[q].getUnits();
                 for (int i = 0; i < units.size(); i++) {
+                    if(distances.get(i) < 0) continue;
+
                     ArrayList<Node> way = units.get(i).getWay();
-                    for (int j = 0; j < units.get(i).getDistance() && !way.isEmpty(); j++) {
-                        Node next = way.get(0);
-                        /*while(u.getX()!=next.getX()*(board.getModel().getSize()/30)
-                        &&u.getY()!=next.getY()*(board.getModel().getSize()/30)){
-                    int dirX=u.getX()<next.getX()*(board.getModel().getSize()/30) ? 1:
-                            u.getX()==next.getX()*(board.getModel().getSize()/30) ? 0: -1;
-                    int dirY=u.getY()<next.getY()*(board.getModel().getSize()/30) ? 1:
-                            u.getY()==next.getY()*(board.getModel().getSize()/30) ? 0: -1;
-                    u.setX(u.getX()+dirX);
-                    u.setY(u.getY()+dirY);
-                }
-                         */
+                    Node next = way.get(0);
 
-                        units.get(i).setX(next.getX() * (board.getModel().getSize() / 30));
-                        units.get(i).setY(next.getY() * (board.getModel().getSize() / 30));
-                         board.repaint();
+                    units.get(i).setX(next.getX() * (board.getModel().getSize() / 30));
+                    units.get(i).setY(next.getY() * (board.getModel().getSize() / 30));
+                    board.repaint();
 
-                        way.remove(0);
-                    }
-                        ArrayList<Tower> towersNearby = board.getModel().towersNearby(q, units.get(i));
-                        System.out.println(towersNearby.toString());
-                        ArrayList<Tower> newEnemyTowerList = new ArrayList<>();
+                    way.remove(0);
 
-                        if (units.get(i).getType() == "Destroyer" && towersNearby.size() > 0) {
-                            int rand = (int) (Math.random() * 2);
-                            if (rand == 1) //destroyer attacks neraby towers (direct next to it) with full power, then disappears
-                            {
-                                //destroyer deals 50 damage when attacking towers
-                                for (Tower t : board.getModel().getPlayers()[(q + 1) % 2].getTowers()) {
-                                    if (t.getHp() > 50) {
-                                        t.setHp(t.getHp() - 50);
-                                        newEnemyTowerList.add(t);
-                                    }
-                                    //adding towers to a temprary list, this list will be the new tower list of enemy player
+                    distances.set(i,distances.get(i) - 1);
+                    if(distances.get(i) >= 0) moreDistance = true;
 
+
+                    ArrayList<Tower> towersNearby = board.getModel().towersNearby(q, units.get(i));
+                    //System.out.println(towersNearby.toString());
+                    ArrayList<Tower> newEnemyTowerList = new ArrayList<>();
+
+                    if (units.get(i).getType() == "Destroyer" && towersNearby.size() > 0) {
+                        int rand = (int) (Math.random() * 2);
+                        if (rand == 1) //destroyer attacks neraby towers (direct next to it) with full power, then disappears
+                        {
+                            //destroyer deals 50 damage when attacking towers
+                            for (Tower t : board.getModel().getPlayers()[(q + 1) % 2].getTowers()) {
+                                if (t.getHp() > 50) {
+                                    t.setHp(t.getHp() - 50);
+                                    newEnemyTowerList.add(t);
                                 }
-                                System.out.println(newEnemyTowerList.toString());
-                                board.getModel().getPlayers()[(q + 1) % 2].setTowers(newEnemyTowerList);
-                                board.getModel().getPlayers()[q].deleteUnit(units.get(i));
-                                if(i>0) {--i;}
+                                //adding towers to a temprary list, this list will be the new tower list of enemy player
 
                             }
-                        }
-                       
+                           // System.out.println(newEnemyTowerList.toString());
+                            board.getModel().getPlayers()[(q + 1) % 2].setTowers(newEnemyTowerList);
+                            board.getModel().getPlayers()[q].deleteUnit(units.get(i));
+                            if(i>0) {--i;}
 
-                        board.repaint();
-                        startAnimation();
+                        }
                     }
-                
+
+
+                    board.repaint();
+                    startAnimation();
+                }
+
                 //u.setWay(board.getModel().getPlayers()[q].findWay());
             }
             for (int i = 0; i < board.getModel().getPlayers()[q].getUnits().size(); i++) {
@@ -342,7 +365,7 @@ public class GameWindow extends JPanel implements ActionListener {
                             - board.getModel().getPlayers()[q].getUnits().get(i).getPower() > 0) {
                         board.getModel().getPlayers()[Math.abs(q - 1)].getCastle().setHp(
                                 board.getModel().getPlayers()[Math.abs(q - 1)].getCastle().getHp()
-                                - board.getModel().getPlayers()[q].getUnits().get(i).getPower());
+                                        - board.getModel().getPlayers()[q].getUnits().get(i).getPower());
                         board.repaint();
                         playerDataUpdate();
                     } else {
@@ -355,7 +378,7 @@ public class GameWindow extends JPanel implements ActionListener {
 
             //remove units who reached Castle after dealing damage to it
         }
-
+        return moreDistance;
     }
 
     @Override
@@ -397,22 +420,23 @@ public class GameWindow extends JPanel implements ActionListener {
         Model model = board.getModel();
         model.setSelectables(new ArrayList<>());
         model.setRound(model.getRound() + 1);
+
         if (model.getRound() == 1 || model.getRound() == 2) {
             ticks = 120;
         } else {
-            ticks = 60;
+            ticks = 120;
         }
         //rounds.setText("Round: " + model.getRound());
-        timeAndRoundLabel.setText("Time left: " + (ticks + 1) / 2 + " s, round: " + board.getModel().getRound());
+        //timeAndRoundLabel.setText("Time left: " + (ticks + 1) / 2 + " s, round: " + (board.getModel().getRound() + 1)/ 2);
 
         model.setActivePlayer((1 + model.getActivePlayer()) % 2);
         playerDataUpdate();
         activePlayerPanelSetter();
         if (model.getRound() % 2 == 1) {
+            simulationTime = true;
             model.getPlayers()[0].setMoney(model.getPlayers()[0].getMoney() + 100);
             model.getPlayers()[1].setMoney(model.getPlayers()[1].getMoney() + 100);
             playerDataUpdate();
-            simulation();
 
             for (int q = 0; q < 2; q++) {
 
@@ -436,6 +460,7 @@ public class GameWindow extends JPanel implements ActionListener {
                     //System.out.println(bestway);
                 }
             }
+            //simulation();
         }
         ArrayList<Tower> p1Towers = board.getModel().getPlayers()[0].getTowers();
         for (int i = p1Towers.size() - 1; i >= 0; i--) {
@@ -631,5 +656,4 @@ public class GameWindow extends JPanel implements ActionListener {
     public JLabel getTimeAndRoundLabel() {
         return timeAndRoundLabel;
     }
-
 }

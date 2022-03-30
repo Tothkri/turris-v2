@@ -105,11 +105,38 @@ public class Player {
     public void upgrade(int x, int y, int size) {
         x *= (size / 30);
         y *= (size / 30);
-        money -= 100;//will change
+        boolean canUpgrade = false;
         for (var t : towers) {
             if (t.getX() == x && t.getY() == y) {
-                t.upgrade();
+
+                switch(t.getType()){
+                    case "Fortified": canUpgrade = enoughMoney(t.getLevel(),350,500);
+                    break;
+                    case "Sniper": canUpgrade = enoughMoney(t.getLevel(),500,800);
+                    break;
+                    case "Rapid": canUpgrade = enoughMoney(t.getLevel(),400,600);
+                    break;
+                    default:break;
+                }
+                if(canUpgrade)
+                    t.upgrade();
             }
+        }
+    }
+
+    public boolean enoughMoney(int currLvl ,int lvl2, int lvl3){
+        if(currLvl == 1){
+            if(money - lvl2 >= 0){
+                money -= lvl2;
+                return true;
+            }
+            else return false;
+        }else{
+            if(money - lvl3 >= 0){
+                money -= lvl3;
+                return true;
+            }
+            else return false;
         }
     }
 
@@ -234,6 +261,28 @@ public class Player {
 
     }
 
+    public Model calculateWay(Model model){
+        int minDistance = 10000;
+        ArrayList<Node> bestWay = new ArrayList<>();
+        int attacker = model.getActivePlayer() * 4;
+        int defender = Math.abs(model.getActivePlayer() * 4 - 4);
+        for(Unit u : units){
+            for (int j = 0; j < 4; j++) {
+                for (int k = 0; k < 4; k++) {
+                    ArrayList<String> wayString = findWay(model.getCastleCoordinates()[j + attacker][0], model.getCastleCoordinates()[j + attacker][1],
+                            model.getCastleCoordinates()[k + defender][0], model.getCastleCoordinates()[k + defender][1], difficulty);
+                    ArrayList<Node> nodeWay = convertWay(wayString);
+                    if (model.wayDiff(model.getActivePlayer(), wayString, u.getType()) < minDistance) {
+                        bestWay = nodeWay;
+                        minDistance = model.wayDiff(model.getActivePlayer(), wayString, u.getType());
+                    }
+                }
+            }
+            u.setWay(bestWay);
+        }
+        return model;
+    }
+
     public ArrayList<String> findWay(int fromX, int fromY, int toX, int toY, int difficulty[][]) /* 
             stores the best way as String from the home castle to the enemy castle
             step to step as (x, y) pairs
@@ -242,7 +291,6 @@ public class Player {
      */ {
 
         ArrayList<String> bestway = new ArrayList<>();
-
         int currentX = fromX;
         int currentY = fromY;
         //begin from own castle
@@ -428,6 +476,9 @@ public class Player {
 
     public void setTowers(ArrayList<Tower> t) {
         towers = t;
+    }
+    public void setUnits(ArrayList<Unit> u){
+         units = u;
     }
 
 }
