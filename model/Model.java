@@ -15,7 +15,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
 public class Model {
-    
+
     protected int level;
     protected boolean over = false;
     protected Player players[];
@@ -41,7 +41,7 @@ public class Model {
     private final Image Lake = new ImageIcon("src/res/Lake.png").getImage();
     private final Image Mountain = new ImageIcon("src/res/Mountain.png").getImage();
     private final Image Castle = new ImageIcon("src/res/Castle.png").getImage();
-    
+
     public Model(int selectedMap, String p1Name, String p2Name, int size) {
         /*
         Setting up terrain and variables
@@ -50,22 +50,23 @@ public class Model {
         this.selectables = new ArrayList<>();
         this.size = size;
         position = new char[30][30];
-        
+
         this.players = new Player[2];
         this.players[0] = new Player(1000, p1Name);
         this.players[1] = new Player(1000, p2Name);
         this.selectedMap = selectedMap;
         generateTerrain(selectedMap);
-       
+
     }
-    public Model(int size){
+
+    public Model(int size) {
         this.terrain = new ArrayList<>();
         this.selectables = new ArrayList<>();
         position = new char[30][30];
         this.size = size;
         this.players = new Player[2];
     }
-    
+
     private void generateTerrain(int selectedMap) {
         /*
         Filling matrix with Field type Sprites
@@ -88,7 +89,7 @@ public class Model {
         Castle c1 = new Castle(randPos * (size / 30), 2 * (size / 30), (size / 15), (size / 15), Castle, 300);
         terrain.add(c1);
         players[0].setCastle(c1);
-        
+
         randPos = rand.nextInt(25) + 2;
         position[randPos][27] = 'C';
         position[randPos + 1][27] = 'C';
@@ -97,10 +98,9 @@ public class Model {
         Castle c2 = new Castle(randPos * (size / 30), 26 * (size / 30), (size / 15), (size / 15), Castle, 300);
         terrain.add(c2);
         players[1].setCastle(c2);
-        
 
         //store the coordinates of the castles
-        setCastleCords(c1,c2);
+        setCastleCords(c1, c2);
 
         /*
         Generate other terrain components depending on given map index
@@ -124,11 +124,12 @@ public class Model {
             mcount = rand.nextInt(5) + 5;
             lcount = rand.nextInt(5) + 30;
         }
-        
+
         isInRangeOfCastle(mcount, c1, c2, "mountain");
         isInRangeOfCastle(lcount, c1, c2, "lake");
     }
-    public void setCastleCords(Castle c1,Castle c2){
+
+    public void setCastleCords(Castle c1, Castle c2) {
         castleCoordinates[0][0] = c1.x / (size / 30);
         castleCoordinates[0][1] = c1.y / (size / 30);
         castleCoordinates[1][0] = (c1.x + 1) / (size / 30);
@@ -146,20 +147,20 @@ public class Model {
         castleCoordinates[7][0] = (c2.x + 1) / (size / 30);
         castleCoordinates[7][1] = (c2.y + 1) / (size / 30);
     }
-    
+
     public int[][] getCastleCoordinates() {
         return castleCoordinates;
     }
-    
+
     private void isInRangeOfCastle(int count, Castle c1, Castle c2, String tr) {
         Random rand = new Random();
         for (int i = 0; i < count; i++) {
             int x, y;
             do {
-                
+
                 x = rand.nextInt(30);
                 y = rand.nextInt(30);
-                
+
             } while (position[x][y] != 'F'
                     || distance(x, c1.x / (size / 30), y, c1.y / (size / 30)) < 4
                     || distance(x, c1.x / (size / 30) + 1, y, c1.y / (size / 30)) < 4
@@ -186,17 +187,17 @@ public class Model {
             }
         }
     }
-    
+
     private int distance(int x1, int x2, int y1, int y2) {
         //distance is calculated by the block-distance, not the absolute
         return max(abs(x1 - x2), abs(y1 - y2));
     }
-    
+
     public int damagePerHalfSec(int actPl, int x, int y) /*
                 returns how much damage would be dealt to the Unit by enemy Towers at the (x,y) position
                 returns 0 if there's no enemy Tower in range
      */ {
-        
+
         for (Tower t : players[(actPl + 1) % 2].getTowers()) {
             if (distance(x, t.getX() / (size / 30), y, t.getY() / (size / 30)) <= t.range) {
                 return (int) (t.power * (0.5 / t.attack_speed));
@@ -204,10 +205,10 @@ public class Model {
         }
         return 0;
     }
-    
+
     public boolean placable(int x, int y, int matrix[][]) //simulates if Tower is placed, is there a way between the two Castles or not
     {
-        
+
         int newMatrix[][] = new int[30][30];
         for (int i = 0; i < 30; i++) {
             for (int j = 0; j < 30; j++) {
@@ -218,9 +219,9 @@ public class Model {
         {
             return false;
         }
-        
+
         newMatrix[x][y] = 1000;
-        
+
         ArrayList<String> wayString;
         //check all possible start and destination coordinates (Castle1, Castle2)
         for (int j = 0; j < 4; j++) {
@@ -233,10 +234,10 @@ public class Model {
                 }
             }
         }
-        
+
         return false;
     }
-    
+
     public void saveData(String filename) /*
             save terrain ans players' data to txt line by line with separator
             
@@ -244,24 +245,24 @@ public class Model {
      */ {
         try ( Writer writer = new BufferedWriter(new OutputStreamWriter(
                 new FileOutputStream(filename + ".txt"), "utf-8"))) {
-            
+
             for (int i = 0; i < 30; i++) {
                 for (int j = 0; j < 30; j++) {
-                    writer.write(position[j][i]);  
+                    writer.write(position[j][i]);
                 }
                 writer.write(System.getProperty("line.separator"));
             }
-            writer.write(""+selectedMap+"\n");
-            writer.write(""+activePlayer+"\n");
-            writer.write(""+round);
+            writer.write("" + selectedMap + "\n");
+            writer.write("" + activePlayer + "\n");
+            writer.write("" + round);
             writer.write(System.getProperty("line.separator"));
             for (int i = 0; i < 2; i++) {
                 writer.write("p:\n");
                 writer.write(players[i].getName() + "\n");
                 writer.write("" + players[i].getMoney());
-                
+
                 writer.write(System.getProperty("line.separator"));
-                
+
                 if (players[i].getUnits() != null) {
                     for (Unit u : players[i].getUnits()) {
                         writer.write("U " + u.x + " " + u.y + " " + u.width + " " + u.height + " " + u.getType() + " " + u.getDistance()
@@ -276,31 +277,30 @@ public class Model {
                         writer.write(System.getProperty("line.separator"));
                     }
                 }
-                
+
                 writer.write(System.getProperty("line.separator"));
-                
+
             }
-            
+
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, "File not found!", "Warning", JOptionPane.INFORMATION_MESSAGE);
         }
-        
+
     }
-    
-    public int wayDiff(int actPl, ArrayList<String> al, String type)
-            //return the difficulty of the whole way
+
+    public int wayDiff(int actPl, ArrayList<String> al, String type) //return the difficulty of the whole way
     {
-        int d=0;
-        
-        int diff[][]=players[actPl].getDifficulty(this, type);
-        
-        for(String s: al){
-            int x=parseInt(s.split(";")[0]);
-            int y=parseInt(s.split(";")[0]);
-            
-            d+=diff[x][y];
+        int d = 0;
+
+        int diff[][] = players[actPl].getDifficulty(this, type);
+
+        for (String s : al) {
+            int x = parseInt(s.split(";")[0]);
+            int y = parseInt(s.split(";")[0]);
+
+            d += diff[x][y];
         }
-                
+
         return d;
     }
 
@@ -315,7 +315,8 @@ public class Model {
             }
         }
     }
-    public void setSelectableTowers(){
+
+    public void setSelectableTowers() {
         for (int i = 0; i < 30; i++) {
             for (int j = 0; j < 30; j++) {
                 if (j >= activePlayer * 15 && j < ((activePlayer + 1) * 15)
@@ -326,7 +327,71 @@ public class Model {
             }
         }
     }
+
+    public String getInfo(int x, int y) {
+        String info = "";
+        boolean found = false;
+        for (int i = 0; i < players[activePlayer].getTowers().size() && !found; i++) {
+            Tower t = players[activePlayer].getTowers().get(i);
+            if (t.x / (size / 30) == x && t.y / (size / 30) == y) {
+                info = "<html><font face=\"sansserif\" color=\"black\">Tower type: " + t.type + "<br>hp: " + t.hp + ""
+                        + "<br>attack speed: " + t.attack_speed + "<br>power: " + t.power + "<br>range: " + t.range + "</font></html>";
+                found = true;
+
+            }
+        }
+        ArrayList<Unit> units = new ArrayList<Unit>();
+        for (Unit u : players[activePlayer].getUnits()) {
+            if (u.getX() / (size / 30) == x && u.getY() / (size / 30) == y) {
+                units.add(u);
+            }
+        }
+        if (units.size() == 1) {
+            info += "<html><font face=\"sansserif\" color=\"black\">Unit type: " + units.get(0).type + "<br>hp: " + units.get(0).hp + ""
+                    + "<br>distance: " + units.get(0).distance + "<br>power: " + units.get(0).power + "</font></html>";
+        } else if (units.size() > 1) {
+            ArrayList<String> types = new ArrayList<String>();
+            String typesStr = "";
+            int sumPower = 0;
+            int sumHp = 0;
+            for (Unit u : units) {
+                if (!types.contains(u.type)) {
+                    types.add(u.type);
+                }
+                sumPower += u.power;
+                sumHp += u.hp;
+
+            }
+            typesStr = types.get(0);
+            for (int i = 1; i < types.size(); i++) {
+                typesStr += ", " + types.get(i);
+            }
+            info += "<html><font face=\"sansserif\" color=\"black\">" + units.size() + " units<br>Types: " + typesStr + "<br>Sum power: " + sumPower + "<br>Sum hp: " + sumHp + "</font></html>";
+        }
+        return info;
+    }
     
+    public ArrayList<Tower> towersNearby(int actPlayer,Unit u){
+        ArrayList<Tower>towersNB=new ArrayList<Tower>();
+        
+        ArrayList<Tower> enemyTowers=players[(actPlayer+1)%2].getTowers();
+        
+        System.out.println("enemy towers: "+enemyTowers.toString());
+        
+        if(enemyTowers.size()>0){
+            for(Tower t : enemyTowers){
+                System.out.println(distance(u.x/(size/30),t.x/(size/30),u.y/(size/30),t.y/(size/30)));
+                if(distance(u.x/(size/30),t.x/(size/30),u.y/(size/30),t.y/(size/30))==1){
+                    towersNB.add(t);
+                }
+            }
+        }
+        
+        
+        
+        return towersNB;
+    }
+
     public ArrayList<Sprite> getSelectables() {
         return selectables;
     }
@@ -334,14 +399,15 @@ public class Model {
     public void setSelectables(ArrayList<Sprite> sc) {
         selectables = sc;
     }
-    
-    public void setMap(int sc){
+
+    public void setMap(int sc) {
         selectedMap = sc;
     }
-    public int getMap(){
+
+    public int getMap() {
         return selectedMap;
     }
-    
+
     public boolean isOver() {
         return over;
     }
