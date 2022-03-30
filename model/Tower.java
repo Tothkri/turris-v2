@@ -12,6 +12,7 @@ public abstract class Tower extends Sprite{
     protected int hp;
     protected int price;
     protected int demolishedIn;
+    protected int level;
 
     public Tower(String type, int power, int range, double attack_speed, int hp, int price, int x, int y, int height, int width, Image img) {
         super(x, y, height, width, img);
@@ -22,6 +23,7 @@ public abstract class Tower extends Sprite{
         this.hp = hp;
         this.price = price;
         this.demolishedIn = -1;
+        level = 1;
     }
 
     public String getType() {
@@ -71,12 +73,12 @@ public abstract class Tower extends Sprite{
     public void setPrice(int price) {
         this.price = price;
     }
+
+    public int getLevel() {return level;}
+
+    public void setLevel(int lvl){level = lvl;}
     
-    public void upgrade(){
-        //temporary, just place holders
-        this.hp = 5000;
-        this.attack_speed = 2.0;
-    }
+    public abstract void upgrade();
     public void demolish(){
         demolishedIn = 4;//2 whole round
         img = new ImageIcon("src/res/Destroyed.png").getImage();

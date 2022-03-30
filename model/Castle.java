@@ -6,6 +6,7 @@ import java.awt.Image;
 
 public class Castle extends Sprite{
     
+    
     private int hp;
 
     public Castle(int x, int y, int height, int width, Image img, int hp) {

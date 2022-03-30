@@ -10,6 +10,7 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Scanner;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -20,14 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
-import model.Castle;
-import model.Fortified;
-import model.Lake;
-import model.Model;
-import model.Mountain;
-import model.Player;
-import model.Rapid;
-import model.Sniper;
+import model.*;
 
 public class StartScreen extends JPanel {
 
@@ -74,188 +68,212 @@ public class StartScreen extends JPanel {
     * @param gw
     * @return
     */
-    public void loadGame(GameWindow gw){
+    public void loadGame(GameWindow gw) throws IOException{
         File userDir = new File(System.getProperty("user.dir"));
         File[] allfile = userDir.listFiles();
         String fileName = "";
         int size = height - 150;
         Model model = new Model(size);
 
-        for (int i = 0; i < allfile.length; i++) {
-            if(allfile[i].getName().contains("txt")){
-                fileName = allfile[i].getName();
+        for (File file : allfile) {
+            if (file.getName().contains("txt")) {
+                fileName = file.getName();
             }
         }
+        File myObj = new File(fileName);
+        Scanner myReader = new Scanner(myObj);
 
-        try{
-            File myObj = new File(fileName);
-            Scanner myReader = new Scanner(myObj);
-            
-            Castle c1 = new Castle();
-            Castle c2 = new Castle();
-            int castleCount = 0;
-            for(int i = 0; i < 30;i++){
-                String data = myReader.nextLine();
-                for (int j = 0; j < 30; j++) {
-                    model.getPosition()[j][i] = data.charAt(i);
-                    if(data.charAt(j) == 'C'){
-                        castleCount++;
-                        model.getPosition()[j][i] = 'C';
-                    }
-                    if(castleCount == 3){
-                        c1 = new Castle(j * (size / 30), 2 * (size / 30), (size / 15), (size / 15), Castle, 300);
-                    }
-
-                    if(castleCount == 7){
-                        c2 = new Castle(j * (size / 30), 26 * (size / 30), (size / 15), (size / 15), Castle, 300);
-                    }
-
-                    if(data.charAt(j) == 'F'){
-                        model.getPosition()[j][i] = 'F';
-                    } else if(data.charAt(j) == 'M') {
-                        model.getPosition()[j][i] = 'M';
-                        model.addTerrainElement(new Mountain(j * (size / 30), i * (size / 30), (size / 30), (size / 30), Mountain));
-                    } else if(data.charAt(j) == 'L') {
-                        model.getPosition()[j][i] = 'L';
-                        model.addTerrainElement(new Lake(j * (size / 30), i * (size / 30), (size / 30), (size / 30), Lake));
-                    } else if(data.charAt(j) == 'T') {
-                        model.getPosition()[j][i] = 'T';
-                    }
-                }
-            }
-
-            /**
-            * Térkép kiválasztása
-            * kezdő játékos kiválasztása
-            * játékosok neveinek beállítása
-            * játékosok pénzeinek kiosztása
-            * kastélyok lehelyezése
-            * terepakadályok lehelyezése
-            * jelenlegi kör beállítása
-            */
-            model.setMap(Integer.parseInt(myReader.nextLine()));
-            model.setActivePlayer(Integer.parseInt(myReader.nextLine()));
-            model.setRound(Integer.parseInt(myReader.nextLine()));
-            model.setCastleCords(c1,c2);
-            model.addTerrainElement(c1);
-            model.addTerrainElement(c2);
-            
-            myReader.nextLine();
-            String name = myReader.nextLine();
-            int money = Integer.parseInt(myReader.nextLine());
-            model.getPlayers()[0] = new Player(money,name);
-            model.getPlayers()[0].setCastle(c1);
-            
+        Castle c1 = new Castle();
+        Castle c2 = new Castle();
+        int castleCount = 0;
+        for(int i = 0; i < 30;i++){
             String data = myReader.nextLine();
-            while(!data.equals("p:")){
-                if(!data.equals("")){
-                    String[] arr = new String[12];
-                    arr = data.split(" ");
-                    if(arr[5].equals("Fortified")){
-                        String png = "Tower";
-                        
-                        if(!arr[11].equals("-1")) png = "destroyed";
-                        
-                        Fortified f = new Fortified(arr[5], Integer.parseInt(arr[6]), Integer.parseInt(arr[7]), Double.parseDouble(arr[8]),
-                        Integer.parseInt(arr[9]),Integer.parseInt(arr[10]), Integer.parseInt(arr[1]), Integer.parseInt(arr[2]),Integer.parseInt(arr[3]),
-                        Integer.parseInt(arr[4]),new ImageIcon("src/res/"+png+".png").getImage());
-                        
-                        if(Integer.parseInt(arr[11]) == -1) f.setDemolishedIn(0);//-1
-                        else f.setDemolishedIn((Integer.parseInt(arr[11]) + 1) * -1);//can change
-                        
-                        model.getPlayers()[0].addTower(f);
-                        model.addTerrainElement(f);
-                    } else if(arr[5].equals("Rapid")) {
-                        String png = "Tower";
-                        
-                        if(!arr[11].equals("-1")) png = "destroyed";
-                        Rapid f = new Rapid(arr[5], Integer.parseInt(arr[6]), Integer.parseInt(arr[7]), Double.parseDouble(arr[8]),
-                        Integer.parseInt(arr[9]),Integer.parseInt(arr[10]), Integer.parseInt(arr[1]), Integer.parseInt(arr[2]),Integer.parseInt(arr[3]),
-                        Integer.parseInt(arr[4]),new ImageIcon("src/res/"+png+".png").getImage());
-                        
-                        if(Integer.parseInt(arr[11]) == -1) f.setDemolishedIn(0);//-1
-                        else f.setDemolishedIn((Integer.parseInt(arr[11]) + 1) * -1);//can change
-                        
-                        model.getPlayers()[0].addTower(f);
-                        model.addTerrainElement(f);
-                    } else if(arr[5].equals("Sniper")) {
-                        String png = "Tower";
-                        
-                        if(!arr[11].equals("-1")) png = "destroyed";
-                        Sniper f = new Sniper(arr[5], Integer.parseInt(arr[6]), Integer.parseInt(arr[7]), Double.parseDouble(arr[8]),
-                        Integer.parseInt(arr[9]),Integer.parseInt(arr[10]), Integer.parseInt(arr[1]), Integer.parseInt(arr[2]),Integer.parseInt(arr[3]),
-                        Integer.parseInt(arr[4]),new ImageIcon("src/res/"+png+".png").getImage());
-                        
-                        if(Integer.parseInt(arr[11]) == -1) f.setDemolishedIn(0);//-1
-                        else f.setDemolishedIn((Integer.parseInt(arr[11]) + 1) * -1);//can change
-                        
-                        model.getPlayers()[0].addTower(f);
-                        model.addTerrainElement(f);
+            for (int j = 0; j < 30; j++) {
+                model.getPosition()[j][i] = data.charAt(i);
+                if(data.charAt(j) == 'C'){
+                    castleCount++;
+                    model.getPosition()[j][i] = 'C';
+                }
+                if(castleCount == 3){
+                    c1 = new Castle(j * (size / 30), 2 * (size / 30), (size / 15), (size / 15), Castle, 300);
+                }
+
+                if(castleCount == 7){
+                    c2 = new Castle(j * (size / 30), 26 * (size / 30), (size / 15), (size / 15), Castle, 300);
+                }
+
+                if(data.charAt(j) == 'F'){
+                    model.getPosition()[j][i] = 'F';
+                } else if(data.charAt(j) == 'M') {
+                    model.getPosition()[j][i] = 'M';
+                    model.addTerrainElement(new Mountain(j * (size / 30), i * (size / 30), (size / 30), (size / 30), Mountain));
+                } else if(data.charAt(j) == 'L') {
+                    model.getPosition()[j][i] = 'L';
+                    model.addTerrainElement(new Lake(j * (size / 30), i * (size / 30), (size / 30), (size / 30), Lake));
+                } else if(data.charAt(j) == 'T') {
+                    model.getPosition()[j][i] = 'T';
+                }
+            }
+        }
+
+        /**
+        * Térkép kiválasztása
+        * kezdő játékos kiválasztása
+        * játékosok neveinek beállítása
+        * játékosok pénzeinek kiosztása
+        * kastélyok lehelyezése
+        * terepakadályok lehelyezése
+        * jelenlegi kör beállítása
+        */
+        model.setMap(Integer.parseInt(myReader.nextLine()));
+        model.setActivePlayer(Integer.parseInt(myReader.nextLine()));
+        model.setRound(Integer.parseInt(myReader.nextLine()));
+        model.setCastleCords(c1,c2);
+        model.addTerrainElement(c1);
+        model.addTerrainElement(c2);
+
+        myReader.nextLine();
+        String name = myReader.nextLine();
+        int money = Integer.parseInt(myReader.nextLine());
+        model.getPlayers()[0] = new Player(money,name);
+        model.getPlayers()[0].setCastle(c1);
+
+        String data = myReader.nextLine();
+        while(!data.equals("p:")){
+            if(!data.equals("")){
+                String[] arr;
+                arr = data.split(" ");
+                if(arr[0].equals("T")){
+                    switch (arr[5]){
+                        case "Rapid":
+                            Rapid rt = (Rapid)setTower(arr);
+                            model.getPlayers()[0].addTower(rt);
+                            model.addTerrainElement(rt);break;
+                        case "Sniper":
+                            Sniper st = (Sniper)setTower(arr);
+                            model.getPlayers()[0].addTower(st);
+                            model.addTerrainElement(st);break;
+                        default:
+                            Fortified ft = (Fortified)setTower(arr);
+                            model.getPlayers()[0].addTower(ft);
+                            model.addTerrainElement(ft);break;
+                    }
+                }else if(arr[0].equals("U")){
+                    switch(arr[5]){
+                        case "Fighter":
+                            Fighter fu = (Fighter)setUnit(arr);
+                            model.getPlayers()[0].addUnits(fu);break;
+                        case "Diver":
+                            Diver du = (Diver)setUnit(arr);
+                            model.getPlayers()[0].addUnits(du);break;
+                        case "Climber":
+                            Climber cu = (Climber)setUnit(arr);
+                            model.getPlayers()[0].addUnits(cu);break;
+                        case "Destroyer":
+                            Destroyer deu = (Destroyer)setUnit(arr);
+                            model.getPlayers()[0].addUnits(deu);break;
+                        default:
+                            General gu = (General)setUnit(arr);
+                            model.getPlayers()[0].addUnits(gu);break;
                     }
                 }
-                data = myReader.nextLine();
+
             }
-            name = myReader.nextLine();
-            
-            money = Integer.parseInt(myReader.nextLine());
             data = myReader.nextLine();
-            model.getPlayers()[1] = new Player(money,name);
-            model.getPlayers()[1].setCastle(c2);
-            while(!data.equals("")){
-                String[] arr = new String[12];
-                arr = data.split(" ");
-                if(arr[5].equals("Fortified")){
-                        String png = "Tower";
-                        
-                        if(!arr[11].equals("-1")) png = "destroyed";
-                        
-                        Fortified f = new Fortified(arr[5], Integer.parseInt(arr[6]), Integer.parseInt(arr[7]), Double.parseDouble(arr[8]),
-                        Integer.parseInt(arr[9]),Integer.parseInt(arr[10]), Integer.parseInt(arr[1]), Integer.parseInt(arr[2]),Integer.parseInt(arr[3]),
-                        Integer.parseInt(arr[4]),new ImageIcon("src/res/"+ png +".png").getImage());
-                        
-                        if(Integer.parseInt(arr[11]) == -1) f.setDemolishedIn(0);//-1
-                        else f.setDemolishedIn((Integer.parseInt(arr[11]) + 1) * -1);//can change
-                        
-                        model.getPlayers()[1].addTower(f);
-                        model.addTerrainElement(f);
-                    }else if(arr[5].equals("Rapid")){
-                        String png = "Tower";
-                        
-                        if(!arr[11].equals("-1")) png = "destroyed";
-                        
-                        Rapid f = new Rapid(arr[5], Integer.parseInt(arr[6]), Integer.parseInt(arr[7]), Double.parseDouble(arr[8]),
-                        Integer.parseInt(arr[9]),Integer.parseInt(arr[10]), Integer.parseInt(arr[1]), Integer.parseInt(arr[2]),Integer.parseInt(arr[3]),
-                        Integer.parseInt(arr[4]),new ImageIcon("src/res/Tower.png").getImage());
-                        
-                        if(Integer.parseInt(arr[11]) == -1) f.setDemolishedIn(0);//-1
-                        else f.setDemolishedIn((Integer.parseInt(arr[11]) + 1) * -1);//can change
-
-                        model.getPlayers()[1].addTower(f);
-                        model.addTerrainElement(f);
-                    }else if(arr[5].equals("Sniper")){
-                        String png = "Tower";
-                        
-                        if(!arr[11].equals("-1")) png = "destroyed";
-                        
-                        Sniper f = new Sniper(arr[5], Integer.parseInt(arr[6]), Integer.parseInt(arr[7]), Double.parseDouble(arr[8]),
-                        Integer.parseInt(arr[9]),Integer.parseInt(arr[10]), Integer.parseInt(arr[1]), Integer.parseInt(arr[2]),Integer.parseInt(arr[3]),
-                        Integer.parseInt(arr[4]),new ImageIcon("src/res/Tower.png").getImage());
-                        
-                        if(Integer.parseInt(arr[11]) == -1) f.setDemolishedIn(0);//-1
-                        else f.setDemolishedIn((Integer.parseInt(arr[11]) + 1) * -1);//can change
-                        
-                        model.getPlayers()[1].addTower(f);
-                        model.addTerrainElement(f);
-                    }
-                data = myReader.nextLine();
-            }
-            Board bd = new Board(width,height);
-            bd.setModel(model);
-            gw.setBoard(bd);
-
-        }catch(IOException e){
-            JOptionPane.showMessageDialog(null, "No saved games found!", "Warning", JOptionPane.INFORMATION_MESSAGE);
         }
+        name = myReader.nextLine();
+
+        money = Integer.parseInt(myReader.nextLine());
+        data = myReader.nextLine();
+        model.getPlayers()[1] = new Player(money,name);
+        model.getPlayers()[1].setCastle(c2);
+        while(!data.equals("")){
+            String[] arr;
+            arr = data.split(" ");
+            if(arr[0].equals("T")){
+                switch (arr[5]) {
+                    case "Rapid":
+                        Rapid rt = (Rapid) setTower(arr);
+                        model.getPlayers()[0].addTower(rt);
+                        model.addTerrainElement(rt);
+                        break;
+                    case "Sniper":
+                        Sniper st = (Sniper) setTower(arr);
+                        model.getPlayers()[0].addTower(st);
+                        model.addTerrainElement(st);
+                        break;
+                    default:
+                        Fortified ft = (Fortified) setTower(arr);
+                        model.getPlayers()[0].addTower(ft);
+                        model.addTerrainElement(ft);
+                        break;
+                }
+            }else if(arr[0].equals("U")){
+                switch(arr[5]){
+                    case "Fighter":
+                        Fighter fu = (Fighter)setUnit(arr);
+                        model.getPlayers()[0].addUnits(fu);break;
+                    case "Diver":
+                        Diver du = (Diver)setUnit(arr);
+                        model.getPlayers()[0].addUnits(du);break;
+                    case "Climber":
+                        Climber cu = (Climber)setUnit(arr);
+                        model.getPlayers()[0].addUnits(cu);break;
+                    case "Destroyer":
+                        Destroyer deu = (Destroyer)setUnit(arr);
+                        model.getPlayers()[0].addUnits(deu);break;
+                    default:
+                        General gu = (General)setUnit(arr);
+                        model.getPlayers()[0].addUnits(gu);break;
+                }
+            }
+            data = myReader.nextLine();
+        }
+        Board bd = new Board(width,height);
+        bd.setModel(model);
+        gw.setBoard(bd);
+    }
+    public Tower setTower(String[] arr){
+        String png = "Tower";
+        if(!arr[11].equals("-1")) png = "destroyed";
+        Tower t;
+        switch(arr[5]){
+            case "Rapid": t = new Rapid(arr[5], Integer.parseInt(arr[6]), Integer.parseInt(arr[7]), Double.parseDouble(arr[8]),
+                    Integer.parseInt(arr[9]),Integer.parseInt(arr[10]), Integer.parseInt(arr[1]), Integer.parseInt(arr[2]),Integer.parseInt(arr[3]),
+                    Integer.parseInt(arr[4]),new ImageIcon("src/res/"+png+".png").getImage());break;
+            case "Sniper": t = new Sniper(arr[5], Integer.parseInt(arr[6]), Integer.parseInt(arr[7]), Double.parseDouble(arr[8]),
+                    Integer.parseInt(arr[9]),Integer.parseInt(arr[10]), Integer.parseInt(arr[1]), Integer.parseInt(arr[2]),Integer.parseInt(arr[3]),
+                    Integer.parseInt(arr[4]),new ImageIcon("src/res/"+png+".png").getImage());break;
+            default: t = new Fortified(arr[5], Integer.parseInt(arr[6]), Integer.parseInt(arr[7]), Double.parseDouble(arr[8]),
+                    Integer.parseInt(arr[9]),Integer.parseInt(arr[10]), Integer.parseInt(arr[1]), Integer.parseInt(arr[2]),Integer.parseInt(arr[3]),
+                    Integer.parseInt(arr[4]),new ImageIcon("src/res/"+ png +".png").getImage());break;
+        }
+        if(Integer.parseInt(arr[11]) == -1) t.setDemolishedIn(0);//-1
+        else t.setDemolishedIn((Integer.parseInt(arr[11]) + 1) * -1);//can change
+        t.setLevel(Integer.parseInt(arr[12]));
+        return t;
+    }
+    public Unit setUnit(String[] arr){
+        Unit u;
+        int size = height - 150;
+        switch(arr[5]){
+            case "Fighter": u = new Fighter(arr[5],Integer.parseInt(arr[6]),Integer.parseInt(arr[7]),Integer.parseInt(arr[8]),Integer.parseInt(arr[9]),
+                    Integer.parseInt(arr[1]),Integer.parseInt(arr[2]), (size / 30),(size / 30),new ImageIcon("src/res/Unit.png").getImage(),
+                    new ArrayList<>());break;
+            case "Diver": u = new Diver(arr[5],Integer.parseInt(arr[6]),Integer.parseInt(arr[7]),Integer.parseInt(arr[8]),Integer.parseInt(arr[9]),
+                    Integer.parseInt(arr[1]),Integer.parseInt(arr[2]), (size / 30),(size / 30),new ImageIcon("src/res/Unit.png").getImage(),
+                    new ArrayList<>());break;
+            case "Climber": u = new Climber(arr[5],Integer.parseInt(arr[6]),Integer.parseInt(arr[7]),Integer.parseInt(arr[8]),Integer.parseInt(arr[9]),
+                    Integer.parseInt(arr[1]),Integer.parseInt(arr[2]), (size / 30),(size / 30),new ImageIcon("src/res/Unit.png").getImage(),
+                    new ArrayList<>());break;
+            case "Destroyer": u = new Destroyer(arr[5],Integer.parseInt(arr[6]),Integer.parseInt(arr[7]),Integer.parseInt(arr[8]),Integer.parseInt(arr[9]),
+                    Integer.parseInt(arr[1]),Integer.parseInt(arr[2]), (size / 30),(size / 30),new ImageIcon("src/res/Unit.png").getImage(),
+                    new ArrayList<>());break;
+            default: u = new General(arr[5],Integer.parseInt(arr[6]),Integer.parseInt(arr[7]),Integer.parseInt(arr[8]),Integer.parseInt(arr[9]),
+                    Integer.parseInt(arr[1]),Integer.parseInt(arr[2]), (size / 30),(size / 30),new ImageIcon("src/res/Unit.png").getImage(),
+                    new ArrayList<>());break;
+        }
+        return u;
     }
 
     /**

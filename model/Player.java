@@ -21,7 +21,15 @@ public class Player {
     private final int[] row = {-1, 0, 0, 1};
     private final int[] col = {0, -1, 1, 0};
     private int[][] difficulty = new int[30][30];
-    //hogy mozoghatsz egy Node-tól
+    //how you can move from a Node
+
+    public Castle getCastle() {
+        return castle;
+    }
+
+    public void setCastle(Castle castle) {
+        this.castle = castle;
+    }
 
     public Player(int money, String name) {
         this.money = money;
@@ -36,7 +44,8 @@ public class Player {
             for (int j = 0; j < 30; j++) {
                 if (model.position[i][j] == 'F' || model.position[i][j] == 'C') {
                     difficulty[i][j] = 1 + model.damagePerHalfSec(model.getActivePlayer(), i, j);
-                } else {    //cant go through so we set a large number
+                } else //cant go through so we set a large number
+                {
                     difficulty[i][j] = 1000;
                 }
             }
@@ -45,19 +54,16 @@ public class Player {
 
         model.setSelectables(new ArrayList<>());
 
-        if (isValid(x, y) && y >= model.getActivePlayer() * 15 && y < (model.getActivePlayer() + 1) * 15) {
-            /*
-            * eldönti, hogy a player rákattintott-e a boardra
-            * player 1's y területe: 0-14
-            * player 2's y területe: 15-29
-            */
-
+        if (isValid(x, y) && y >= model.getActivePlayer() * 15
+                && y < (model.getActivePlayer() + 1) * 15) /*
+                        deciding if the player clicked to the board
+                        player 1's y area: 0-14
+                         player 2's y area: 15-29
+         */ {
             if (model.getPosition()[x][y] == 'F' && model.placable(x, y, difficulty)) //deciding if player clicked to a Field or not
             {
-                /**
-                * kiválasztott torony elkészítése és hozzáadása a játékhoz
-                * (ha van kiválasztott torony)
-                */
+                //creating chosen tower and adding it to the game (if there's chosen tower)
+
                 if (!type.equals("")) {
                     Tower newTower;
                     if (type.equals("Fortified")) {
@@ -70,76 +76,84 @@ public class Player {
                                 y * (model.getSize() / 30),
                                 model.getSize() / 30, model.getSize() / 30,
                                 new ImageIcon("src/res/Tower.png").getImage());
-                    } else {
+                    } else //type.equals("Sniper")
+                    {
                         newTower = new Rapid("Rapid", 2, 1, 0.33, 40, 250, x * (model.getSize() / 30),
                                 y * (model.getSize() / 30),
                                 model.getSize() / 30, model.getSize() / 30,
                                 new ImageIcon("src/res/Tower.png").getImage());
                     }
 
-                    /**
-                    * megnézi hogy a játékosnak van elég pénze, hogy megvegye
-                    */
+                    //checking if player's money is enough to buy it
                     if (newTower.price <= money) {
                         money -= newTower.price;
 
                         model.setPosition(x, y, 'T');
                         model.addTerrainElement(newTower);
                         addTower(newTower);
-                    } else {    //player gets a warning 
-                        JOptionPane.showMessageDialog(null, "You don't have enough money to build this tower!", "Warning", JOptionPane.INFORMATION_MESSAGE);
                     }
 
                 }
-            } else {    //player gets a warning 
-                JOptionPane.showMessageDialog(null, "You can't place a tower here!", "Warning", JOptionPane.INFORMATION_MESSAGE);
             }
 
-        } else {        //player gets a warning 
-            JOptionPane.showMessageDialog(null, "You can't place a tower here!", "Warning", JOptionPane.INFORMATION_MESSAGE);
         }
 
         return model;
 
     }
 
-    /**
-    * tower fejlesztése
-    * @param x
-    * @param y
-    * @param size
-    */
     public void upgrade(int x, int y, int size) {
         x *= (size / 30);
         y *= (size / 30);
-        money -= 100;//will change
-        for(var t : towers){
-            if(t.getX() == x && t.getY() == y){
-                t.upgrade();
+        boolean canUpgrade = false;
+        for (var t : towers) {
+            if (t.getX() == x && t.getY() == y) {
+
+                switch(t.getType()){
+                    case "Fortified": canUpgrade = enoughMoney(t.getLevel(),350,500);
+                    break;
+                    case "Sniper": canUpgrade = enoughMoney(t.getLevel(),500,800);
+                    break;
+                    case "Rapid": canUpgrade = enoughMoney(t.getLevel(),400,600);
+                    break;
+                    default:break;
+                }
+                if(canUpgrade)
+                    t.upgrade();
             }
         }
     }
 
-    /**
-    * tower lerombolása
-    * @param x
-    * @param y
-    * @param size
-    */
+    public boolean enoughMoney(int currLvl ,int lvl2, int lvl3){
+        if(currLvl == 1){
+            if(money - lvl2 >= 0){
+                money -= lvl2;
+                return true;
+            }
+            else return false;
+        }else{
+            if(money - lvl3 >= 0){
+                money -= lvl3;
+                return true;
+            }
+            else return false;
+        }
+    }
+
     public void demolish(int x, int y, int size) {
         x *= (size / 30);
         y *= (size / 30);
-        for(var t : towers){
-            if(t.getX() == x && t.getY() == y){
+        for (var t : towers) {
+            if (t.getX() == x && t.getY() == y) {
                 t.demolish();
             }
         }
     }
+    
+   
 
-    /**
-    * eldönti, hogy rajta van-e a board-on vagy sem
-    */
-    private boolean isValid(int x, int y) {
+    private boolean isValid(int x, int y) //determine if it's on the board or not
+    {
         return (x >= 0 && x < 30) && (y >= 0 && y < 30);
     }
 
@@ -148,38 +162,43 @@ public class Player {
         int minDistance = 10000;
         ArrayList<Node> bestWay = new ArrayList<>();
 
-        /**
-        * mind a 4 kastély koordinátából ki kell számolni a legjobb utat
-        * a másik kastély 4 koordinátájába, hogy megtaláljuk a legrövidebb utat
-        */
-
         /*
-        * eltárolja, hogy milyen nehéz mindegyiken átmenni
-        * 1 - field
-        * 2 - mountain és lake ha a unit Climber/Diver
-        */
+        we need to calculate all best ways from each of 4 castle coordinates 
+        to the other 4 castle coordinates and find the shortest of them
+         */
+ /*
+            stores how difficult to go through each 
+            1 - field
+            2 - mountain and lake if unit is Climber/Diver
+         */
         for (int i = 0; i < 30; i++) {
             for (int j = 0; j < 30; j++) {
-                if (type.equals("Diver")) { //they can go through lakes
+                if (type.equals("Diver")) //they can go through lakes
+                {
                     if (model.position[i][j] == 'F' || model.position[i][j] == 'C') {
                         difficulty[i][j] = 1 + model.damagePerHalfSec(model.getActivePlayer(), i, j);
                     } else if (model.position[i][j] == 'L') {
                         difficulty[i][j] = 2 + model.damagePerHalfSec(model.getActivePlayer(), i, j);
-                    } else {    //cant go through so we set a large number
+                    } else //cant go through so we set a large number
+                    {
                         difficulty[i][j] = 1000;
                     }
-                } else if (type.equals("Climber")) {    //they can go through mountains
+                } else if (type.equals("Climber")) //they can go through mountains
+                {
                     if (model.position[i][j] == 'F' || model.position[i][j] == 'C') {
                         difficulty[i][j] = 1 + model.damagePerHalfSec(model.getActivePlayer(), i, j);
                     } else if (model.position[i][j] == 'M') {
                         difficulty[i][j] = 2 + model.damagePerHalfSec(model.getActivePlayer(), i, j);
-                    } else {    //cant go through so we set a large number
+                    } else //cant go through so we set a large number
+                    {
                         difficulty[i][j] = 1000;
                     }
-                } else {        //normal unit
+                } else //normal unit
+                {
                     if (model.position[i][j] == 'F' || model.position[i][j] == 'C') {
                         difficulty[i][j] = 1 + model.damagePerHalfSec(model.getActivePlayer(), i, j);
-                    } else {    //cant go through so we set a large number
+                    } else //cant go through so we set a large number
+                    {
                         difficulty[i][j] = 1000;
                     }
                 }
@@ -207,7 +226,6 @@ public class Player {
 
             if (way != null && way.size() > 0) {
                 Unit newUnit;
-
                 if (type.equals("General")) {
                     newUnit = new General("General", 5, 3, 10, 20, castle.x, castle.y,
                             model.getSize() / 30, model.getSize() / 30, new ImageIcon("src/res/Unit.png").getImage(),
@@ -224,37 +242,55 @@ public class Player {
                     newUnit = new Fighter("Fighter", 4, 5, 15, 30, castle.x, castle.y,
                             model.getSize() / 30, model.getSize() / 30, new ImageIcon("src/res/Unit.png").getImage(),
                             way);
-                } else {    //Destroyer
+                } else //Destroyer
+                {
                     newUnit = new Destroyer("Destroyer", 2, 5, 15, 30, castle.x, castle.y,
                             model.getSize() / 30, model.getSize() / 30, new ImageIcon("src/res/Unit.png").getImage(),
                             way);
                 }
-                
-                if (newUnit.price <= money) {   //megnézi, hogy a jétékosnak van-e elég pénze, hogy megvegye
+                //checking if player's money is enough to buy it
+                if (newUnit.price <= money) {
                     money -= newUnit.price;
                     addUnits(newUnit);
-                } else {                        //játékos figyelmeztetést kap
-                    JOptionPane.showMessageDialog(null, "You don't have enough money to send this unit!", "Warning", JOptionPane.INFORMATION_MESSAGE);
                 }
 
             }
         }
+
+        return model;
+
+    }
+
+    public Model calculateWay(Model model){
+        int minDistance = 10000;
+        ArrayList<Node> bestWay = new ArrayList<>();
+        int attacker = model.getActivePlayer() * 4;
+        int defender = Math.abs(model.getActivePlayer() * 4 - 4);
+        for(Unit u : units){
+            for (int j = 0; j < 4; j++) {
+                for (int k = 0; k < 4; k++) {
+                    ArrayList<String> wayString = findWay(model.getCastleCoordinates()[j + attacker][0], model.getCastleCoordinates()[j + attacker][1],
+                            model.getCastleCoordinates()[k + defender][0], model.getCastleCoordinates()[k + defender][1], difficulty);
+                    ArrayList<Node> nodeWay = convertWay(wayString);
+                    if (model.wayDiff(model.getActivePlayer(), wayString, u.getType()) < minDistance) {
+                        bestWay = nodeWay;
+                        minDistance = model.wayDiff(model.getActivePlayer(), wayString, u.getType());
+                    }
+                }
+            }
+            u.setWay(bestWay);
+        }
         return model;
     }
 
-    /* 
-    * string-ként eltárolja a saját kastélytól 
-    * az ellenfél kastélyáig vezető legjobb utat 
-    * a lépések (x, y) páronként lesznek eltárolva
-    * az egységek átlósan nem mozoghatnak
-    *
-    * stores the best way as String from the home castle to the enemy castle
-    * step to step as (x, y) pairs
-    * (units can't move in any diagonal directions)
-    */
-    public ArrayList<String> findWay(int fromX, int fromY, int toX, int toY, int difficulty[][]) {
-        ArrayList<String> bestway = new ArrayList<>();
+    public ArrayList<String> findWay(int fromX, int fromY, int toX, int toY, int difficulty[][]) /* 
+            stores the best way as String from the home castle to the enemy castle
+            step to step as (x, y) pairs
+            (units can't move in any diagonal directions)
 
+     */ {
+
+        ArrayList<String> bestway = new ArrayList<>();
         int currentX = fromX;
         int currentY = fromY;
         //begin from own castle
@@ -264,45 +300,32 @@ public class Player {
         q.add(from);
 
         Set<String> visited = new HashSet<>();
-
-        /**
-        * megtudjunk, hogy átmentünk-e egy Node-on vagy sem
-        * to know if we went across a Node or not
-        */
+        // to know if we went across a Node or not
         visited.add(from.toString());
         while (!q.isEmpty()) {
             Node current = q.poll();
             int i = current.getX();
             int j = current.getY();
 
-            /**
-            * célpont megtalálva
-            * destination found
-            */
-            if (i == toX && j == toY) {
+            if (i == toX && j == toY) //destination found
+            {
                 findNodeWay(current, bestway);
+
                 return bestway;
             }
 
             int currentValue = difficulty[i][j];
-            
+
             for (int k = 0; k < row.length; k++) {
                 currentX = i + (row[k] * currentValue);
                 currentY = j + (col[k] * currentValue);
 
-                /**
-                * megnézi, hogy a boardban vagyunk-e
-                * check if we're in the board
-                */
-                if (isValid(currentX, currentY)) {
+                if (isValid(currentX, currentY)) //check if we're in the board
+                {
                     Node next = new Node(currentX, currentY, current);
 
-                    /**
-                    * ha a Node még nem volt meglátogatva, hozzáadjuk az úthoz
-                    * és megflageljük meglátogatottként
-                    * if node is not visited yet, we add it to the way and flag as visited
-                    */
-                    if (!visited.contains(next.toString())) {
+                    if (!visited.contains(next.toString())) //if node is not visited yet, we add it to the way and flag as visited
+                    {
                         q.add(next);
                         visited.add(next.toString());
                     }
@@ -313,14 +336,11 @@ public class Player {
         return bestway;
     }
 
-    /**
-    * Node-ok közötti utak átalakítása
-    * @param src
-    */
     public ArrayList<Node> convertWay(ArrayList<String> src) {
+
         ArrayList<Node> way = new ArrayList<Node>();
-        
-        if(src.size() == 0 || src == null) {
+
+        if (src.size() == 0 || src == null) {
             return new ArrayList<Node>();
         }
 
@@ -336,19 +356,19 @@ public class Player {
             if (max(abs(x1 - x2), abs(y1 - y2)) > 1) {
 
                 if (x1 > x2) {
-                    for (int j = x1-1; j > x2; j--) {
+                    for (int j = x1 - 1; j > x2; j--) {
                         way.add(new Node(j, y1));
                     }
                 } else if (x2 > x1) {
-                    for (int j = x1+1; j < x2; j++) {
+                    for (int j = x1 + 1; j < x2; j++) {
                         way.add(new Node(j, y1));
                     }
                 } else if (y2 > y1) {
-                    for (int j = y1+1; j < y2; j++) {
+                    for (int j = y1 + 1; j < y2; j++) {
                         way.add(new Node(x1, j));
                     }
                 } else {
-                    for (int j = y1-1; j < y2; j--) {
+                    for (int j = y1 - 1; j < y2; j--) {
                         way.add(new Node(x1, j));
                     }
                 }
@@ -358,71 +378,61 @@ public class Player {
             }
 
         }
-        
-        /**
-        * megnézi, hogy vannak-e ugyanolyan pozíciók egymás után
-        * checks if there are same positions after each other
-        * @param n
-        * @param way
-        */
-        for(int j = 1;j < way.size(); j++){
-            if(way.get(j - 1).equals(way.get(j))) {
+
+        //check if there are same positions after each other
+        for (int j = 1; j < way.size(); j++) {
+            if (way.get(j - 1).equals(way.get(j))) {
                 way.remove(j);
                 j--;
             }
         }
-        
+
         return way;
     }
 
-    /**
-    * megkeresi az utat két Node között
-    * @param n
-    * @param way
-    */
-    private void findNodeWay(Node n, ArrayList<String> way) {
+    private void findNodeWay(Node n, ArrayList<String> way) //find the way between two Nodes
+    {
         if (n != null) {
             findNodeWay(n.parent, way);
             way.add(n.toString());
         }
     }
 
-    /**
-    * unit törlése
-    * @param unitToDelete
-    */
     public void deleteUnit(Unit unitToDelete) {
+
         units.remove(unitToDelete);
+
     }
 
-    /**
-    * getDifficulty
-    * @param model
-    * @param type
-    */
     public int[][] getDifficulty(Model model, String type) {
         for (int i = 0; i < 30; i++) {
             for (int j = 0; j < 30; j++) {
-                if (type.equals("Diver")) { //they can go through lakes
+                if (type.equals("Diver")) //they can go through lakes
+                {
                     if (model.position[i][j] == 'F' || model.position[i][j] == 'C') {
                         difficulty[i][j] = 1 + model.damagePerHalfSec(model.getActivePlayer(), i, j);
                     } else if (model.position[i][j] == 'L') {
                         difficulty[i][j] = 2 + model.damagePerHalfSec(model.getActivePlayer(), i, j);
-                    } else {                //cant go through so we set a large number
+                    } else //cant go through so we set a large number
+                    {
                         difficulty[i][j] = 1000;
                     }
-                } else if (type.equals("Climber")) {    //they can go through mountains
+                } else if (type.equals("Climber")) //they can go through mountains
+                {
                     if (model.position[i][j] == 'F' || model.position[i][j] == 'C') {
                         difficulty[i][j] = 1 + model.damagePerHalfSec(model.getActivePlayer(), i, j);
                     } else if (model.position[i][j] == 'M') {
                         difficulty[i][j] = 2 + model.damagePerHalfSec(model.getActivePlayer(), i, j);
-                    } else {                            //cant go through so we set a large number
+                    } else //cant go through so we set a large number
+                    {
                         difficulty[i][j] = 1000;
                     }
-                } else {        //normal unit
+                } else //normal unit
+                {
                     if (model.position[i][j] == 'F' || model.position[i][j] == 'C') {
                         difficulty[i][j] = 1 + model.damagePerHalfSec(model.getActivePlayer(), i, j);
-                    } else {    //cant go through so we set a large number
+                    } else //cant go through so we set a large number
+                    {
                         difficulty[i][j] = 1000;
                     }
                 }
@@ -430,17 +440,6 @@ public class Player {
 
         }
         return difficulty;
-    }
-
-    /**
-    * Getterek, setterek
-    */
-    public Castle getCastle() {
-        return castle;
-    }
-
-    public void setCastle(Castle castle) {
-        this.castle = castle;
     }
 
     public int getMoney() {
@@ -475,8 +474,11 @@ public class Player {
         units.add(newUnit);
     }
 
-    public void setTowers(ArrayList<Tower> t){
+    public void setTowers(ArrayList<Tower> t) {
         towers = t;
+    }
+    public void setUnits(ArrayList<Unit> u){
+         units = u;
     }
 
 }
