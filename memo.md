@@ -32,7 +32,7 @@ Ki mit csinált:
 
     Tóth Kristóf (SONXZF): Timer működik, info megjelenitése, destroyer sebez tornyot
 
-    Tóth Kristóf (YPENKF):
+    Tóth Kristóf (YPENKF): Unitok mentése, szakaszosan lépnek a unitok, tower fejlesztés véglegesítése
     
     Szálkai Olivér Dávid (ONLQ05):
 
