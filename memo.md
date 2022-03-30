@@ -31,7 +31,9 @@ Ki mit csinált:
 4. hét (03.23 - 03.30)
 
     Tóth Kristóf (SONXZF): Timer működik, info megjelenitése, destroyer sebez tornyot
+
     Tóth Kristóf (YPENKF):
+    
     Szálkai Olivér Dávid (ONLQ05):
 
 
