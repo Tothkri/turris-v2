@@ -34,3 +34,4 @@ Ki mit csinált:
     Tóth Kristóf (YPENKF):
     Szálkai Olivér Dávid (ONLQ05):
 
+
