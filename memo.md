@@ -34,6 +34,6 @@ Ki mit csinált:
 
     Tóth Kristóf (YPENKF): Unitok mentése, szakaszosan lépnek a unitok, tower fejlesztés véglegesítése
     
-    Szálkai Olivér Dávid (ONLQ05):
+    Szálkai Olivér Dávid (ONLQ05): Javadoc, StartScreen GUI véglegesítés
 
 
