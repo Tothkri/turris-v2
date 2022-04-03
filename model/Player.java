@@ -1,5 +1,6 @@
 package model;
 
+import java.awt.Color;
 import static java.lang.Integer.max;
 import static java.lang.Integer.parseInt;
 import static java.lang.Math.abs;
@@ -22,6 +23,10 @@ public class Player {
     private final int[] col = {0, -1, 1, 0};
     private int[][] difficulty = new int[30][30];
     //how you can move from a Node
+
+    
+
+    
 
     public Castle getCastle() {
         return castle;
@@ -157,7 +162,7 @@ public class Player {
         return (x >= 0 && x < 30) && (y >= 0 && y < 30);
     }
 
-    public Model sendUnits(String type, int amount, Model model) {
+    public Model sendUnits(String type, String color,int amount, Model model) {
 
         int minDistance = 10000;
         ArrayList<Node> bestWay = new ArrayList<>();
@@ -227,24 +232,24 @@ public class Player {
             if (way != null && way.size() > 0) {
                 Unit newUnit;
                 if (type.equals("General")) {
-                    newUnit = new General("General", 5, 3, 10, 20, castle.x, castle.y,
+                    newUnit = new General("General",color, 5, 3, 10, 20, castle.x, castle.y,
                             model.getSize() / 30, model.getSize() / 30, new ImageIcon("src/res/Unit.png").getImage(),
                             way);
                 } else if (type.equals("Climber")) {
-                    newUnit = new Climber("Climber", 3, 2, 10, 30, castle.x, castle.y,
+                    newUnit = new Climber("Climber",color, 3, 2, 10, 30, castle.x, castle.y,
                             model.getSize() / 30, model.getSize() / 30, new ImageIcon("src/res/Unit.png").getImage(),
                             way);
                 } else if (type.equals("Diver")) {
-                    newUnit = new Diver("Diver", 3, 2, 10, 30, castle.x, castle.y,
+                    newUnit = new Diver("Diver",color, 3, 2, 10, 30, castle.x, castle.y,
                             model.getSize() / 30, model.getSize() / 30, new ImageIcon("src/res/Unit.png").getImage(),
                             way);
                 } else if (type.equals("Fighter")) {
-                    newUnit = new Fighter("Fighter", 4, 5, 15, 30, castle.x, castle.y,
+                    newUnit = new Fighter("Fighter",color, 4, 5, 15, 30, castle.x, castle.y,
                             model.getSize() / 30, model.getSize() / 30, new ImageIcon("src/res/Unit.png").getImage(),
                             way);
                 } else //Destroyer
                 {
-                    newUnit = new Destroyer("Destroyer", 2, 5, 15, 30, castle.x, castle.y,
+                    newUnit = new Destroyer("Destroyer",color, 2, 5, 15, 30, castle.x, castle.y,
                             model.getSize() / 30, model.getSize() / 30, new ImageIcon("src/res/Unit.png").getImage(),
                             way);
                 }

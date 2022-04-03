@@ -95,11 +95,11 @@ public class StartScreen extends JPanel {
                     model.getPosition()[j][i] = 'C';
                 }
                 if(castleCount == 3){
-                    c1 = new Castle(j * (size / 30), 2 * (size / 30), (size / 15), (size / 15), Castle, 300);
+                    c1 = new Castle("blue",j * (size / 30), 2 * (size / 30), (size / 15), (size / 15), Castle, 300);
                 }
 
                 if(castleCount == 7){
-                    c2 = new Castle(j * (size / 30), 26 * (size / 30), (size / 15), (size / 15), Castle, 300);
+                    c2 = new Castle("red",j * (size / 30), 26 * (size / 30), (size / 15), (size / 15), Castle, 300);
                 }
 
                 if(data.charAt(j) == 'F'){
@@ -137,7 +137,7 @@ public class StartScreen extends JPanel {
         int money = Integer.parseInt(myReader.nextLine());
         model.getPlayers()[0] = new Player(money,name);
         model.getPlayers()[0].setCastle(c1);
-
+        Color color=Color.blue;
         String data = myReader.nextLine();
         while(!data.equals("p:")){
             if(!data.equals("")){
@@ -159,7 +159,7 @@ public class StartScreen extends JPanel {
                             model.addTerrainElement(ft);break;
                     }
                 }else if(arr[0].equals("U")){
-                    switch(arr[5]){
+                    switch(arr[6]){
                         case "Fighter":
                             Fighter fu = (Fighter)setUnit(arr);
                             model.getPlayers()[0].addUnits(fu);break;
@@ -185,6 +185,7 @@ public class StartScreen extends JPanel {
 
         money = Integer.parseInt(myReader.nextLine());
         data = myReader.nextLine();
+        color=Color.red;
         model.getPlayers()[1] = new Player(money,name);
         model.getPlayers()[1].setCastle(c2);
         while(!data.equals("")){
@@ -209,7 +210,7 @@ public class StartScreen extends JPanel {
                         break;
                 }
             }else if(arr[0].equals("U")){
-                switch(arr[5]){
+                switch(arr[6]){
                     case "Fighter":
                         Fighter fu = (Fighter)setUnit(arr);
                         model.getPlayers()[0].addUnits(fu);break;
@@ -257,19 +258,19 @@ public class StartScreen extends JPanel {
         Unit u;
         int size = height - 150;
         switch(arr[5]){
-            case "Fighter": u = new Fighter(arr[5],Integer.parseInt(arr[6]),Integer.parseInt(arr[7]),Integer.parseInt(arr[8]),Integer.parseInt(arr[9]),
+            case "Fighter": u = new Fighter(arr[5],arr[6],Integer.parseInt(arr[7]),Integer.parseInt(arr[8]),Integer.parseInt(arr[9]),Integer.parseInt(arr[10]),
                     Integer.parseInt(arr[1]),Integer.parseInt(arr[2]), (size / 30),(size / 30),new ImageIcon("src/res/Unit.png").getImage(),
                     new ArrayList<>());break;
-            case "Diver": u = new Diver(arr[5],Integer.parseInt(arr[6]),Integer.parseInt(arr[7]),Integer.parseInt(arr[8]),Integer.parseInt(arr[9]),
+            case "Diver": u = new Diver(arr[5],arr[6],Integer.parseInt(arr[7]),Integer.parseInt(arr[8]),Integer.parseInt(arr[9]),Integer.parseInt(arr[10]),
                     Integer.parseInt(arr[1]),Integer.parseInt(arr[2]), (size / 30),(size / 30),new ImageIcon("src/res/Unit.png").getImage(),
                     new ArrayList<>());break;
-            case "Climber": u = new Climber(arr[5],Integer.parseInt(arr[6]),Integer.parseInt(arr[7]),Integer.parseInt(arr[8]),Integer.parseInt(arr[9]),
+            case "Climber": u = new Climber(arr[5],arr[6],Integer.parseInt(arr[7]),Integer.parseInt(arr[8]),Integer.parseInt(arr[9]),Integer.parseInt(arr[10]),
                     Integer.parseInt(arr[1]),Integer.parseInt(arr[2]), (size / 30),(size / 30),new ImageIcon("src/res/Unit.png").getImage(),
                     new ArrayList<>());break;
-            case "Destroyer": u = new Destroyer(arr[5],Integer.parseInt(arr[6]),Integer.parseInt(arr[7]),Integer.parseInt(arr[8]),Integer.parseInt(arr[9]),
+            case "Destroyer": u = new Destroyer(arr[5],arr[6],Integer.parseInt(arr[7]),Integer.parseInt(arr[8]),Integer.parseInt(arr[9]),Integer.parseInt(arr[10]),
                     Integer.parseInt(arr[1]),Integer.parseInt(arr[2]), (size / 30),(size / 30),new ImageIcon("src/res/Unit.png").getImage(),
                     new ArrayList<>());break;
-            default: u = new General(arr[5],Integer.parseInt(arr[6]),Integer.parseInt(arr[7]),Integer.parseInt(arr[8]),Integer.parseInt(arr[9]),
+            default: u = new General(arr[5],arr[6],Integer.parseInt(arr[7]),Integer.parseInt(arr[8]),Integer.parseInt(arr[9]),Integer.parseInt(arr[10]),
                     Integer.parseInt(arr[1]),Integer.parseInt(arr[2]), (size / 30),(size / 30),new ImageIcon("src/res/Unit.png").getImage(),
                     new ArrayList<>());break;
         }

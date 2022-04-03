@@ -86,7 +86,7 @@ public class Model {
         position[randPos][3] = 'C';
         position[randPos + 1][3] = 'C';
         //castles' size is 2x2
-        Castle c1 = new Castle(randPos * (size / 30), 2 * (size / 30), (size / 15), (size / 15), Castle, 300);
+        Castle c1 = new Castle("blue", randPos * (size / 30), 2 * (size / 30), (size / 15), (size / 15), Castle, 300);
         terrain.add(c1);
         players[0].setCastle(c1);
 
@@ -95,7 +95,7 @@ public class Model {
         position[randPos + 1][27] = 'C';
         position[randPos][26] = 'C';
         position[randPos + 1][26] = 'C';
-        Castle c2 = new Castle(randPos * (size / 30), 26 * (size / 30), (size / 15), (size / 15), Castle, 300);
+        Castle c2 = new Castle("red", randPos * (size / 30), 26 * (size / 30), (size / 15), (size / 15), Castle, 300);
         terrain.add(c2);
         players[1].setCastle(c2);
 
@@ -265,7 +265,7 @@ public class Model {
 
                 if (players[i].getUnits() != null) {
                     for (Unit u : players[i].getUnits()) {
-                        writer.write("U " + u.x + " " + u.y + " " + u.width + " " + u.height + " " + u.getType() + " " + u.getDistance()
+                        writer.write("U " + u.color + " " + u.x + " " + u.y + " " + u.width + " " + u.height + " " + u.getType() + " " + u.getDistance()
                                 + " " + u.getPower() + " " + u.getHp() + " " + u.getPrice());
                         writer.write(System.getProperty("line.separator"));
                     }
@@ -370,27 +370,62 @@ public class Model {
         }
         return info;
     }
-    
-    public ArrayList<Tower> towersNearby(int actPlayer,Unit u){
-        ArrayList<Tower>towersNB=new ArrayList<Tower>();
-        
-        ArrayList<Tower> enemyTowers=players[(actPlayer+1)%2].getTowers();
-        
+
+    public ArrayList<Tower> towersNearby(int actPlayer, Unit u) {
+        ArrayList<Tower> towersNB = new ArrayList<Tower>();
+
+        ArrayList<Tower> enemyTowers = players[(actPlayer + 1) % 2].getTowers();
+
         //System.out.println("enemy towers: "+enemyTowers.toString());
-        
-        if(enemyTowers.size()>0){
-            for(Tower t : enemyTowers){
-                System.out.println(distance(u.x/(size/30),t.x/(size/30),u.y/(size/30),t.y/(size/30)));
-                if(distance(u.x/(size/30),t.x/(size/30),u.y/(size/30),t.y/(size/30))==1){
+        if (enemyTowers.size() > 0) {
+            for (Tower t : enemyTowers) {
+                //System.out.println(distance(u.x/(size/30),t.x/(size/30),u.y/(size/30),t.y/(size/30)));
+                if (distance(u.x / (size / 30), t.x / (size / 30), u.y / (size / 30), t.y / (size / 30)) == 1) {
                     towersNB.add(t);
                 }
             }
         }
-        
-        
-        
+
         return towersNB;
     }
+    
+     public ArrayList<Unit> enemyUnitsNearby(int actPlayer, Unit u) {
+     
+         ArrayList<Unit> enemyUnitsNB = new ArrayList<>();
+         
+         ArrayList<Unit> enemyUnits = players[(actPlayer + 1) % 2].getUnits();
+         
+         if (enemyUnits.size() > 0) {
+            for (Unit eu: enemyUnits) {
+                //System.out.println(distance(u.x/(size/30),t.x/(size/30),u.y/(size/30),t.y/(size/30)));
+                if (distance(u.x / (size / 30), eu.x / (size / 30), u.y / (size / 30), eu.y / (size / 30)) == 0) {
+                    enemyUnitsNB.add(eu);
+                }
+            }
+        }
+         
+         return enemyUnitsNB;
+     
+     }
+     
+     public ArrayList<Unit> enemyUnitsNearby(int actPlayer, Tower t) {
+     
+         ArrayList<Unit> enemyUnitsNB = new ArrayList<>();
+         
+         ArrayList<Unit> enemyUnits = players[(actPlayer + 1) % 2].getUnits();
+         
+         if (enemyUnits.size() > 0) {
+            for (Unit eu: enemyUnits) {
+                //System.out.println(distance(u.x/(size/30),t.x/(size/30),u.y/(size/30),t.y/(size/30)));
+                if (distance(t.x / (size / 30), eu.x / (size / 30), t.y / (size / 30), eu.y / (size / 30)) <=t.range) {
+                    enemyUnitsNB.add(eu);
+                }
+            }
+        }
+         
+         return enemyUnitsNB;
+     
+     }
 
     public ArrayList<Sprite> getSelectables() {
         return selectables;
