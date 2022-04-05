@@ -1,10 +1,12 @@
 package model;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import javax.swing.ImageIcon;
 
-public abstract class Tower extends Sprite{
-    
+public abstract class Tower extends Sprite {
+
     protected String type;
     protected int power;
     protected int range;
@@ -13,17 +15,21 @@ public abstract class Tower extends Sprite{
     protected int price;
     protected int demolishedIn;
     protected int level;
+    protected int maxHp;
+    protected Color color;
 
-    public Tower(String type, int power, int range, double attack_speed, int hp, int price, int x, int y, int height, int width, Image img) {
+    public Tower(String scolor, int x, int y, int height, int width, Image img) {
         super(x, y, height, width, img);
-        this.type = type;
-        this.power = power;
-        this.range = range;
-        this.attack_speed = attack_speed;
-        this.hp = hp;
-        this.price = price;
+
         this.demolishedIn = -1;
         level = 1;
+        if (scolor == "red") {
+            this.color = Color.red;
+            this.img = new ImageIcon("src/res/Towerred.png").getImage();
+        } else {
+            this.color = Color.blue;
+            this.img = new ImageIcon("src/res/Towerblue.png").getImage();
+        }
     }
 
     public String getType() {
@@ -74,20 +80,54 @@ public abstract class Tower extends Sprite{
         this.price = price;
     }
 
-    public int getLevel() {return level;}
-
-    public void setLevel(int lvl){level = lvl;}
+    public int getLevel() {
+        return level;
+    }
     
+    public int getMaxHp() {
+        return maxHp;
+    }
+
+    public void setMaxHp(int maxHp) {
+        this.maxHp = maxHp;
+    }
+
+    public void setLevel(int lvl) {
+        level = lvl;
+    }
+
     public abstract void upgrade();
-    public void demolish(){
+
+    public void demolish() {
         demolishedIn = 4;//2 whole round
         img = new ImageIcon("src/res/Destroyed.png").getImage();
     }
-    public int getDemolishedIn(){
+
+    public int getDemolishedIn() {
         return demolishedIn;
     }
-    public void setDemolishedIn(int x){
+
+    public void setDemolishedIn(int x) {
         demolishedIn -= x;
     }
-    
+
+    private double hpLine() {
+        double d = (double) hp / maxHp;
+            return d * width;
+
+    }
+
+    @Override
+    public void draw(Graphics2D g2) {
+
+        if (hp != 0) {
+            g2.drawImage(img, x, y, height, width, null);
+            g2.setColor(color);
+            g2.drawLine(x + 2, y + height - 2, x + (int) hpLine() - 2, y + height - 2);
+            g2.drawLine(x + 2, y + height - 3, x + (int) hpLine() - 2, y + height - 3);
+            g2.drawLine(x + 2, y + height - 4, x + (int) hpLine() - 2, y + height - 4);
+        }
+
+    }
+
 }
