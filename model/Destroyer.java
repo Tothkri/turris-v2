@@ -3,9 +3,22 @@ package model;
 import java.awt.Image;
 import java.util.ArrayList;
 
-public class Destroyer extends Unit{
+public class Destroyer extends Unit {
 
-    public Destroyer(String type,String scolor, int distance, int power, int hp, int price, int x, int y, int height, int width, Image img,ArrayList<Node> way) {
-        super(type,scolor, distance, power, hp, price, x, y, height, width, img,way);
+    //constructor for loaded units
+    public Destroyer(String type, String scolor, int distance, int power, int hp, int price, int x, int y, int height, int width, Image img) {
+        super(scolor, x, y, height, width, img);
+        this.maxHp = 15;
+    }
+
+    //constructor for creating new unit
+    public Destroyer(String scolor, int x, int y, int height, int width, Image img, ArrayList<Node> way) {
+        super(scolor, x, y, height, width, img);
+        this.distance = 3;
+        this.power = 6;
+        this.hp = 15;
+        this.price = 40;
+        this.type = "Destroyer";
+        this.maxHp = 15;
     }
 }

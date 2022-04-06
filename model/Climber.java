@@ -3,12 +3,22 @@ package model;
 import java.awt.Image;
 import java.util.ArrayList;
 
+public class Climber extends Unit {
 
-public class Climber extends Unit{
+    //constructor for loaded units
+    public Climber(String type, String scolor, int distance, int power, int hp, int price, int x, int y, int height, int width, Image img) {
+        super(scolor, x, y, height, width, img);
+        this.maxHp = 10;
+    }
 
-    public Climber(String type,String scolor, int distance, int power, int hp, int price, int x, int y, int height, int width, Image img,ArrayList<Node> way) {
-        super(type,scolor, distance, power, hp, price, x, y, height, width, img,way);
-    
-    } 
+    //constructor for creating new unit
+    public Climber(String scolor, int x, int y, int height, int width, Image img, ArrayList<Node> way) {
+        super(scolor, x, y, height, width, img);
+        this.distance = 4;
+        this.power = 4;
+        this.hp = 10;
+        this.price = 20;
+        this.type = "Climber";
+        this.maxHp = 10;
+    }
 }
-

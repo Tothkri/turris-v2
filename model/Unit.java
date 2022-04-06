@@ -15,6 +15,15 @@ public abstract class Unit extends Sprite {
     protected int price;
     protected ArrayList<Node> way;
     protected Color color;
+    protected int maxHp;
+
+    public int getMaxHp() {
+        return maxHp;
+    }
+
+    public void setMaxHp(int maxHp) {
+        this.maxHp = maxHp;
+    }
 
     protected void move(int x, int y) {
         this.x = x;
@@ -26,24 +35,13 @@ public abstract class Unit extends Sprite {
     }
 
     private double hpLine() {
-        if (type == "General" || type == "Climber" || type == "Diver") {
-            double d=(double)hp/10;
+        double d = (double) hp / maxHp;
             return d * width;
-        } else {
-            double d=(double)hp/15;
-            return d * width;
-        }
 
     }
 
-    public Unit(String type, String scolor, int distance, int power, int hp, int price, int x, int y, int height, int width, Image img, ArrayList<Node> way) {
+    public Unit(String scolor, int x, int y, int height, int width, Image img) {
         super(x, y, height, width, img);
-        this.type = type;
-        this.distance = distance;
-        this.power = power;
-        this.hp = hp;
-        this.price = price;
-        this.way = way;
         if (scolor == "red") {
             this.color = Color.red;
             this.img = new ImageIcon("src/res/Unitred.png").getImage();
@@ -51,6 +49,7 @@ public abstract class Unit extends Sprite {
             this.color = Color.blue;
             this.img = new ImageIcon("src/res/Unitblue.png").getImage();
         }
+        this.way=null;
     }
 
     public String getType() {
