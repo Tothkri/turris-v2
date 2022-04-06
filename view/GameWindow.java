@@ -1,7 +1,11 @@
 package view;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import model.*;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -26,6 +30,7 @@ import javax.swing.Timer;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.border.EmptyBorder;
 import javax.swing.text.BadLocationException;
 import model.Model;
 import model.Player;
@@ -68,8 +73,8 @@ public class GameWindow extends JPanel implements ActionListener {
         super();
         board = new Board(selectedMap, p1Name, p2Name, width, height);
         this.model = board.getModel();
-
         model.setRound(1);
+        
         //players have 50% chance to start the game
         Random rand = new Random();
 
@@ -94,11 +99,9 @@ public class GameWindow extends JPanel implements ActionListener {
             public void run() {
                 try {
                     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-                }
+                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {  }
 
                 JTextPane text = new JTextPane() {
-
                     @Override
                     public String getToolTipText() {
                         return ((JComponent) getParent()).getToolTipText();
@@ -108,23 +111,22 @@ public class GameWindow extends JPanel implements ActionListener {
                     public String getToolTipText(MouseEvent event) {
                         return ((JComponent) getParent()).getToolTipText(event);
                     }
-
                 };
+                
                 try {
                     text.getStyledDocument().insertString(0, ".", null);
                 } catch (BadLocationException e) {
                     e.printStackTrace();
                 }
-
+                
                 ToolTipManager.sharedInstance().registerComponent(text);
             }
-
         });
 
         saveButton = new JButton("Save game");
         saveButton.addActionListener((event) -> saveGame());
 
-        this.add(saveButton);
+        //this.add(saveButton);
         this.setLayout(new GridBagLayout());
 
         p1TowerButtons = new JButton[5];
@@ -132,18 +134,20 @@ public class GameWindow extends JPanel implements ActionListener {
         p2TowerButtons = new JButton[5];
         p2UnitButtons = new JButton[5];
 
-        //rounds = new JLabel("Round: 1");
         setPanels();
 
-        p1TowerButtons[0].addActionListener(ae -> {
-            towerPlaceAction("Fortified");
-        });
-        p1TowerButtons[1].addActionListener(ae -> {
-            towerPlaceAction("Rapid");
-        });
-        p1TowerButtons[2].addActionListener(ae -> {
-            towerPlaceAction("Sniper");
-        });
+        
+        //PLAYER BUTTONS
+        /**
+        * PLAYER1 Tower típusok
+        */
+        p1TowerButtons[0].addActionListener(ae -> { towerPlaceAction("Fortified"); });
+        p1TowerButtons[1].addActionListener(ae -> { towerPlaceAction("Rapid"); });
+        p1TowerButtons[2].addActionListener(ae -> { towerPlaceAction("Sniper"); });
+        
+        /**
+        * PLAYER1 Tower management
+        */
         p1TowerButtons[3].addActionListener(ae -> {
             buttonAction = "upgrade";
             model.setSelectableTowers(true);
@@ -152,6 +156,10 @@ public class GameWindow extends JPanel implements ActionListener {
             buttonAction = "demolish";
             model.setSelectableTowers(false);
         });
+        
+        /**
+        * PLAYER1 Unit típusok
+        */
         p1UnitButtons[0].addActionListener(ae -> {
             board.setModel(model.getPlayers()[0].sendUnits("General", "blue", 1, model));
             playerDataUpdate();
@@ -172,6 +180,30 @@ public class GameWindow extends JPanel implements ActionListener {
             board.setModel(model.getPlayers()[0].sendUnits("Destroyer", "blue", 1, model));
             playerDataUpdate();
         });
+        ////////////////////////////////////////////////////////////////////////
+        
+        /**
+        * PLAYER2 Tower típusok
+        */
+        p2TowerButtons[0].addActionListener(ae -> { towerPlaceAction("Fortified"); });
+        p2TowerButtons[1].addActionListener(ae -> { towerPlaceAction("Rapid"); });
+        p2TowerButtons[2].addActionListener(ae -> { towerPlaceAction("Sniper"); });
+        
+        /**
+        * PLAYER2 Tower management
+        */
+        p2TowerButtons[3].addActionListener(ae -> {
+            buttonAction = "upgrade";
+            model.setSelectableTowers(true);
+        });
+        p2TowerButtons[4].addActionListener(ae -> {
+            buttonAction = "demolish";
+            model.setSelectableTowers(false);
+        });
+        
+        /**
+        * PLAYER2 Unit típusok
+        */
         p2UnitButtons[0].addActionListener(ae -> {
             board.setModel(model.getPlayers()[1].sendUnits("General", "red", 1, model));
             playerDataUpdate();
@@ -192,27 +224,9 @@ public class GameWindow extends JPanel implements ActionListener {
             board.setModel(model.getPlayers()[1].sendUnits("Destroyer", "red", 1, model));
             playerDataUpdate();
         });
-        p2TowerButtons[0].addActionListener(ae -> {
-            towerPlaceAction("Fortified");
-        });
-        p2TowerButtons[1].addActionListener(ae -> {
-            towerPlaceAction("Rapid");
-        });
-        p2TowerButtons[2].addActionListener(ae -> {
-            towerPlaceAction("Sniper");
-        });
 
-        p2TowerButtons[3].addActionListener(ae -> {
-            buttonAction = "upgrade";
-            model.setSelectableTowers(true);
-        });
-        p2TowerButtons[4].addActionListener(ae -> {
-            buttonAction = "demolish";
-            model.setSelectableTowers(false);
-        });
-
-        board.addMouseListener(new MouseAdapter() // after selecting tower type, players must click where they want to place it
-        {
+        // after selecting tower type, players must click where they want to place it
+        board.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int x = e.getX() / (model.getSize() / 30);
@@ -238,14 +252,12 @@ public class GameWindow extends JPanel implements ActionListener {
 
                 board.repaint();
                 playerDataUpdate();
-
             }
         });
 
         ticks = (1000 / timerInterval) * 60;
 
         timer = new Timer(timerInterval, (ActionEvent ae) -> {
-
             PointerInfo a = MouseInfo.getPointerInfo();
 
             Point b = a.getLocation();
@@ -328,35 +340,24 @@ public class GameWindow extends JPanel implements ActionListener {
                 }
             }
 
-                    ticks--;
-                    if (!model.isOver()) {
-                        int newtime = (ticks + 1) / 2;
-                        if (newtime == 0) {
-                            newRound();
-                        } else {
-                            //timeSec = (int) (System.currentTimeMillis() - time) / 1000;
-                            //timeLabel.setText("Time " + timeSec + " s,");
-                            timeAndRoundLabel.setText("Time left: " + (ticks + 1) / (1000 / timerInterval) + " s, round: " + (model.getRound() + 1) / 2);
-                        }
-
-                        board.repaint();
-
-                    } else {
-                        gameOver();
-                    }
-
+            ticks--;
+            if (!model.isOver()) {
+                int newtime = (ticks + 1) / 2;
+                if (newtime == 0) {
+                    newRound();
+                } else {
+                    timeAndRoundLabel.setText("Time left: " + (ticks + 1) / (1000 / timerInterval) 
+                        + " sec // Round: " + (model.getRound() + 1) / 2);
                 }
-                );
+                board.repaint();
+            } else {
+                gameOver();
+            }
+        }
+        );
 
         timer.start();
-
-                activePlayerPanelSetter();
-            }
-
-    
-
-    public int getTicks() {
-        return ticks;
+        activePlayerPanelSetter();
     }
 
     public boolean simulation() {
@@ -450,12 +451,9 @@ public class GameWindow extends JPanel implements ActionListener {
                     }
                     model.getPlayers()[q].deleteUnit(model.getPlayers()[q].getUnits().get(i));
                     //remove units who reached Castle after dealing damage to it
-                    if (i > 0) {
-                        i--;
-                    }
+                    if (i > 0) { i--; }
                 }
             }
-
         }
         return moreDistance;
     }
@@ -479,18 +477,14 @@ public class GameWindow extends JPanel implements ActionListener {
         // TODO repeated code goes here
     }
 
-    public Board getBoard() {
-        return board;
-    }
-
     public void towerPlaceAction(String sc) {
         selectedTower = sc;
         buttonAction = "placeTower";
         model.setSelectables();
     }
 
-    private void showWays() //helper
-    {
+    //helper
+    private void showWays() {
         System.out.print("p1: ");
         for (Unit u : model.getPlayers()[0].getUnits()) {
             System.out.println(u.getWay());
@@ -501,13 +495,12 @@ public class GameWindow extends JPanel implements ActionListener {
         }
     }
 
-    /*
-    now it's the other player's round
-    both players get 100 coins
-    after every 2 rounds, the simulation starts
-     */
+    /**
+    * now it's the other player's round
+    * both players get 100 coins
+    * after every 2 rounds, the simulation starts
+    */
     public void newRound() {
-
         model.setSelectables(new ArrayList<>());
         model.setRound(model.getRound() + 1);
 
@@ -550,6 +543,7 @@ public class GameWindow extends JPanel implements ActionListener {
                 }
             }
         }
+        
         model.getPlayers()[0].setTowers(p1Towers);
         ArrayList<Tower> p2Towers = model.getPlayers()[1].getTowers();
         for (int i = p2Towers.size() - 1; i >= 0; i--) {
@@ -566,40 +560,83 @@ public class GameWindow extends JPanel implements ActionListener {
     }
 
     public void gameOver() {
-        JOptionPane.showInputDialog(
-                winner + " won, congratulations!");
+        JOptionPane.showInputDialog(winner + " won, congratulations!");
         System.exit(0);
     }
 
     public void saveGame() {
         String filename;
-
         filename = JOptionPane.showInputDialog("Filename:");
-        if (filename == null || filename.length() == 0) {
-            return;
-        }
-
+        if (filename == null || filename.length() == 0) { return; }
         model.saveData(filename);
+    }
+    
+    /**
+    * Outlines
+    */
+    @Override
+    protected void paintComponent(Graphics grph) {
+        super.paintComponent(grph);
+        Graphics2D grphcs2 = (Graphics2D)grph;
+        
+        /*grph.setColor(Color.DARK_GRAY);
+        grphcs2.fillRoundRect(600, 20, 790, 175, 50, 50);   //Game name LABEL
+        grphcs2.fillRoundRect(157, 215, 765, 840, 50, 50);  //Player name LABEL
+        grphcs2.fillRoundRect(1013, 855, 765, 201, 50, 50);  //Start game LABEL
 
+        grph.setColor(Color.LIGHT_GRAY);
+        //int x, int y, int width, int height, int arcWidth, int arcHeight
+        grphcs2.fillRoundRect(610, 30, 770, 155, 30, 30);   //Game name LABEL
+        grphcs2.fillRoundRect(167, 225, 745, 270, 30, 30);  //Player name LABEL
+        grphcs2.fillRoundRect(167, 510, 745, 335, 30, 30);  //Map name LABEL
+        grphcs2.fillRoundRect(167, 860, 745, 185, 30, 30);  //Load game LABEL
+        grphcs2.fillRoundRect(1023, 865, 745, 181, 30, 30);  //Start game LABEL*/
     }
 
+    /**
+    * UI-on megjelenő gombok elhelyezése
+    */
     public final void setPanels() {
-        /*this.add(exitButton);
-        this.add(saveButton);
-         */
-        JPanel p1Panel = new JPanel();
-        JPanel p2Panel = new JPanel();
-        p1Data = new JLabel();
-        p2Data = new JLabel();
+        Color algaeGreen    = new Color(105, 168, 120);
+        Color veryLightGray = new Color(220, 220, 220);
+        Color transp        = new Color(1f, 0f, 0f, .5f);
+        
+        JPanel p1Panel          = new JPanel(); //whole panel
+        JPanel p1Stats          = new JPanel(); //legfelső (name/cas hp/money)
+        JPanel p1TwrLabelRow    = new JPanel(); //tower text
+        JPanel p1TwrOptRow      = new JPanel(); //tower button options
+        JPanel p1TwrManLabelRow = new JPanel(); //tower management text
+        JPanel p1TwrManOptRow   = new JPanel(); //tower management button options
+        JPanel p1UnitLabelRow   = new JPanel(); //unit text
+        JPanel p1UnitOptRow     = new JPanel(); //unit button options
+        
+        p1Data                  = new JLabel();
+        JLabel p1Twr            = new JLabel("Towers");
+        JLabel p1TwrMan         = new JLabel("Tower Management");
+        JLabel p1UnitLab        = new JLabel("Units");
+        
+        
+        JPanel p2Panel          = new JPanel();
+        JPanel p2Stats          = new JPanel();
+        JPanel p2TwrLabelRow    = new JPanel();
+        JPanel p2TwrOptRow      = new JPanel();
+        JPanel p2TwrManLabelRow = new JPanel();
+        JPanel p2TwrManOptRow   = new JPanel();
+        JPanel p2UnitLabelRow   = new JPanel();
+        JPanel p2UnitOptRow     = new JPanel();
+        
+        p2Data                  = new JLabel();
+        JLabel p2Twr            = new JLabel("Towers");
+        JLabel p2TwrMan         = new JLabel("Tower Management");
+        JLabel p2UnitLab        = new JLabel("Units");
 
         playerDataUpdate();
-
+        
         p1TowerButtons[0] = new JButton("Fortified");
         p1TowerButtons[1] = new JButton("Rapid");
         p1TowerButtons[2] = new JButton("Sniper");
         p1TowerButtons[3] = new JButton("Upgrade");
         p1TowerButtons[4] = new JButton("Demolish");
-
         p1UnitButtons[0] = new JButton("General");
         p1UnitButtons[1] = new JButton("Fighter");
         p1UnitButtons[2] = new JButton("Climber");
@@ -611,124 +648,505 @@ public class GameWindow extends JPanel implements ActionListener {
         p2TowerButtons[2] = new JButton("Sniper");
         p2TowerButtons[3] = new JButton("Upgrade");
         p2TowerButtons[4] = new JButton("Demolish");
-
         p2UnitButtons[0] = new JButton("General");
         p2UnitButtons[1] = new JButton("Fighter");
         p2UnitButtons[2] = new JButton("Climber");
         p2UnitButtons[3] = new JButton("Diver");
         p2UnitButtons[4] = new JButton("Destroyer");
-
-        p1Panel.setLayout(new BoxLayout(p1Panel, BoxLayout.PAGE_AXIS));
-        p2Panel.setLayout(new BoxLayout(p2Panel, BoxLayout.PAGE_AXIS));
-
-        p1Panel.add(p1Data);
-        p1Panel.add(p1TowerButtons[0]);
-        p1Panel.add(p1TowerButtons[1]);
-        p1Panel.add(p1TowerButtons[2]);
-        p1Panel.add(p1TowerButtons[3]);
-        p1Panel.add(p1TowerButtons[4]);
-        p1Panel.add(new JLabel("Units"));
-        p1Panel.add(p1UnitButtons[0]);
-        p1Panel.add(p1UnitButtons[1]);
-        p1Panel.add(p1UnitButtons[2]);
-        p1Panel.add(p1UnitButtons[3]);
-        p1Panel.add(p1UnitButtons[4]);
-
-        p2Panel.add(p2Data);
-        p2Panel.add(p2TowerButtons[0]);
-        p2Panel.add(p2TowerButtons[1]);
-        p2Panel.add(p2TowerButtons[2]);
-        p2Panel.add(p2TowerButtons[3]);
-        p2Panel.add(p2TowerButtons[4]);
-        p2Panel.add(new JLabel("Units"));
-        p2Panel.add(p2UnitButtons[0]);
-        p2Panel.add(p2UnitButtons[1]);
-        p2Panel.add(p2UnitButtons[2]);
-        p2Panel.add(p2UnitButtons[3]);
-        p2Panel.add(p2UnitButtons[4]);
-
+        
+        this.setBackground(algaeGreen);
+        
+        //p1 panels
+        p1Panel.setLayout       (new GridBagLayout());
+        p1TwrOptRow.setLayout   (new GridBagLayout());
+        p1TwrManOptRow.setLayout(new GridBagLayout());
+        p1UnitOptRow.setLayout  (new GridBagLayout());
+        
+        //p2 panels
+        p2Panel.setLayout       (new GridBagLayout());
+        p2TwrOptRow.setLayout   (new GridBagLayout());
+        p2TwrManOptRow.setLayout(new GridBagLayout());
+        p2UnitOptRow.setLayout  (new GridBagLayout());
+        
+        //Elhelyezés
         GridBagConstraints gbc = new GridBagConstraints();
+        
+        GridBagConstraints gbl = new GridBagConstraints();
+        GridBagConstraints gbtl = new GridBagConstraints();
+        GridBagConstraints gbml = new GridBagConstraints();
+        GridBagConstraints gbul = new GridBagConstraints();
+        
+        GridBagConstraints gbr = new GridBagConstraints();
+        GridBagConstraints gbtr = new GridBagConstraints();
+        GridBagConstraints gbmr = new GridBagConstraints();
+        GridBagConstraints gbur = new GridBagConstraints();
 
+        /**
+        * Játéktér
+        */
+        gbc.anchor = GridBagConstraints.CENTER; //nem csinál semmit..
+        gbc.insets = new Insets(0, 45, 0, 45);
         gbc.gridx = 1;
         gbc.gridy = 1;
         this.add(board, gbc);
-
-        gbc.insets = new Insets(0, 0, 0, 200);
+        
+        
+        /*
+        - statok: valami custom megoldást találni
+        - nagyobb labelek közötti gap: grapics-szal
+        - gombok közötti gap: invisible borders
+        - gombok: 
+            - egységes méret
+            - balra zárt text
+        */
+        
+        /**
+        * Player 1 UI - p1Panel MAIN
+        */
+        p1Panel.setPreferredSize(new Dimension(420, 930));
+        p1Panel.setBackground(Color.DARK_GRAY);
+        
+        
+        //STATOK: név + pénz + kastély hp
+        p1Stats.add             (p1Data);
+        p1Stats.setBackground   (veryLightGray);
+        
+        p1Data.setPreferredSize (new Dimension(380, 115));
+        p1Data.setFont          (new Font("Calibri", Font.PLAIN, 35));  //35
+        p1Data.setBorder        (new EmptyBorder(0, 5, 8, 0));
+        
+        gbl.insets = new Insets(-210, 0, 100, 0);
+        gbl.gridx = 0;
+        gbl.gridy = 0;
+        p1Panel.add(p1Stats, gbl);
+        
+        
+        //Tower LABEL
+        p1TwrLabelRow.add               (p1Twr);
+        p1TwrLabelRow.setBorder         (new EmptyBorder(8, 0, 0, 240));
+        p1TwrLabelRow.setBackground     (veryLightGray);
+        p1TwrLabelRow.setPreferredSize  (new Dimension(390, 60));
+        
+        p1Twr.setFont                   (new Font("Calibri", Font.PLAIN, 40));
+        
+        gbl.insets = new Insets(-100, 0, 0, 0);
+        gbl.gridx = 0;
+        gbl.gridy = 1;
+        p1Panel.add(p1TwrLabelRow, gbl);
+        
+        
+        //Tower BUTTONS
+        p1TowerButtons[0].setPreferredSize(new Dimension(260, 40));
+        p1TowerButtons[0].setFont(new Font("Calibri", Font.PLAIN, 25));
+        p1TowerButtons[0].setMargin(new Insets(8, 0, 0, 0));
+        gbtl.insets = new Insets(2, 0, 3, 0);
+        gbtl.gridx = 0;
+        gbtl.gridy = 0;
+        p1TwrOptRow.add(p1TowerButtons[0], gbtl);
+        
+        p1TowerButtons[1].setPreferredSize(new Dimension(260, 40));
+        p1TowerButtons[1].setFont(new Font("Calibri", Font.PLAIN, 25));
+        p1TowerButtons[1].setMargin(new Insets(8, 0, 0, 0));
+        gbtl.insets = new Insets(3, 0, 3, 0);
+        gbtl.gridx = 0;
+        gbtl.gridy = 1;
+        p1TwrOptRow.add(p1TowerButtons[1], gbtl);
+        
+        p1TowerButtons[2].setPreferredSize(new Dimension(260, 40));
+        p1TowerButtons[2].setFont(new Font("Calibri", Font.PLAIN, 25));
+        p1TowerButtons[2].setMargin(new Insets(8, 0, 0, 0));
+        gbtl.insets = new Insets(3, 0, 2, 0);
+        gbtl.gridx = 0;
+        gbtl.gridy = 2;
+        p1TwrOptRow.add(p1TowerButtons[2], gbtl);
+        
+        p1TwrOptRow.setBackground     (Color.LIGHT_GRAY);
+        p1TwrOptRow.setPreferredSize  (new Dimension(390, 160));
+        
+        gbl.insets = new Insets(-20, 0, 20, 0);
+        gbl.gridx = 0;
+        gbl.gridy = 2;
+        p1Panel.add(p1TwrOptRow, gbl);
+        
+        
+        //Tower management LABEL
+        p1TwrManLabelRow.add                (p1TwrMan);
+        p1TwrManLabelRow.setBorder          (new EmptyBorder(8, 0, 0, 30));
+        p1TwrManLabelRow.setBackground      (veryLightGray);
+        p1TwrManLabelRow.setPreferredSize   (new Dimension(390, 60));
+        
+        p1TwrMan.setFont                    (new Font("Calibri", Font.PLAIN, 40));
+        
+        gbl.insets = new Insets(0, 0, 0, 0);
+        gbl.gridx = 0;
+        gbl.gridy = 3;
+        p1Panel.add(p1TwrManLabelRow, gbl);
+        
+        
+        //Tower management BUTTONS
+        p1TowerButtons[3].setPreferredSize  (new Dimension(260, 40));
+        p1TowerButtons[3].setFont           (new Font("Calibri", Font.PLAIN, 25));
+        p1TowerButtons[3].setMargin         (new Insets(8, 0, 0, 0));
+        gbml.insets = new Insets(4, 0, 3, 0);
+        gbml.gridx = 0;
+        gbml.gridy = 0;
+        p1TwrManOptRow.add(p1TowerButtons[3], gbml);
+        
+        p1TowerButtons[4].setPreferredSize  (new Dimension(260, 40));
+        p1TowerButtons[4].setFont           (new Font("Calibri", Font.PLAIN, 25));
+        p1TowerButtons[4].setMargin         (new Insets(8, 0, 0, 0));
+        gbml.insets = new Insets(3, 0, 4, 0);
+        gbml.gridx = 0;
+        gbml.gridy = 1;
+        p1TwrManOptRow.add(p1TowerButtons[4], gbml);
+        
+        p1TwrManOptRow.setBackground        (Color.LIGHT_GRAY);
+        p1TwrManOptRow.setPreferredSize     (new Dimension(390, 110));
+        
+        gbl.insets = new Insets(0, 0, 20, 0);
+        gbl.gridx = 0;
+        gbl.gridy = 4;
+        p1Panel.add(p1TwrManOptRow, gbl);
+        
+        
+        //Units LABEL
+        p1UnitLabelRow.add                  (p1UnitLab);
+        p1UnitLabelRow.setBorder            (new EmptyBorder(8, 0, 0, 280));
+        p1UnitLabelRow.setBackground        (veryLightGray); 
+        p1UnitLabelRow.setPreferredSize     (new Dimension(390, 60));
+        
+        p1UnitLab.setFont                   (new Font("Calibri", Font.PLAIN, 40));
+        
+        gbl.insets = new Insets(0, 0, 0, 0);
+        gbl.gridx = 0;
+        gbl.gridy = 5;  //5
+        p1Panel.add(p1UnitLabelRow, gbl);
+        
+        
+        //Units BUTTONS
+        p1UnitButtons[0].setPreferredSize   (new Dimension(260, 40));
+        p1UnitButtons[0].setFont            (new Font("Calibri", Font.PLAIN, 25));
+        p1UnitButtons[0].setMargin          (new Insets(8, 0, 0, 0));
+        gbul.insets = new Insets(5, 0, 3, 0);
+        gbul.gridx = 0;
+        gbul.gridy = 0;
+        p1UnitOptRow.add(p1UnitButtons[0], gbul);
+        
+        p1UnitButtons[1].setPreferredSize   (new Dimension(260, 40));
+        p1UnitButtons[1].setFont            (new Font("Calibri", Font.PLAIN, 25));
+        p1UnitButtons[1].setMargin          (new Insets(8, 0, 0, 0));
+        gbul.insets = new Insets(3, 0, 3, 0);
+        gbul.gridx = 0;
+        gbul.gridy = 1;
+        p1UnitOptRow.add(p1UnitButtons[1], gbul);
+        
+        p1UnitButtons[2].setPreferredSize   (new Dimension(260, 40));
+        p1UnitButtons[2].setFont            (new Font("Calibri", Font.PLAIN, 25));
+        p1UnitButtons[2].setMargin          (new Insets(8, 0, 0, 0));
+        gbul.insets = new Insets(3, 0, 3, 0);
+        gbul.gridx = 0;
+        gbul.gridy = 2;
+        p1UnitOptRow.add(p1UnitButtons[2], gbul);
+        
+        p1UnitButtons[3].setPreferredSize   (new Dimension(260, 40));
+        p1UnitButtons[3].setFont            (new Font("Calibri", Font.PLAIN, 25));
+        p1UnitButtons[3].setMargin          (new Insets(8, 0, 0, 0));
+        gbul.insets = new Insets(3, 0, 3, 0);
+        gbul.gridx = 0;
+        gbul.gridy = 3;
+        p1UnitOptRow.add(p1UnitButtons[3], gbul);
+        
+        p1UnitButtons[4].setPreferredSize   (new Dimension(260, 40));
+        p1UnitButtons[4].setFont            (new Font("Calibri", Font.PLAIN, 25));
+        p1UnitButtons[4].setMargin          (new Insets(8, 0, 0, 0));
+        gbul.insets = new Insets(3, 0, 5, 0);
+        gbul.gridx = 0;
+        gbul.gridy = 4;
+        p1UnitOptRow.add(p1UnitButtons[4], gbul);
+        
+        p1UnitOptRow.setBackground     (Color.LIGHT_GRAY);
+        p1UnitOptRow.setPreferredSize  (new Dimension(390, 250));
+        
+        gbl.insets = new Insets(0, 0, -210, 0);
+        gbl.gridx = 0;
+        gbl.gridy = 6;  //6
+        p1Panel.add(p1UnitOptRow, gbl);
+        
+        
+        //p1Panel elhelyezkedése
+        gbc.insets = new Insets(0, 0, 0, 0);
         gbc.gridx = 0;
         gbc.gridy = 1;
         this.add(p1Panel, gbc);
 
-        gbc.insets = new Insets(0, 200, 0, 0);
+        
+        
+        /**
+        * Player 2 UI
+        */
+        p2Panel.setPreferredSize(new Dimension(420, 930));
+        p2Panel.setBackground(Color.DARK_GRAY);
+        
+        
+        //STATOK: név + pénz + kastély hp
+        p2Stats.add             (p2Data);
+        p2Stats.setBackground   (veryLightGray);
+        
+        p2Data.setPreferredSize (new Dimension(380, 115));
+        p2Data.setFont          (new Font("Calibri", Font.PLAIN, 35));
+        p2Data.setBorder        (new EmptyBorder(0, 5, 8, 0));
+        
+        gbr.insets = new Insets(-210, 0, 100, 0);
+        gbr.gridx = 0;
+        gbr.gridy = 0;
+        p2Panel.add(p2Stats, gbr);
+        
+        
+        //Tower LABEL
+        p2TwrLabelRow.add               (p2Twr);
+        p2TwrLabelRow.setBorder         (new EmptyBorder(8, 0, 0, 240));
+        p2TwrLabelRow.setBackground     (veryLightGray);
+        p2TwrLabelRow.setPreferredSize  (new Dimension(390, 60));
+        
+        p2Twr.setFont                   (new Font("Calibri", Font.PLAIN, 40));
+        
+        gbr.insets = new Insets(-100, 0, 0, 0);
+        gbr.gridx = 0;
+        gbr.gridy = 1;
+        p2Panel.add(p2TwrLabelRow, gbr);
+        
+        
+        //Tower BUTTONS
+        p2TowerButtons[0].setPreferredSize  (new Dimension(260, 40));
+        p2TowerButtons[0].setFont           (new Font("Calibri", Font.PLAIN, 25));
+        p2TowerButtons[0].setMargin         (new Insets(8, 0, 0, 0));
+        gbtr.insets = new Insets(2, 0, 3, 0);
+        gbtr.gridx = 0;
+        gbtr.gridy = 0;
+        p2TwrOptRow.add(p2TowerButtons[0], gbtr);
+        
+        p2TowerButtons[1].setPreferredSize  (new Dimension(260, 40));
+        p2TowerButtons[1].setFont           (new Font("Calibri", Font.PLAIN, 25));
+        p2TowerButtons[1].setMargin         (new Insets(8, 0, 0, 0));
+        gbtr.insets = new Insets(3, 0, 3, 0);
+        gbtr.gridx = 0;
+        gbtr.gridy = 1;
+        p2TwrOptRow.add(p2TowerButtons[1], gbtr);
+        
+        p2TowerButtons[2].setPreferredSize  (new Dimension(260, 40));
+        p2TowerButtons[2].setFont           (new Font("Calibri", Font.PLAIN, 25));
+        p2TowerButtons[2].setMargin         (new Insets(8, 0, 0, 0));
+        gbtr.insets = new Insets(3, 0, 2, 0);
+        gbtr.gridx = 0;
+        gbtr.gridy = 2;
+        p2TwrOptRow.add(p2TowerButtons[2], gbtr);
+        
+        p2TwrOptRow.setBackground     (Color.LIGHT_GRAY);
+        p2TwrOptRow.setPreferredSize  (new Dimension(390, 160));
+        
+        gbr.insets = new Insets(-20, 0, 20, 0);
+        gbr.gridx = 0;
+        gbr.gridy = 2;
+        p2Panel.add(p2TwrOptRow, gbr);
+        
+        
+        //Tower management LABEL
+        p2TwrManLabelRow.add                (p2TwrMan);
+        p2TwrManLabelRow.setBorder          (new EmptyBorder(8, 0, 0, 30));
+        p2TwrManLabelRow.setBackground      (veryLightGray);
+        p2TwrManLabelRow.setPreferredSize   (new Dimension(390, 60));
+        
+        p2TwrMan.setFont                    (new Font("Calibri", Font.PLAIN, 40));
+        
+        gbr.insets = new Insets(0, 0, 0, 0);
+        gbr.gridx = 0;
+        gbr.gridy = 3;
+        p2Panel.add(p2TwrManLabelRow, gbr);
+        
+        
+        //Tower management BUTTONS
+        p2TowerButtons[3].setPreferredSize  (new Dimension(260, 40));
+        p2TowerButtons[3].setFont           (new Font("Calibri", Font.PLAIN, 25));
+        p2TowerButtons[3].setMargin         (new Insets(8, 0, 0, 0));
+        gbmr.insets = new Insets(4, 0, 3, 0);
+        gbmr.gridx = 0;
+        gbmr.gridy = 0;
+        p2TwrManOptRow.add(p2TowerButtons[3], gbmr);
+        
+        p2TowerButtons[4].setPreferredSize  (new Dimension(260, 40));
+        p2TowerButtons[4].setFont           (new Font("Calibri", Font.PLAIN, 25));
+        p2TowerButtons[4].setMargin         (new Insets(8, 0, 0, 0));
+        gbmr.insets = new Insets(3, 0, 4, 0);
+        gbmr.gridx = 0;
+        gbmr.gridy = 1;
+        p2TwrManOptRow.add(p2TowerButtons[4], gbmr);
+        
+        p2TwrManOptRow.setBackground        (Color.LIGHT_GRAY);
+        p2TwrManOptRow.setPreferredSize     (new Dimension(390, 110));
+        
+        gbr.insets = new Insets(0, 0, 20, 0);
+        gbr.gridx = 0;
+        gbr.gridy = 4;
+        p2Panel.add(p2TwrManOptRow, gbr);
+        
+        
+        //Units LABEL
+        p2UnitLabelRow.add                  (p2UnitLab);
+        p2UnitLabelRow.setBorder            (new EmptyBorder(8, 0, 0, 280));
+        p2UnitLabelRow.setBackground        (veryLightGray); 
+        p2UnitLabelRow.setPreferredSize     (new Dimension(390, 60));
+        
+        p2UnitLab.setFont                   (new Font("Calibri", Font.PLAIN, 40));
+        
+        gbr.insets = new Insets(0, 0, 0, 0);
+        gbr.gridx = 0;
+        gbr.gridy = 5;  //5
+        p2Panel.add(p2UnitLabelRow, gbr);
+        
+        
+        //Units BUTTONS
+        p2UnitButtons[0].setPreferredSize   (new Dimension(260, 40));
+        p2UnitButtons[0].setFont            (new Font("Calibri", Font.PLAIN, 25));
+        p2UnitButtons[0].setMargin          (new Insets(8, 0, 0, 0));
+        gbur.insets = new Insets(5, 0, 3, 0);
+        gbur.gridx = 0;
+        gbur.gridy = 0;
+        p2UnitOptRow.add(p2UnitButtons[0], gbur);
+        
+        p2UnitButtons[1].setPreferredSize   (new Dimension(260, 40));
+        p2UnitButtons[1].setFont            (new Font("Calibri", Font.PLAIN, 25));
+        p2UnitButtons[1].setMargin          (new Insets(8, 0, 0, 0));
+        gbur.insets = new Insets(3, 0, 3, 0);
+        gbur.gridx = 0;
+        gbur.gridy = 1;
+        p2UnitOptRow.add(p2UnitButtons[1], gbur);
+        
+        p2UnitButtons[2].setPreferredSize   (new Dimension(260, 40));
+        p2UnitButtons[2].setFont            (new Font("Calibri", Font.PLAIN, 25));
+        p2UnitButtons[2].setMargin          (new Insets(8, 0, 0, 0));
+        gbur.insets = new Insets(3, 0, 3, 0);
+        gbur.gridx = 0;
+        gbur.gridy = 2;
+        p2UnitOptRow.add(p2UnitButtons[2], gbur);
+        
+        p2UnitButtons[3].setPreferredSize   (new Dimension(260, 40));
+        p2UnitButtons[3].setFont            (new Font("Calibri", Font.PLAIN, 25));
+        p2UnitButtons[3].setMargin          (new Insets(8, 0, 0, 0));
+        gbur.insets = new Insets(3, 0, 3, 0);
+        gbur.gridx = 0;
+        gbur.gridy = 3;
+        p2UnitOptRow.add(p2UnitButtons[3], gbur);
+        
+        p2UnitButtons[4].setPreferredSize   (new Dimension(260, 40));
+        p2UnitButtons[4].setFont            (new Font("Calibri", Font.PLAIN, 25));
+        p2UnitButtons[4].setMargin          (new Insets(8, 0, 0, 0));
+        gbur.insets = new Insets(3, 0, 5, 0);
+        gbur.gridx = 0;
+        gbur.gridy = 4;
+        p2UnitOptRow.add(p2UnitButtons[4], gbur);
+        
+        p2UnitOptRow.setBackground     (Color.LIGHT_GRAY);
+        p2UnitOptRow.setPreferredSize  (new Dimension(390, 250));
+        
+        gbr.insets = new Insets(0, 0, -210, 0);
+        gbr.gridx = 0;
+        gbr.gridy = 6;  //6
+        p2Panel.add(p2UnitOptRow, gbr);
+        
+        
+        //p2Panel elhelyezkedése
+        gbc.insets = new Insets(0, 0, 0, 0);
         gbc.gridx = 2;
         gbc.gridy = 1;
         this.add(p2Panel, gbc);
-
-        gbc.insets = new Insets(0, 0, 0, 0);
+        
+        
+        //Save game BUTTON
+        saveButton.setPreferredSize(new Dimension(260, 40));
+        saveButton.setFont(new Font("Calibri", Font.PLAIN, 25));
+        saveButton.setMargin(new Insets(8, 0, 0, 0));
+        gbc.insets = new Insets(-5, 0, 15, 0);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        this.add(saveButton, gbc);
+        
+        
+        //Exit game BUTTON
+        exitButton.setPreferredSize(new Dimension(260, 40));
+        exitButton.setFont(new Font("Calibri", Font.PLAIN, 25));
+        exitButton.setMargin(new Insets(8, 0, 0, 0));
+        gbc.insets = new Insets(-5, 0, 15, 0);
+        gbc.gridx = 2;
+        gbc.gridy = 0;
+        this.add(exitButton, gbc);
+        
+        
+        /**
+        * New round BUTTON
+        */
+        newRoundButton.setPreferredSize(new Dimension(932, 50));
+        newRoundButton.setFont(new Font("Calibri", Font.PLAIN, 32));
+        newRoundButton.setMargin(new Insets(12, 0, 0, 0));
+        gbc.insets = new Insets(10, 0, -5, 0);
         gbc.gridx = 1;
         gbc.gridy = 2;
         this.add(newRoundButton, gbc);
-
+        
+        
+        /**
+        * Round time & count LABEL
+        */
+        timeAndRoundLabel.setFont(new Font("Calibri", Font.BOLD, 30));
+        //timeAndRoundLabel.setBackground(veryLightGray);
+        gbc.insets = new Insets(5, 0, 8, 0);
         gbc.gridx = 1;
         gbc.gridy = 0;
         this.add(timeAndRoundLabel, gbc);
-
     }
 
+    /**
+    * Aktiválja a soron levő játékos gombjait
+    */
     public final void activePlayerPanelSetter() {
-        if (model.getActivePlayer() == 0) {
-            for (var button : p2TowerButtons) {
-                button.setEnabled(false);
-            }
-            for (var button : p2UnitButtons) {
-                button.setEnabled(false);
-            }
-            for (var button : p1TowerButtons) {
-                button.setEnabled(true);
-            }
-            for (var button : p1UnitButtons) {
-                button.setEnabled(true);
-            }
+        if (board.getModel().getActivePlayer() == 0) {
+            for (var button : p2TowerButtons)   { button.setEnabled(false); }
+            for (var button : p2UnitButtons)    { button.setEnabled(false); }
+            for (var button : p1TowerButtons)   { button.setEnabled(true); }
+            for (var button : p1UnitButtons)    { button.setEnabled(true); }
         } else {
-            for (var button : p1TowerButtons) {
-                button.setEnabled(false);
-            }
-            for (var button : p1UnitButtons) {
-                button.setEnabled(false);
-            }
-            for (var button : p2TowerButtons) {
-                button.setEnabled(true);
-            }
-            for (var button : p2UnitButtons) {
-                button.setEnabled(true);
-            }
+            for (var button : p1TowerButtons)   { button.setEnabled(false); }
+            for (var button : p1UnitButtons)    { button.setEnabled(false); }
+            for (var button : p2TowerButtons)   { button.setEnabled(true); }
+            for (var button : p2UnitButtons)    { button.setEnabled(true); }
         }
     }
 
+    /**
+    * Frissíti a játékos UI-on megjelenő adatait
+    */
     public void playerDataUpdate() {
         Player p1 = board.getModel().getPlayers()[0];
         Player p2 = board.getModel().getPlayers()[1];
         p1Data.setText(
                 "<html>"
                 + p1.getName()
-                + "<br><br>Money: " + p1.getMoney()
-                + "<br><br> Towers"
+                + "<br>Money: " + p1.getMoney()
                 + "</html>"
         );
 
         p2Data.setText(
                 "<html>"
                 + p2.getName()
-                + "<br><br>Money: " + p2.getMoney()
-                + "<br><br> Towers"
+                + "<br>Money: " + p2.getMoney()
                 + "</html>"
         );
     }
 
-    public void setBoard(Board bd) {
-        board = bd;
-    }
-
-    public JLabel getTimeAndRoundLabel() {
-        return timeAndRoundLabel;
-    }
+    /**
+    * Getterek, setterek
+    */
+    public Board getBoard()                 { return board; }
+    public void setBoard(Board bd)          { board = bd; }
+    public int getTicks()                   { return ticks; }
+    public JLabel getTimeAndRoundLabel()    { return timeAndRoundLabel; }
 }

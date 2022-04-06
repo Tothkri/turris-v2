@@ -41,17 +41,6 @@ public class Board extends JPanel {
     }
 
     /**
-    * Getterek, setterek
-    */
-    public Model getModel() {
-        return model;
-    }
-
-    public void setModel(Model m) {
-        model = m;
-    }
-
-    /**
     * Sprite-ok kirajzolása a játékteren
     */
     @Override
@@ -70,21 +59,21 @@ public class Board extends JPanel {
         }
 
         if (!selectables.isEmpty()) {
-            for (Sprite s : selectables) {
-                s.draw(g2);
-            }
+            for (Sprite s : selectables) { s.draw(g2); }
         }
 
         if (!p1units.isEmpty()) {
-            for (Unit u : p1units) {
-                u.draw(g2);
-            }
+            for (Unit u : p1units) { u.draw(g2); }
         }
 
         if (!p2units.isEmpty()) {
-            for (Unit u : p2units) {
-                u.draw(g2);
-            }
+            for (Unit u : p2units) { u.draw(g2); }
         }
     }
+    
+    /**
+    * Getterek, setterek
+    */
+    public Model getModel()         { return model; }
+    public void setModel(Model m)   { model = m; }
 }
