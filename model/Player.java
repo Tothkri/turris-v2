@@ -1,5 +1,6 @@
 package model;
 
+import java.awt.Color;
 import static java.lang.Integer.max;
 import static java.lang.Integer.parseInt;
 import static java.lang.Math.abs;
@@ -66,22 +67,22 @@ public class Player {
 
                 if (!type.equals("")) {
                     Tower newTower;
+                    String color;
+                    if (model.getActivePlayer() == 0) {
+                        color = "blue";
+                    } else {
+                        color = "red";
+                    }
+                    int towerSize = (model.getSize() / 30);
+
                     if (type.equals("Fortified")) {
-                        newTower = new Fortified("Fortified", 2, 1, 0.5, 100, 200, x * (model.getSize() / 30),
-                                y * (model.getSize() / 30),
-                                model.getSize() / 30, model.getSize() / 30,
-                                new ImageIcon("src/res/Tower.png").getImage());
+                        newTower = new Fortified(color, x * towerSize, y * towerSize, towerSize, towerSize, new ImageIcon("src/res/Tower.png").getImage());
                     } else if (type.equals("Sniper")) {
-                        newTower = new Sniper("Sniper", 9, 1, 1.0, 25, 300, x * (model.getSize() / 30),
-                                y * (model.getSize() / 30),
-                                model.getSize() / 30, model.getSize() / 30,
+                        newTower = new Sniper(color, x * towerSize, y * towerSize, towerSize, towerSize,
                                 new ImageIcon("src/res/Tower.png").getImage());
-                    } else //type.equals("Sniper")
+                    } else //type.equals("Rapid")
                     {
-                        newTower = new Rapid("Rapid", 2, 1, 0.33, 40, 250, x * (model.getSize() / 30),
-                                y * (model.getSize() / 30),
-                                model.getSize() / 30, model.getSize() / 30,
-                                new ImageIcon("src/res/Tower.png").getImage());
+                        newTower = new Rapid(color, x * towerSize, y * towerSize, towerSize, towerSize, new ImageIcon("src/res/Tower.png").getImage());
                     }
 
                     //checking if player's money is enough to buy it
@@ -109,34 +110,53 @@ public class Player {
         for (var t : towers) {
             if (t.getX() == x && t.getY() == y) {
 
-                switch(t.getType()){
-                    case "Fortified": canUpgrade = enoughMoney(t.getLevel(),350,500);
-                    break;
-                    case "Sniper": canUpgrade = enoughMoney(t.getLevel(),500,800);
-                    break;
-                    case "Rapid": canUpgrade = enoughMoney(t.getLevel(),400,600);
-                    break;
-                    default:break;
+                switch (t.getType()) {
+                    case "Fortified":
+                        if (t.getLevel() < 3) {
+                            canUpgrade = enoughMoney(t.getLevel(), 350, 500);
+                        } else {
+                            canUpgrade = false;
+                        }
+                        break;
+                    case "Sniper":
+                        if (t.getLevel() < 3) {
+                            canUpgrade = enoughMoney(t.getLevel(), 500, 700);
+                        } else {
+                            canUpgrade = false;
+                        }
+                        break;
+                    case "Rapid":
+                        if (t.getLevel() < 3) {
+                            canUpgrade = enoughMoney(t.getLevel(), 400, 550);
+                        } else {
+                            canUpgrade = false;
+                        }
+                        break;
+                    default:
+                        break;
                 }
-                if(canUpgrade)
+                if (canUpgrade) {
                     t.upgrade();
+                }
             }
         }
     }
 
-    public boolean enoughMoney(int currLvl ,int lvl2, int lvl3){
-        if(currLvl == 1){
-            if(money - lvl2 >= 0){
+    public boolean enoughMoney(int currLvl, int lvl2, int lvl3) {
+        if (currLvl == 1) {
+            if (money - lvl2 >= 0) {
                 money -= lvl2;
                 return true;
+            } else {
+                return false;
             }
-            else return false;
-        }else{
-            if(money - lvl3 >= 0){
+        } else {
+            if (money - lvl3 >= 0) {
                 money -= lvl3;
                 return true;
+            } else {
+                return false;
             }
-            else return false;
         }
     }
 
@@ -149,15 +169,13 @@ public class Player {
             }
         }
     }
-    
-   
 
     private boolean isValid(int x, int y) //determine if it's on the board or not
     {
         return (x >= 0 && x < 30) && (y >= 0 && y < 30);
     }
 
-    public Model sendUnits(String type, int amount, Model model) {
+    public Model sendUnits(String type, String color, int amount, Model model) {
 
         int minDistance = 10000;
         ArrayList<Node> bestWay = new ArrayList<>();
@@ -222,31 +240,20 @@ public class Player {
                 }
             }
 
-            ArrayList<Node> way = bestWay;
-
-            if (way != null && way.size() > 0) {
+            if (bestWay != null && bestWay.size() > 0) {
                 Unit newUnit;
+                int unitSize = model.getSize() / 30;
                 if (type.equals("General")) {
-                    newUnit = new General("General", 5, 3, 10, 20, castle.x, castle.y,
-                            model.getSize() / 30, model.getSize() / 30, new ImageIcon("src/res/Unit.png").getImage(),
-                            way);
+                    newUnit = new General(color, castle.x, castle.y, unitSize, unitSize, new ImageIcon("src/res/Unit.png").getImage(), bestWay);
                 } else if (type.equals("Climber")) {
-                    newUnit = new Climber("Climber", 3, 2, 10, 30, castle.x, castle.y,
-                            model.getSize() / 30, model.getSize() / 30, new ImageIcon("src/res/Unit.png").getImage(),
-                            way);
+                    newUnit = new Climber(color, castle.x, castle.y, unitSize, unitSize, new ImageIcon("src/res/Unit.png").getImage(), bestWay);
                 } else if (type.equals("Diver")) {
-                    newUnit = new Diver("Diver", 3, 2, 10, 30, castle.x, castle.y,
-                            model.getSize() / 30, model.getSize() / 30, new ImageIcon("src/res/Unit.png").getImage(),
-                            way);
+                    newUnit = new Diver(color, castle.x, castle.y, unitSize, unitSize, new ImageIcon("src/res/Unit.png").getImage(), bestWay);
                 } else if (type.equals("Fighter")) {
-                    newUnit = new Fighter("Fighter", 4, 5, 15, 30, castle.x, castle.y,
-                            model.getSize() / 30, model.getSize() / 30, new ImageIcon("src/res/Unit.png").getImage(),
-                            way);
+                    newUnit = new Fighter(color, castle.x, castle.y, unitSize, unitSize, new ImageIcon("src/res/Unit.png").getImage(), bestWay);
                 } else //Destroyer
                 {
-                    newUnit = new Destroyer("Destroyer", 2, 5, 15, 30, castle.x, castle.y,
-                            model.getSize() / 30, model.getSize() / 30, new ImageIcon("src/res/Unit.png").getImage(),
-                            way);
+                    newUnit = new Destroyer(color, castle.x, castle.y, unitSize, unitSize, new ImageIcon("src/res/Unit.png").getImage(), bestWay);
                 }
                 //checking if player's money is enough to buy it
                 if (newUnit.price <= money) {
@@ -261,12 +268,12 @@ public class Player {
 
     }
 
-    public Model calculateWay(Model model){
+    public Model calculateWay(Model model) {
         int minDistance = 10000;
         ArrayList<Node> bestWay = new ArrayList<>();
         int attacker = model.getActivePlayer() * 4;
         int defender = Math.abs(model.getActivePlayer() * 4 - 4);
-        for(Unit u : units){
+        for (Unit u : units) {
             for (int j = 0; j < 4; j++) {
                 for (int k = 0; k < 4; k++) {
                     ArrayList<String> wayString = findWay(model.getCastleCoordinates()[j + attacker][0], model.getCastleCoordinates()[j + attacker][1],
@@ -356,19 +363,19 @@ public class Player {
             if (max(abs(x1 - x2), abs(y1 - y2)) > 1) {
 
                 if (x1 > x2) {
-                    for (int j = x1 - 1; j > x2; j--) {
+                    for (int j = x1 - 1; j >= x2; j--) {
                         way.add(new Node(j, y1));
                     }
                 } else if (x2 > x1) {
-                    for (int j = x1 + 1; j < x2; j++) {
+                    for (int j = x1 + 1; j <= x2; j++) {
                         way.add(new Node(j, y1));
                     }
                 } else if (y2 > y1) {
-                    for (int j = y1 + 1; j < y2; j++) {
+                    for (int j = y1 + 1; j <= y2; j++) {
                         way.add(new Node(x1, j));
                     }
                 } else {
-                    for (int j = y1 - 1; j < y2; j--) {
+                    for (int j = y1 - 1; j >= y2; j--) {
                         way.add(new Node(x1, j));
                     }
                 }
@@ -477,8 +484,9 @@ public class Player {
     public void setTowers(ArrayList<Tower> t) {
         towers = t;
     }
-    public void setUnits(ArrayList<Unit> u){
-         units = u;
+
+    public void setUnits(ArrayList<Unit> u) {
+        units = u;
     }
 
 }
