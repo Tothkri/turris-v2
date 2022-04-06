@@ -88,9 +88,7 @@ public abstract class Tower extends Sprite {
         return maxHp;
     }
 
-    public void setMaxHp(int maxHp) {
-        this.maxHp = maxHp;
-    }
+    public abstract void setMaxHp();
 
     public void setLevel(int lvl) {
         level = lvl;
@@ -119,9 +117,8 @@ public abstract class Tower extends Sprite {
 
     @Override
     public void draw(Graphics2D g2) {
-
-        if (hp != 0) {
-            g2.drawImage(img, x, y, height, width, null);
+        g2.drawImage(img, x, y, height, width, null);
+        if (demolishedIn == -1) {
             g2.setColor(color);
             g2.drawLine(x + 2, y + height - 2, x + (int) hpLine() - 2, y + height - 2);
             g2.drawLine(x + 2, y + height - 3, x + (int) hpLine() - 2, y + height - 3);

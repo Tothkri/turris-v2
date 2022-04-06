@@ -3,9 +3,8 @@ package view;
 import java.awt.CardLayout;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JOptionPane;
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class Game {
 
@@ -54,9 +53,19 @@ public class Game {
          * mentett játék betöltésére használt gomb
          */
         ss.getLoadButton().addActionListener(ae ->{
+
+            JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
+            FileNameExtensionFilter filter = new FileNameExtensionFilter(".txt", "txt", "text");
+            fc.setFileFilter(filter);
+            int returnVal = fc.showOpenDialog(frame);
+            String fileName = "";
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                fileName = fc.getSelectedFile().getName();
+            }
+
             gw = new GameWindow();
             try{
-                ss.loadGame(gw);
+                ss.loadGame(gw,fileName);
             }catch(IOException e){
                 JOptionPane.showMessageDialog(null, "No saved games found!", "Warning", JOptionPane.INFORMATION_MESSAGE);
                 return;

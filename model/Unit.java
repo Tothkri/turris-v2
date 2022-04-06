@@ -42,7 +42,7 @@ public abstract class Unit extends Sprite {
 
     public Unit(String scolor, int x, int y, int height, int width, Image img) {
         super(x, y, height, width, img);
-        if (scolor == "red") {
+        if (scolor.equals("red")) {
             this.color = Color.red;
             this.img = new ImageIcon("src/res/Unitred.png").getImage();
         } else {

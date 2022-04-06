@@ -29,7 +29,6 @@ public class Fortified extends Tower {
         this.price = price;
         this.demolishedIn = -1;
         this.maxHp = 75+level*25;
-        //level needs to be saved in the file!
         level = 1;
     }
 
@@ -43,6 +42,9 @@ public class Fortified extends Tower {
         price += 150;
         level++;
         maxHp=75+level*25;
-
+    }
+    @Override
+    public void setMaxHp(){
+        maxHp=75+level*25;
     }
 }
