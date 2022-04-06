@@ -38,7 +38,7 @@ Ki mit csinált:
 
 5. hét (03.30 - 04.06)
 
-    Tóth Kristóf (SONXZF): életerő megjelenítése (kastély,tornyok,egységek), tornyok lehelyezésének szabályozása, pénzszerzési módok kialakítása
+    Tóth Kristóf (SONXZF): életerő megjelenítése (kastély,tornyok,egységek), tornyok lehelyezésének szabályozása, pénzszerzési módok kialakítása, tornyok lőnek, fighter sebez
 
     Tóth Kristóf (YPENKF): 
     
