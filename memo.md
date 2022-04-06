@@ -38,9 +38,9 @@ Ki mit csinált:
 
 5. hét (03.30 - 04.06)
 
-    Tóth Kristóf (SONXZF): életerő megjelenítése (kastély,tornyok,egységek), tornyok lehelyezésének szabályozása, pénzszerzési módok kialakítása, tornyok lőnek, fighter sebez
+    Tóth Kristóf (SONXZF): életerő megjelenítése (kastély, tornyok, egységek), tornyok lehelyezésének szabályozása, pénzszerzési módok kialakítása, tornyok lőnek, fighter sebez
 
     Tóth Kristóf (YPENKF): 
     
-    Szálkai Olivér Dávid (ONLQ05): 
+    Szálkai Olivér Dávid (ONLQ05): kezdőoldal GUI javítás, GameWindow GUI kialakítás, Javadoc
 
