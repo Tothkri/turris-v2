@@ -66,18 +66,9 @@ public class StartScreen extends JPanel {
      * @param gw
      * @return
      */
-    public void loadGame(GameWindow gw) throws IOException {
-        File userDir = new File(System.getProperty("user.dir"));
-        File[] allfile = userDir.listFiles();
-        String fileName = "";
+    public void loadGame(GameWindow gw, String fileName) throws IOException {
         int size = height - 150;
         Model model = new Model(size);
-
-        for (File file : allfile) {
-            if (file.getName().contains("txt")) {
-                fileName = file.getName();
-            }
-        }
         
         File myObj = new File(fileName);
         Scanner myReader = new Scanner(myObj);
@@ -140,7 +131,7 @@ public class StartScreen extends JPanel {
                 String[] arr;
                 arr = data.split(" ");
                 if (arr[0].equals("T")) {
-                    switch (arr[5]) {
+                    switch (arr[6]) {
                         case "Rapid":
                             Rapid rt = (Rapid) setTower(arr);
                             model.getPlayers()[0].addTower(rt);
@@ -195,20 +186,20 @@ public class StartScreen extends JPanel {
             String[] arr;
             arr = data.split(" ");
             if (arr[0].equals("T")) {
-                switch (arr[5]) {
+                switch (arr[6]) {
                     case "Rapid":
                         Rapid rt = (Rapid) setTower(arr);
-                        model.getPlayers()[0].addTower(rt);
+                        model.getPlayers()[1].addTower(rt);
                         model.addTerrainElement(rt);
                         break;
                     case "Sniper":
                         Sniper st = (Sniper) setTower(arr);
-                        model.getPlayers()[0].addTower(st);
+                        model.getPlayers()[1].addTower(st);
                         model.addTerrainElement(st);
                         break;
                     default:
                         Fortified ft = (Fortified) setTower(arr);
-                        model.getPlayers()[0].addTower(ft);
+                        model.getPlayers()[1].addTower(ft);
                         model.addTerrainElement(ft);
                         break;
                 }
@@ -216,23 +207,23 @@ public class StartScreen extends JPanel {
                 switch (arr[6]) {
                     case "Fighter":
                         Fighter fu = (Fighter) setUnit(arr);
-                        model.getPlayers()[0].addUnits(fu);
+                        model.getPlayers()[1].addUnits(fu);
                         break;
                     case "Diver":
                         Diver du = (Diver) setUnit(arr);
-                        model.getPlayers()[0].addUnits(du);
+                        model.getPlayers()[1].addUnits(du);
                         break;
                     case "Climber":
                         Climber cu = (Climber) setUnit(arr);
-                        model.getPlayers()[0].addUnits(cu);
+                        model.getPlayers()[1].addUnits(cu);
                         break;
                     case "Destroyer":
                         Destroyer deu = (Destroyer) setUnit(arr);
-                        model.getPlayers()[0].addUnits(deu);
+                        model.getPlayers()[1].addUnits(deu);
                         break;
                     default:
                         General gu = (General) setUnit(arr);
-                        model.getPlayers()[0].addUnits(gu);
+                        model.getPlayers()[1].addUnits(gu);
                         break;
                 }
             }
@@ -248,7 +239,7 @@ public class StartScreen extends JPanel {
         String png = "Tower";
         if (!arr[11].equals("-1")) { png = "destroyed"; }
         Tower t;
-        switch (arr[5]) {
+        switch (arr[6]) {
             case "Rapid":
                 t = new Rapid(arr[6], arr[1], Integer.parseInt(arr[7]), Integer.parseInt(arr[8]), Double.parseDouble(arr[9]),
                         Integer.parseInt(arr[10]), Integer.parseInt(arr[11]), Integer.parseInt(arr[2]), Integer.parseInt(arr[3]), Integer.parseInt(arr[4]),
@@ -266,12 +257,13 @@ public class StartScreen extends JPanel {
                         Integer.parseInt(arr[5]), new ImageIcon("src/res/" + png + ".png").getImage());
                 break;
         }
-        if (Integer.parseInt(arr[11]) == -1) {
+        if (Integer.parseInt(arr[12]) == -1) {
             t.setDemolishedIn(0);//-1
         } else {
-            t.setDemolishedIn((Integer.parseInt(arr[11]) + 1) * -1);//can change
+            t.setDemolishedIn((Integer.parseInt(arr[12]) + 1) * -1);//can change
         }
-        t.setLevel(Integer.parseInt(arr[12]));
+        t.setLevel(Integer.parseInt(arr[13]));
+        t.setMaxHp();
         return t;
     }
 
@@ -280,24 +272,24 @@ public class StartScreen extends JPanel {
         int size = height - 150;
         switch (arr[6]) {
             case "Fighter":
-                u = new Fighter(arr[6], arr[1], Integer.parseInt(arr[7]), Integer.parseInt(arr[8]), Integer.parseInt(arr[9]), Integer.parseInt(arr[10]),
-                        Integer.parseInt(arr[2]), Integer.parseInt(arr[3]), (size / 30), (size / 30), new ImageIcon("src/res/Unit.png").getImage());
+                u = new Fighter(arr[1], Integer.parseInt(arr[7]), Integer.parseInt(arr[2]), Integer.parseInt(arr[3]), (size / 30), (size / 30),
+                        new ImageIcon("src/res/Unit.png").getImage());
                 break;
             case "Diver":
-                u = new Diver(arr[6], arr[1], Integer.parseInt(arr[7]), Integer.parseInt(arr[8]), Integer.parseInt(arr[9]), Integer.parseInt(arr[10]),
-                        Integer.parseInt(arr[2]), Integer.parseInt(arr[3]), (size / 30), (size / 30), new ImageIcon("src/res/Unit.png").getImage());
+                u = new Diver(arr[1], Integer.parseInt(arr[7]), Integer.parseInt(arr[2]), Integer.parseInt(arr[3]), (size / 30), (size / 30),
+                        new ImageIcon("src/res/Unit.png").getImage());
                 break;
             case "Climber":
-                u = new Climber(arr[6], arr[1], Integer.parseInt(arr[7]), Integer.parseInt(arr[8]), Integer.parseInt(arr[9]), Integer.parseInt(arr[10]),
-                        Integer.parseInt(arr[2]), Integer.parseInt(arr[3]), (size / 30), (size / 30), new ImageIcon("src/res/Unit.png").getImage());
+                u = new Climber(arr[1], Integer.parseInt(arr[7]), Integer.parseInt(arr[2]), Integer.parseInt(arr[3]), (size / 30), (size / 30),
+                        new ImageIcon("src/res/Unit.png").getImage());
                 break;
             case "Destroyer":
-                u = new Destroyer(arr[6], arr[1], Integer.parseInt(arr[7]), Integer.parseInt(arr[8]), Integer.parseInt(arr[9]), Integer.parseInt(arr[10]),
-                        Integer.parseInt(arr[2]), Integer.parseInt(arr[3]), (size / 30), (size / 30), new ImageIcon("src/res/Unit.png").getImage());
+                u = new Destroyer(arr[1], Integer.parseInt(arr[7]), Integer.parseInt(arr[2]), Integer.parseInt(arr[3]), (size / 30), (size / 30),
+                        new ImageIcon("src/res/Unit.png").getImage());
                 break;
             default:
-                u = new General(arr[6], arr[1], Integer.parseInt(arr[7]), Integer.parseInt(arr[8]), Integer.parseInt(arr[9]), Integer.parseInt(arr[10]),
-                        Integer.parseInt(arr[2]), Integer.parseInt(arr[3]), (size / 30), (size / 30), new ImageIcon("src/res/Unit.png").getImage());
+                u = new General(arr[1], Integer.parseInt(arr[7]), Integer.parseInt(arr[2]), Integer.parseInt(arr[3]), (size / 30), (size / 30),
+                        new ImageIcon("src/res/Unit.png").getImage());
                 break;
         }
         return u;

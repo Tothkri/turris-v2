@@ -6,8 +6,13 @@ import java.util.ArrayList;
 public class Destroyer extends Unit {
 
     //constructor for loaded units
-    public Destroyer(String type, String scolor, int distance, int power, int hp, int price, int x, int y, int height, int width, Image img) {
+    public Destroyer(String scolor, int hp, int x, int y, int height, int width, Image img) {
         super(scolor, x, y, height, width, img);
+        this.distance = 3;
+        this.power = 6;
+        this.hp = hp;
+        this.price = 40;
+        this.type = "Destroyer";
         this.maxHp = 15;
     }
 

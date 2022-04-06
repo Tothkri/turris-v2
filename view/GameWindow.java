@@ -149,12 +149,22 @@ public class GameWindow extends JPanel implements ActionListener {
         * PLAYER1 Tower management
         */
         p1TowerButtons[3].addActionListener(ae -> {
-            buttonAction = "upgrade";
-            model.setSelectableTowers(true);
+            if(!buttonAction.equals("")){
+                model.setSelectables(new ArrayList<>());
+                buttonAction = "";
+            }else{
+                buttonAction = "upgrade";
+                model.setSelectableTowers(true);
+            }
         });
         p1TowerButtons[4].addActionListener(ae -> {
-            buttonAction = "demolish";
-            model.setSelectableTowers(false);
+            if(!buttonAction.equals("")){
+                model.setSelectables(new ArrayList<>());
+                buttonAction = "";
+            }else{
+                buttonAction = "demolish";
+                model.setSelectableTowers(false);
+            }
         });
         
         /**
@@ -193,12 +203,22 @@ public class GameWindow extends JPanel implements ActionListener {
         * PLAYER2 Tower management
         */
         p2TowerButtons[3].addActionListener(ae -> {
-            buttonAction = "upgrade";
-            model.setSelectableTowers(true);
+            if(!buttonAction.equals("")){
+                model.setSelectables(new ArrayList<>());
+                buttonAction = "";
+            }else{
+                buttonAction = "upgrade";
+                model.setSelectableTowers(true);
+            }
         });
         p2TowerButtons[4].addActionListener(ae -> {
-            buttonAction = "demolish";
-            model.setSelectableTowers(false);
+            if(!buttonAction.equals("")){
+                model.setSelectables(new ArrayList<>());
+                buttonAction = "";
+            }else{
+                buttonAction = "demolish";
+                model.setSelectableTowers(false);
+            }
         });
         
         /**
@@ -334,7 +354,6 @@ public class GameWindow extends JPanel implements ActionListener {
                         u.setWay(bestway);
                         //System.out.println("timer bestway: " + bestway);
                         model.getPlayers()[q].setUnits(updateUnits);
-
                     }
                    
                 }
@@ -478,9 +497,14 @@ public class GameWindow extends JPanel implements ActionListener {
     }
 
     public void towerPlaceAction(String sc) {
-        selectedTower = sc;
-        buttonAction = "placeTower";
-        model.setSelectables();
+        if(!buttonAction.equals("")){
+            buttonAction = "";
+            model.setSelectables(new ArrayList<>());
+        }else{
+            selectedTower = sc;
+            buttonAction = "placeTower";
+            model.setSelectables();
+        }
     }
 
     //helper

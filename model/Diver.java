@@ -6,9 +6,14 @@ import java.util.ArrayList;
 public class Diver extends Unit {
 
     //constructor for loaded units
-    public Diver(String type, String scolor, int distance, int power, int hp, int price, int x, int y, int height, int width, Image img) {
+    public Diver(String scolor, int hp, int x, int y, int height, int width, Image img)  {
         super(scolor, x, y, height, width, img);
-         this.maxHp=10;
+        this.distance = 4;
+        this.power = 4;
+        this.hp = hp;
+        this.price = 20;
+        this.type = "Diver";
+        this.maxHp=10;
     }
 
     //constructor for creating new unit

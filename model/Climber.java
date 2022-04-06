@@ -6,8 +6,13 @@ import java.util.ArrayList;
 public class Climber extends Unit {
 
     //constructor for loaded units
-    public Climber(String type, String scolor, int distance, int power, int hp, int price, int x, int y, int height, int width, Image img) {
+    public Climber(String scolor, int hp, int x, int y, int height, int width, Image img) {
         super(scolor, x, y, height, width, img);
+        this.distance = 4;
+        this.power = 4;
+        this.hp = hp;
+        this.price = 20;
+        this.type = "Climber";
         this.maxHp = 10;
     }
 

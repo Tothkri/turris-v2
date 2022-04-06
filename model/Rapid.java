@@ -43,6 +43,9 @@ public class Rapid extends Tower {
         price += 150;
         level++;
         maxHp = 40+level*5;
-
+    }
+    @Override
+    public void setMaxHp(){
+        maxHp = 40+level*5;
     }
 }

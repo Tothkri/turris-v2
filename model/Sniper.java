@@ -19,8 +19,8 @@ public class Sniper extends Tower {
     }
 
     //constructor for loaded towers
-    public Sniper(String type, String scolor, int power, int range, double attack_speed, int hp, int price, int x, int y, int height, int width, Image img) {
-        super(scolor, x, y, height, width, img);
+    public Sniper(String type, String sColor, int power, int range, double attack_speed, int hp, int price, int x, int y, int height, int width, Image img) {
+        super(sColor, x, y, height, width, img);
         this.type = type;
         this.power = power;
         this.range = range;
@@ -40,6 +40,11 @@ public class Sniper extends Tower {
         price += 200;
         level++;
         maxHp = 20+level*5;
+        range++;
+    }
 
+    @Override
+    public void setMaxHp(){
+        maxHp = 20+level*5;
     }
 }

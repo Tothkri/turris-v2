@@ -292,8 +292,8 @@ public class Model {
 
                 if (players[i].getUnits() != null) {
                     for (Unit u : players[i].getUnits()) {
-                        writer.write("U " + colorString(u.color) + " " + u.x + " " + u.y + " " + u.width + " " + u.height + " " + u.getType() + " " + u.getDistance()
-                                + " " + u.getPower() + " " + u.getHp() + " " + u.getPrice());
+                        writer.write("U " + colorString(u.color) + " " + u.x + " " + u.y + " " + u.width + " " + u.height + " " + u.getType() +
+                                " " + u.getHp());
                         writer.write(System.getProperty("line.separator"));
                     }
                 }
