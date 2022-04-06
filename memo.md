@@ -36,4 +36,11 @@ Ki mit csinált:
     
     Szálkai Olivér Dávid (ONLQ05): Javadoc, StartScreen GUI véglegesítés
 
+5. hét (03.30 - 04.06)
+
+    Tóth Kristóf (SONXZF): életerő megjelenítése (kastély,tornyok,egységek), tornyok lehelyezésének szabályozása, pénzszerzési módok kialakítása
+
+    Tóth Kristóf (YPENKF): 
+    
+    Szálkai Olivér Dávid (ONLQ05): 
 
