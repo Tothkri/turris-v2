@@ -19,17 +19,18 @@ public class Rapid extends Tower {
     }
 
     //constructor for loaded towers
-    public Rapid(String type, String scolor, int power, int range, double attack_speed, int hp, int price, int x, int y, int height, int width, Image img) {
+    public Rapid(String type, String scolor, int power, int range, double attack_speed, int hp, int level, int x, int y, int height, int width, Image img) {
         super(scolor, x, y, height, width, img);
         this.type = type;
         this.power = power;
         this.range = range;
+        this.level=level;
+        this.price = 100+level*150;
+        this.upgradePrice=price+150;
         this.attack_speed = attack_speed;
         this.hp = hp;
-        this.price = price;
         this.demolishedIn = -1;
         this.maxHp = 40+level*5;
-        level = 1;
     }
 
     @Override
@@ -40,12 +41,10 @@ public class Rapid extends Tower {
         attack_speed = 0.25;
         power = 3;
         hp += 5;
-        price += 150;
-        level++;
+        level++; 
+        price =100+level*150;
+        upgradePrice=price+150;
         maxHp = 40+level*5;
     }
-    @Override
-    public void setMaxHp(){
-        maxHp = 40+level*5;
-    }
+   
 }

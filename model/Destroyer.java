@@ -25,5 +25,6 @@ public class Destroyer extends Unit {
         this.price = 40;
         this.type = "Destroyer";
         this.maxHp = 15;
+        this.way=way;
     }
 }

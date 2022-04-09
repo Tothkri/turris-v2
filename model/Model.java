@@ -18,7 +18,6 @@ import javax.swing.JOptionPane;
 public class Model {
 
     protected int level;
-    protected boolean over = false;
     protected Player players[];
     protected int round;
     protected ArrayList<Sprite> terrain;
@@ -30,23 +29,18 @@ public class Model {
     private int selectedMap;
 
     /**
-    * Storing the field components in a matrix in order to make it easier to 
-    * decide which component is at a given index
-    * F - field
-    * C - Castle
-    * L - Lake
-    * M - Mountain
-    * T - Tower
-    * U - Unit
-    */
+     * Storing the field components in a matrix in order to make it easier to
+     * decide which component is at a given index F - field C - Castle L - Lake
+     * M - Mountain T - Tower U - Unit
+     */
     private final Image Lake = new ImageIcon("src/res/Lake.png").getImage();
     private final Image Mountain = new ImageIcon("src/res/Mountain.png").getImage();
     private final Image Castle = new ImageIcon("src/res/Castle.png").getImage();
 
     public Model(int selectedMap, String p1Name, String p2Name, int size) {
         /**
-        * Setting up terrain and variables
-        */
+         * Setting up terrain and variables
+         */
         this.terrain = new ArrayList<>();
         this.selectables = new ArrayList<>();
         this.size = size;
@@ -76,28 +70,28 @@ public class Model {
     }
 
     /**
-    * Játékteren a terep leképzése
-    */
+     * Játékteren a terep leképzése
+     */
     private void generateTerrain(int selectedMap) {
         /**
-        * Filling matrix with Field type Sprites
-        */
+         * Filling matrix with Field type Sprites
+         */
         for (int i = 0; i < 30; i++) {
             for (int j = 0; j < 30; j++) {
                 position[i][j] = 'F';
             }
         }
-        
+
         /**
-        * Generate the position of the castles and add them to the terrain
-        */
+         * Generate the position of the castles and add them to the terrain
+         */
         Random rand = new Random();
         int randPos = rand.nextInt(25) + 2;
         position[randPos][2] = 'C';
         position[randPos + 1][2] = 'C';
         position[randPos][3] = 'C';
         position[randPos + 1][3] = 'C';
-        
+
         //castles' size is 2x2
         Castle c1 = new Castle("blue", randPos * (size / 30), 2 * (size / 30), (size / 15), (size / 15), Castle, 300);
         terrain.add(c1);
@@ -108,7 +102,7 @@ public class Model {
         position[randPos + 1][27] = 'C';
         position[randPos][26] = 'C';
         position[randPos + 1][26] = 'C';
-        
+
         Castle c2 = new Castle("red", randPos * (size / 30), 26 * (size / 30), (size / 15), (size / 15), Castle, 300);
         terrain.add(c2);
         players[1].setCastle(c2);
@@ -117,15 +111,13 @@ public class Model {
         setCastleCords(c1, c2);
 
         /**
-        * Generate other terrain components depending on given map index
-        * 1 - Mountain and lakes mixed
-        * 2 - Mountains in majority
-        * 3 - Lakes in majority
-        */
-        
+         * Generate other terrain components depending on given map index 1 -
+         * Mountain and lakes mixed 2 - Mountains in majority 3 - Lakes in
+         * majority
+         */
         /**
-        * Amount of mountains and lakes
-        */
+         * Amount of mountains and lakes
+         */
         int mcount, lcount;
 
         if (selectedMap == 1) {         //Mountains and lakes in the same amount
@@ -146,20 +138,20 @@ public class Model {
     public void setCastleCords(Castle c1, Castle c2) {
         castleCoordinates[0][0] = c1.x / (size / 30);
         castleCoordinates[0][1] = c1.y / (size / 30);
-        castleCoordinates[1][0] = (c1.x + 1) / (size / 30);
+        castleCoordinates[1][0] = (c1.x / (size / 30)) + 1;
         castleCoordinates[1][1] = c1.y / (size / 30);
         castleCoordinates[2][0] = c1.x / (size / 30);
-        castleCoordinates[2][1] = (c1.y + 1) / (size / 30);
-        castleCoordinates[3][0] = (c1.x + 1) / (size / 30);
-        castleCoordinates[3][1] = (c1.y + 1) / (size / 30);
+        castleCoordinates[2][1] = (c1.y / (size / 30)) + 1;
+        castleCoordinates[3][0] = (c1.x / (size / 30)) + 1;
+        castleCoordinates[3][1] = (c1.y / (size / 30)) + 1;
         castleCoordinates[4][0] = c2.x / (size / 30);
         castleCoordinates[4][1] = c2.y / (size / 30);
-        castleCoordinates[5][0] = (c2.x + 1) / (size / 30);
+        castleCoordinates[5][0] = (c2.x / (size / 30)) + 1;
         castleCoordinates[5][1] = c2.y / (size / 30);
         castleCoordinates[6][0] = c2.x / (size / 30);
-        castleCoordinates[6][1] = (c2.y + 1) / (size / 30);
-        castleCoordinates[7][0] = (c2.x + 1) / (size / 30);
-        castleCoordinates[7][1] = (c2.y + 1) / (size / 30);
+        castleCoordinates[6][1] = (c2.y / (size / 30)) + 1;
+        castleCoordinates[7][0] = (c2.x / (size / 30)) + 1;
+        castleCoordinates[7][1] = (c2.y / (size / 30)) + 1;
     }
 
     public int[][] getCastleCoordinates() {
@@ -184,12 +176,13 @@ public class Model {
                     || distance(x, c2.x / (size / 30) + 1, y, c2.y / (size / 30) + 1) < 4);
 
             /**
-            * lakes and mountains can't be generated in the 3 block radius of the castles
-            * no component can be generated into a location where there's a component already
-            * 
-            * castles' coordinates only show the left top corner, so the other 3 neighbour 
-            * coordinates' distance need to be calculated too
-            */
+             * lakes and mountains can't be generated in the 3 block radius of
+             * the castles no component can be generated into a location where
+             * there's a component already
+             *
+             * castles' coordinates only show the left top corner, so the other
+             * 3 neighbour coordinates' distance need to be calculated too
+             */
             if (tr.equals("mountain")) {
                 position[x][y] = 'M';
                 terrain.add(new Mountain(x * (size / 30), y * (size / 30), (size / 30), (size / 30), Mountain));
@@ -201,25 +194,16 @@ public class Model {
     }
 
     /**
-    * distance is calculated by the block-distance, not the absolute
-    */
+     * distance is calculated by the block-distance, not the absolute
+     */
     private int distance(int x1, int x2, int y1, int y2) {
         return max(abs(x1 - x2), abs(y1 - y2));
     }
 
     /**
-    * returns how much damage would be dealt to the Unit by enemy Towers at the (x,y) position
-    * returns 0 if there's no enemy Tower in range
-    */
-    public int damagePerHalfSec(int actPl, int x, int y) {
-        for (Tower t : players[(actPl + 1) % 2].getTowers()) {
-            if (distance(x, t.getX() / (size / 30), y, t.getY() / (size / 30)) <= t.range) {
-                return (int) (t.power * (0.5 / t.attack_speed));
-            }
-        }
-        return 0;
-    }
-
+     * returns how much damage would be dealt to the Unit by enemy Towers at the
+     * (x,y) position returns 0 if there's no enemy Tower in range
+     */
     //simulates if Tower is placed -> is there a way between the two Castles or not & is there a way from units to castles
     public boolean placable(int x, int y, int matrix[][]) {
         int newMatrix[][] = new int[30][30];
@@ -228,14 +212,16 @@ public class Model {
                 newMatrix[i][j] = matrix[i][j];
             }
         }
-        
+
         //there's something already in this position
-        if (newMatrix[x][y] != 1 || isThereUnit(x, y)) { return false; }
+        if (newMatrix[x][y] != 1 || isThereUnit(x, y)) {
+            return false;
+        }
 
         newMatrix[x][y] = 1000;
-        
+
         ArrayList<String> wayString;
-        for(int q = 0; q < 2; q++) {
+        for (int q = 0; q < 2; q++) {
             ArrayList<Unit> units = players[q].getUnits();
             for (int i = 0; i < 4; i++) {
                 for (Unit u : units) {
@@ -243,7 +229,9 @@ public class Model {
                             u.y / (size / 30),
                             castleCoordinates[activePlayer * 4 + i][0],
                             castleCoordinates[activePlayer * 4 + i][1], newMatrix);
-                    if (wayString == null || wayString.isEmpty()) { return false; }
+                    if (wayString == null || wayString.isEmpty()) {
+                        return false;
+                    }
                 }
             }
         }
@@ -264,10 +252,10 @@ public class Model {
     }
 
     /**
-    * save terrain ans players' data to txt line by line with separator
-    * the way of the units won't be saved, it will re-generated after loading the save
-    */
-    public void saveData(String filename) {
+     * save terrain ans players' data to txt line by line with separator the way
+     * of the units won't be saved, it will re-generated after loading the save
+     */
+    public void saveData(String filename, int ticks) {
         try ( Writer writer = new BufferedWriter(new OutputStreamWriter(
                 new FileOutputStream(filename + ".txt"), "utf-8"))) {
 
@@ -277,12 +265,13 @@ public class Model {
                 }
                 writer.write(System.getProperty("line.separator"));
             }
-            
+
             writer.write("" + selectedMap + "\n");
             writer.write("" + activePlayer + "\n");
-            writer.write("" + round);
+            writer.write("" + round + "\n");
+            writer.write("" + ticks);
             writer.write(System.getProperty("line.separator"));
-            
+
             for (int i = 0; i < 2; i++) {
                 writer.write("p:\n");
                 writer.write(players[i].getName() + "\n");
@@ -292,16 +281,17 @@ public class Model {
 
                 if (players[i].getUnits() != null) {
                     for (Unit u : players[i].getUnits()) {
-                        writer.write("U " + colorString(u.color) + " " + u.x + " " + u.y + " " + u.width + " " + u.height + " " + u.getType() +
-                                " " + u.getHp());
+                        writer.write("U " + colorString(u.color) + " " + u.x + " " + u.y + " " + u.width + " " + u.height + " " + u.getType()
+                                + " " + u.getHp());
                         writer.write(System.getProperty("line.separator"));
                     }
                 }
-                
+
                 if (players[i].getTowers() != null) {
                     for (Tower t : players[i].getTowers()) {
-                        writer.write("T " + colorString(t.color) + " " +t.x + " " + t.y + " " + t.width + " " + t.height + " " + t.getType() + " "
-                                + t.getPower() + " " + t.getRange() + " " + t.getAttack_speed() + " " + t.getHp() + " " + t.getPrice() + " " + t.getDemolishedIn() + " " + t.getLevel());
+                        //constructor: String type, String scolor, int power, int range, double attack_speed, int hp, int level, int x, int y, int height, int width, Image img
+                        writer.write("T " + t.getType() + " " + colorString(t.color) + " " + t.getPower() + " " + t.getRange() + " " + t.getAttack_speed() + " "
+                                + t.getHp() + " " + t.getLevel() + " " + t.x + " " + t.y + " " + t.height + " " + t.width + " " + t.getDemolishedIn());
                         writer.write(System.getProperty("line.separator"));
                     }
                 }
@@ -314,18 +304,20 @@ public class Model {
     }
 
     /**
-    * options are only red and blue
-    */
+     * options are only red and blue
+     */
     private String colorString(Color c) {
-        if (c == Color.RED) { return "red"; }
+        if (c == Color.RED) {
+            return "red";
+        }
         return "blue";
     }
 
     //return the difficulty of the whole way
     public int wayDiff(int actPl, ArrayList<String> al, String type) {
         int d = 0;
-        int diff[][] = players[actPl].getDifficulty(this, type);
-        
+        int diff[][] = players[actPl].getDifficulty(this, type, actPl);
+
         for (String s : al) {
             int x = parseInt(s.split(";")[0]);
             int y = parseInt(s.split(";")[0]);
@@ -337,9 +329,8 @@ public class Model {
 
     public void setSelectables() {
         for (int i = 0; i < 30; i++) {
-            for (int j = 0; j < 30; j++) {
-                if (j >= activePlayer * 15 && j < ((activePlayer + 1) * 15)
-                        && position[i][j] == 'F' && placable(i, j, players[activePlayer].getDifficulty(this, "General"))) {
+            for (int j = (activePlayer + 1) * 15 - 1; j >= activePlayer * 15; j--) {
+                if (position[i][j] == 'F' && placable(i, j, players[activePlayer].getDifficulty(this, "General", activePlayer))) {
                     selectables.add(new Selectable(i * (size / 30), j * (size / 30),
                             (size / 30), (size / 30)));
                 }
@@ -347,7 +338,8 @@ public class Model {
         }
     }
 
-    private boolean isThereUnit(int x, int y) {
+    private boolean isThereUnit(int x, int y) ////0<=x,y<30
+    {
         for (int q = 0; q < 2; q++) {
             ArrayList<Unit> units = players[q].getUnits();
             for (int i = 0; i < units.size(); i++) {
@@ -359,41 +351,30 @@ public class Model {
         return false;
     }
 
-    private boolean upgradable(int x, int y) {
-        x *= (size / 30);
-        y *= (size / 30);
-        ArrayList<Tower> towers = players[activePlayer].getTowers();
-        for (Tower t : towers) {
-            if (x == t.x && y == t.y) {
-                if (t.level < 3) {
-                    return true;
-                } else {
-                    return false;
+    private boolean upgradable(int x, int y) ////0<=x,y<30
+    {
+        return getTowerFromPosition(x, y).getLevel() < 3;
+    }
+
+    public void setSelectableTowersToUpgrade(int money) {
+        for (int i = 0; i < 30; i++) {
+            for (int j = activePlayer * 15; j < activePlayer * 15 + 15; j++) {
+                if (position[i][j] == 'T' && upgradable(i, j) && money >= getTowerFromPosition(i, j).getUpgradePrice()) {
+                    // System.out.println(money+", "+getTowerFromPosition(i,j).getPrice());
+                    selectables.add(new Selectable(i * (size / 30), j * (size / 30),
+                            (size / 30), (size / 30)));
                 }
             }
         }
-        return false;
     }
 
-    public void setSelectableTowers(boolean upgrade) {
-        if (upgrade) {
-            for (int i = 0; i < 30; i++) {
-                for (int j = 0; j < 30; j++) {
-                    if (j >= activePlayer * 15 && j < ((activePlayer + 1) * 15)
-                            && position[i][j] == 'T' && upgradable(i, j)) {
-                        selectables.add(new Selectable(i * (size / 30), j * (size / 30),
-                                (size / 30), (size / 30)));
-                    }
-                }
-            }
-        } else {
-            for (int i = 0; i < 30; i++) {
-                for (int j = 0; j < 30; j++) {
-                    if (j >= activePlayer * 15 && j < ((activePlayer + 1) * 15)
-                            && position[i][j] == 'T') {
-                        selectables.add(new Selectable(i * (size / 30), j * (size / 30),
-                                (size / 30), (size / 30)));
-                    }
+    public void setSelectableTowersToDemolish() {
+
+        for (int i = 0; i < 30; i++) {
+            for (int j = activePlayer * 15; j < activePlayer * 15 + 15; j++) {
+                if (position[i][j] == 'T') {
+                    selectables.add(new Selectable(i * (size / 30), j * (size / 30),
+                            (size / 30), (size / 30)));
                 }
             }
         }
@@ -403,46 +384,36 @@ public class Model {
         String info = "";
         boolean found = false;
 
-        for (int i = 0; i < 4 && !found; i++) {
-            if (x == castleCoordinates[i][0] && y == castleCoordinates[i][1]) {
-                info = "<html><font face=\"sansserif\" color=\"black\">" + players[0].getName() + "'s castle<br>hp: "
-                        + players[0].getCastle().getHp() + "</font></html>";
-            } else if (x == castleCoordinates[i + 4][0] && y == castleCoordinates[i + 4][1]) {
-                info = "<html><font face=\"sansserif\" color=\"black\">" + players[1].getName() + "'s castle<br>hp: "
-                        + players[1].getCastle().getHp() + "</font></html>";
-            }
-        }
-
         for (int i = 0; i < players[activePlayer].getTowers().size() && !found; i++) {
             Tower t = players[activePlayer].getTowers().get(i);
             if (t.x / (size / 30) == x && t.y / (size / 30) == y) {
-                info = "<html><font face=\"sansserif\" color=\"black\">Tower type: " + t.type +"<br>level: "+t.level + "<br>hp: " + t.hp + ""
+                info = "<html><font face=\"sansserif\" color=\"black\">Tower type: " + t.type + "<br>level: " + t.level + "<br>hp: " + t.hp + ""
                         + "<br>attack speed: " + t.attack_speed + "<br>power: " + t.power + "<br>range: " + t.range + "</font></html>";
                 found = true;
 
             }
         }
-        
+
         ArrayList<Unit> units = new ArrayList<Unit>();
         for (Unit u : players[activePlayer].getUnits()) {
             if (u.getX() / (size / 30) == x && u.getY() / (size / 30) == y) {
                 units.add(u);
             }
         }
-        
+
         if (units.size() == 1) {
-            units.get(0).setX(x*(size/30));
+            units.get(0).setX(x * (size / 30));
             info += "<html><font face=\"sansserif\" color=\"black\">Unit type: " + units.get(0).type + "<br>hp: " + units.get(0).hp + ""
                     + "<br>distance: " + units.get(0).distance + "<br>power: " + units.get(0).power + "</font></html>";
+            return info;
         } else if (units.size() > 1) {
-            int showUnits=5;
-            if(units.size()<5){
-                showUnits=units.size();
+            int showUnits = 5;
+            if (units.size() < 5) {
+                showUnits = units.size();
             }
-            for(int i=0;i<showUnits;i++){
-                    int difference=showUnits-(showUnits/2-i);
-                    units.get(i).setX(x*(size/30)+difference);
-                }
+            for (int i = 0; i < showUnits; i++) {
+                units.get(i).setX(x * (size / 30) + i);
+            }
             ArrayList<String> types = new ArrayList<String>();
             String typesStr = "";
             int sumPower = 0;
@@ -460,8 +431,20 @@ public class Model {
                 typesStr += ", " + types.get(i);
             }
             info += "<html><font face=\"sansserif\" color=\"black\">" + units.size() + " units<br>Types: " + typesStr + "<br>Sum power: " + sumPower + "<br>Sum hp: " + sumHp + "</font></html>";
+            return info;
         }
-        
+
+        for (int i = 0; i < 4; i++) {
+
+            if (x == castleCoordinates[i][0] && y == castleCoordinates[i][1]) {
+                info = "<html><font face=\"sansserif\" color=\"black\">" + players[0].getName() + "'s castle<br>hp: "
+                        + players[0].getCastle().getHp() + "</font></html>";
+            } else if (x == castleCoordinates[i + 4][0] && y == castleCoordinates[i + 4][1]) {
+                info = "<html><font face=\"sansserif\" color=\"black\">" + players[1].getName() + "'s castle<br>hp: "
+                        + players[1].getCastle().getHp() + "</font></html>";
+            }
+        }
+
         return info;
     }
 
@@ -512,11 +495,12 @@ public class Model {
         return enemyUnitsNB;
 
     }
-    
-    public Tower getTower(int x, int y){  
-        for(int q=0;q<2;q++){
-            for(Tower t : players[q].getTowers()){
-                if(t.getX()/(size/30) == x && t.getY() / (size/30) == y) {
+
+    public Tower getTowerFromPosition(int x, int y) {
+        //0<=x,y<30
+        for (int q = 0; q < 2; q++) {
+            for (Tower t : players[q].getTowers()) {
+                if (t.getX() / (size / 30) == x && t.getY() / (size / 30) == y) {
                     return t;
                 }
             }
@@ -539,14 +523,6 @@ public class Model {
 
     public int getMap() {
         return selectedMap;
-    }
-
-    public boolean isOver() {
-        return over;
-    }
-
-    public void setOver(boolean o) {
-        this.over = o;
     }
 
     public boolean roundOver() {

@@ -102,12 +102,12 @@ public abstract class Unit extends Sprite {
 
     @Override
     public void draw(Graphics2D g2) {
-
+        
         g2.drawImage(img, x, y, height, width, null);
         g2.setColor(color);
-        g2.drawLine(x + 2, y + height - 2, x + (int) hpLine() - 2, y + height - 2);
-        g2.drawLine(x + 2, y + height - 3, x + (int) hpLine() - 2, y + height - 3);
-        g2.drawLine(x + 2, y + height - 4, x + (int) hpLine() - 2, y + height - 4);
+        g2.drawLine(x + 4, y + height - 2, x + (int) hpLine() - 4, y + height - 2);
+        g2.drawLine(x + 4, y + height - 3, x + (int) hpLine() - 4, y + height - 3);
+        g2.drawLine(x + 4, y + height - 4, x + (int) hpLine() - 4, y + height - 4);
         
     }
 
