@@ -39,12 +39,35 @@ public class Player {
         this.units = new ArrayList<>();
     }
 
+    private void printDiffMatrices(Model model) {
+        ArrayList<Unit> units1 = model.getPlayers()[0].getUnits();
+        ArrayList<Unit> units2 = model.getPlayers()[1].getUnits();
+        for (Unit u : units1) {
+            int diffM[][] = model.getPlayers()[0].getDifficulty(model, u.getType(), 0);
+            for (int i = 0; i < 30; i++) {
+                for (int j = 0; j < 30; j++) {
+                    System.out.print(diffM[i][j] + " ");
+                }
+                System.out.println();
+            }
+        }
+        for (Unit u : units2) {
+            int diffM[][] = model.getPlayers()[1].getDifficulty(model, u.getType(), 1);
+            for (int i = 0; i < 30; i++) {
+                for (int j = 0; j < 30; j++) {
+                    System.out.print(diffM[i][j] + " ");
+                }
+                System.out.println();
+            }
+        }
+    }
+
     public Model build(int x, int y, String type, Model model) {
 
         for (int i = 0; i < 30; i++) {
             for (int j = 0; j < 30; j++) {
                 if (model.position[i][j] == 'F' || model.position[i][j] == 'C') {
-                    difficulty[i][j] = 1 + model.damagePerHalfSec(model.getActivePlayer(), i, j);
+                    difficulty[i][j] = 1;
                 } else //cant go through so we set a large number
                 {
                     difficulty[i][j] = 1000;
@@ -98,8 +121,33 @@ public class Player {
             }
 
         }
+        for (int q = 0; q < 2; q++) {
+            int defender = Math.abs(q * 4 - 4);
+            ArrayList<Unit> updateUnits = model.getPlayers()[q].getUnits();
+            for (Unit u : updateUnits) {
+                int minWayDiff = 10000;
+                ArrayList<Node> bestway = new ArrayList<>();
 
+                for (int i = 0; i < 4; i++) {
+                    ArrayList<String> wayString = model.getPlayers()[q].findWay(u.getX() / (model.getSize() / 30),
+                            u.getY() / (model.getSize() / 30), model.getCastleCoordinates()[i + defender][0],
+                            model.getCastleCoordinates()[i + defender][1], model.getPlayers()[q].getDifficulty(model, u.getType(), q));
+
+                    if (minWayDiff > model.wayDiff(q, wayString, u.getType())) {
+                        bestway = model.getPlayers()[q].convertWay(wayString);
+                        minWayDiff = model.wayDiff(q, wayString, u.getType());
+
+                    }
+                }
+                u.setWay(bestway);
+                 
+                model.getPlayers()[q].setUnits(updateUnits);
+            }
+
+        }
+       
         return model;
+         
 
     }
 
@@ -194,9 +242,9 @@ public class Player {
                 if (type.equals("Diver")) //they can go through lakes
                 {
                     if (model.position[i][j] == 'F' || model.position[i][j] == 'C') {
-                        difficulty[i][j] = 1 + model.damagePerHalfSec(model.getActivePlayer(), i, j);
+                        difficulty[i][j] = 1 ;
                     } else if (model.position[i][j] == 'L') {
-                        difficulty[i][j] = 2 + model.damagePerHalfSec(model.getActivePlayer(), i, j);
+                        difficulty[i][j] = 2 ;
                     } else //cant go through so we set a large number
                     {
                         difficulty[i][j] = 1000;
@@ -204,9 +252,9 @@ public class Player {
                 } else if (type.equals("Climber")) //they can go through mountains
                 {
                     if (model.position[i][j] == 'F' || model.position[i][j] == 'C') {
-                        difficulty[i][j] = 1 + model.damagePerHalfSec(model.getActivePlayer(), i, j);
+                        difficulty[i][j] = 1 ;
                     } else if (model.position[i][j] == 'M') {
-                        difficulty[i][j] = 2 + model.damagePerHalfSec(model.getActivePlayer(), i, j);
+                        difficulty[i][j] = 2 ;
                     } else //cant go through so we set a large number
                     {
                         difficulty[i][j] = 1000;
@@ -214,7 +262,7 @@ public class Player {
                 } else //normal unit
                 {
                     if (model.position[i][j] == 'F' || model.position[i][j] == 'C') {
-                        difficulty[i][j] = 1 + model.damagePerHalfSec(model.getActivePlayer(), i, j);
+                        difficulty[i][j] = 1 ;
                     } else //cant go through so we set a large number
                     {
                         difficulty[i][j] = 1000;
@@ -266,28 +314,6 @@ public class Player {
 
         return model;
 
-    }
-
-    public Model calculateWay(Model model) {
-        int minDistance = 10000;
-        ArrayList<Node> bestWay = new ArrayList<>();
-        int attacker = model.getActivePlayer() * 4;
-        int defender = Math.abs(model.getActivePlayer() * 4 - 4);
-        for (Unit u : units) {
-            for (int j = 0; j < 4; j++) {
-                for (int k = 0; k < 4; k++) {
-                    ArrayList<String> wayString = findWay(model.getCastleCoordinates()[j + attacker][0], model.getCastleCoordinates()[j + attacker][1],
-                            model.getCastleCoordinates()[k + defender][0], model.getCastleCoordinates()[k + defender][1], difficulty);
-                    ArrayList<Node> nodeWay = convertWay(wayString);
-                    if (model.wayDiff(model.getActivePlayer(), wayString, u.getType()) < minDistance) {
-                        bestWay = nodeWay;
-                        minDistance = model.wayDiff(model.getActivePlayer(), wayString, u.getType());
-                    }
-                }
-            }
-            u.setWay(bestWay);
-        }
-        return model;
     }
 
     public ArrayList<String> findWay(int fromX, int fromY, int toX, int toY, int difficulty[][]) /* 
@@ -347,12 +373,9 @@ public class Player {
 
         ArrayList<Node> way = new ArrayList<Node>();
 
-        if (src.size() == 0 || src == null) {
+        if (src.isEmpty() || src == null) {
             return new ArrayList<Node>();
         }
-
-        way.add(new Node(parseInt(src.get(0).split(";")[0]),
-                parseInt(src.get(0).split(";")[1])));
 
         for (int i = 1; i < src.size(); i++) {
             int x1 = parseInt(src.get(i - 1).split(";")[0]);
@@ -411,15 +434,15 @@ public class Player {
 
     }
 
-    public int[][] getDifficulty(Model model, String type) {
+    public int[][] getDifficulty(Model model, String type, int activePlayer) {
         for (int i = 0; i < 30; i++) {
             for (int j = 0; j < 30; j++) {
                 if (type.equals("Diver")) //they can go through lakes
                 {
                     if (model.position[i][j] == 'F' || model.position[i][j] == 'C') {
-                        difficulty[i][j] = 1 + model.damagePerHalfSec(model.getActivePlayer(), i, j);
+                        difficulty[i][j] = 1;
                     } else if (model.position[i][j] == 'L') {
-                        difficulty[i][j] = 2 + model.damagePerHalfSec(model.getActivePlayer(), i, j);
+                        difficulty[i][j] = 2;
                     } else //cant go through so we set a large number
                     {
                         difficulty[i][j] = 1000;
@@ -427,9 +450,9 @@ public class Player {
                 } else if (type.equals("Climber")) //they can go through mountains
                 {
                     if (model.position[i][j] == 'F' || model.position[i][j] == 'C') {
-                        difficulty[i][j] = 1 + model.damagePerHalfSec(model.getActivePlayer(), i, j);
+                        difficulty[i][j] = 1;
                     } else if (model.position[i][j] == 'M') {
-                        difficulty[i][j] = 2 + model.damagePerHalfSec(model.getActivePlayer(), i, j);
+                        difficulty[i][j] = 2;
                     } else //cant go through so we set a large number
                     {
                         difficulty[i][j] = 1000;
@@ -437,7 +460,7 @@ public class Player {
                 } else //normal unit
                 {
                     if (model.position[i][j] == 'F' || model.position[i][j] == 'C') {
-                        difficulty[i][j] = 1 + model.damagePerHalfSec(model.getActivePlayer(), i, j);
+                        difficulty[i][j] = 1 ;
                     } else //cant go through so we set a large number
                     {
                         difficulty[i][j] = 1000;

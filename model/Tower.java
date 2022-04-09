@@ -13,6 +13,7 @@ public abstract class Tower extends Sprite {
     protected double attack_speed;
     protected int hp;
     protected int price;
+    protected int upgradePrice;
     protected int demolishedIn;
     protected int level;
     protected int maxHp;
@@ -75,6 +76,16 @@ public abstract class Tower extends Sprite {
     public int getPrice() {
         return price;
     }
+    
+    public void setColor(String colorString){
+        if (colorString == "red") {
+            this.color = Color.red;
+            this.img = new ImageIcon("src/res/Towerred.png").getImage();
+        } else {
+            this.color = Color.blue;
+            this.img = new ImageIcon("src/res/Towerblue.png").getImage();
+        }
+    }
 
     public void setPrice(int price) {
         this.price = price;
@@ -88,7 +99,13 @@ public abstract class Tower extends Sprite {
         return maxHp;
     }
 
-    public abstract void setMaxHp();
+    public int getUpgradePrice() {
+        return upgradePrice;
+    }
+
+    public void setUpgradePrice(int upgradePrice) {
+        this.upgradePrice = upgradePrice;
+    }
 
     public void setLevel(int lvl) {
         level = lvl;
@@ -118,7 +135,7 @@ public abstract class Tower extends Sprite {
     @Override
     public void draw(Graphics2D g2) {
         g2.drawImage(img, x, y, height, width, null);
-        if (demolishedIn == -1) {
+        if (demolishedIn <=0) {
             g2.setColor(color);
             g2.drawLine(x + 2, y + height - 2, x + (int) hpLine() - 2, y + height - 2);
             g2.drawLine(x + 2, y + height - 3, x + (int) hpLine() - 2, y + height - 3);

@@ -25,5 +25,6 @@ public class Climber extends Unit {
         this.price = 20;
         this.type = "Climber";
         this.maxHp = 10;
+        this.way=way;
     }
 }
