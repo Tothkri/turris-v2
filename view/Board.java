@@ -75,7 +75,6 @@ public class Board extends JPanel {
             if (!isCastleDestroyed(s.getX(), s.getY())) {
                 s.draw(g2);
             }
-            
         }
 
         if (!selectables.isEmpty()) {
@@ -87,23 +86,43 @@ public class Board extends JPanel {
         if (!p1units.isEmpty()) {
             for (Unit u : p1units) {
                 u.draw(g2);
+                if(u.isBlood()){
+                    grphcs.drawImage(new ImageIcon("src/res/Blood.png").getImage(), u.getX(), u.getY(), 30, 30, null);
+                    u.setBlood(false);
+                }
             }
         }
 
         if (!p2units.isEmpty()) {
             for (Unit u : p2units) {
                 u.draw(g2);
+                if(u.isBlood()){
+                    grphcs.drawImage(new ImageIcon("src/res/Blood.png").getImage(), u.getX(), u.getY(), 30, 30, null);
+                    u.setBlood(false);
+                }
             }
         }
         if (!p1towers.isEmpty()) {
             for (Tower t : p1towers) {
                 t.draw(g2);
+                if(t.isExploded()){
+                    grphcs.drawImage(new ImageIcon("src/res/Explosion.png").getImage(), t.getX(), t.getY(), 30, 30, null);
+                    t.setExploded(false);
+                }
+                if(t.getShootCords().getX() != -1){
+                    grphcs.drawLine(t.getX() + 15, t.getY() + 15, t.getShootCords().getX() + 15, t.getShootCords().getY() + 15);
+                    t.setShootCords(-1,-1);
+                }
             }
         }
 
-        if (!p2units.isEmpty()) {
+        if (!p2towers.isEmpty()) {
             for (Tower t : p2towers) {
                 t.draw(g2);
+                if(t.isExploded()){
+                    grphcs.drawLine(t.getX() + 15, t.getY() + 15, t.getShootCords().getX() + 15, t.getShootCords().getY() + 15);
+                    t.setExploded(false);
+                }
             }
         }
     }

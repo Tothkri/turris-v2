@@ -319,13 +319,14 @@ public class GameWindow extends JPanel implements ActionListener {
                         double tickPerAttack = (1 / towers.get(j).getAttack_speed());
                         if (simulationticks % tickPerAttack == 0) {
                             ArrayList<Unit> enemyUnitsNearby = model.enemyUnitsNearby(i, towers.get(j));
-                            for (int k = 0; k < enemyUnitsNearby.size(); k++) {
-                                if (enemyUnitsNearby.get(k).getHp() > towers.get(j).getPower()) {
-                                    enemyUnitsNearby.get(k).setHp(enemyUnitsNearby.get(k).getHp() - towers.get(j).getPower());
+                            if(enemyUnitsNearby.size() > 0){
+                                int rand = (int) (Math.random() * enemyUnitsNearby.size());
+                                towers.get(j).setShootCords(enemyUnitsNearby.get(rand).getX(),enemyUnitsNearby.get(rand).getY());
+                                if (enemyUnitsNearby.get(rand).getHp() > towers.get(j).getPower()) {
+                                    enemyUnitsNearby.get(rand).setHp(enemyUnitsNearby.get(rand).getHp() - towers.get(j).getPower());
                                 } else {
-
-                                    model.getPlayers()[(i + 1) % 2].deleteUnit(enemyUnitsNearby.get(k));
-                                    model.getPlayers()[i].setMoney(model.getPlayers()[i].getMoney() + enemyUnitsNearby.get(k).getMaxHp() * 2);
+                                    model.getPlayers()[(i + 1) % 2].deleteUnit(enemyUnitsNearby.get(rand));
+                                    model.getPlayers()[i].setMoney(model.getPlayers()[i].getMoney() + enemyUnitsNearby.get(rand).getMaxHp() * 2);
                                 }
                             }
                         }
@@ -447,18 +448,27 @@ public class GameWindow extends JPanel implements ActionListener {
                     //then fighter deal damage to enemy units if they are in the same position
                     ArrayList<Unit> enemyUnitsNearby = model.enemyUnitsNearby(q, units.get(i));
                     if ("Fighter".equals(units.get(i).getType()) && enemyUnitsNearby.size() > 0) {
-                        for (int j = 0; j < enemyUnitsNearby.size(); j++) {
-                            if (enemyUnitsNearby.get(j).getHp() > units.get(i).getPower()) {
-                                enemyUnitsNearby.get(j).setHp(enemyUnitsNearby.get(j).getHp() - units.get(i).getPower());
-                            } else {
-
-                                model.getPlayers()[(q + 1) % 2].deleteUnit(enemyUnitsNearby.get(j));
-                                model.getPlayers()[q].setMoney(model.getPlayers()[q].getMoney() + enemyUnitsNearby.get(j).getMaxHp() * 2);
-                                if (j > 0) {
-                                    j--;
-                                }
+                        int rand = (int) (Math.random() * enemyUnitsNearby.size());
+                        units.get(i).setBlood(true);
+                        if (enemyUnitsNearby.get(rand).getHp() > units.get(i).getPower()) {
+                            enemyUnitsNearby.get(rand).setHp(enemyUnitsNearby.get(rand).getHp() - units.get(i).getPower());
+                            if (units.get(i).getHp() > enemyUnitsNearby.get(rand).getPower() && "Fighter".equals(enemyUnitsNearby.get(rand).getType())) {
+                                units.get(i).setHp(units.get(i).getHp() - enemyUnitsNearby.get(rand).getPower());
+                            } else if("Fighter".equals(enemyUnitsNearby.get(rand).getType())) {
+                                model.getPlayers()[q].deleteUnit(units.get(i));
+                                model.getPlayers()[Math.abs(q - 1)].setMoney(model.getPlayers()[Math.abs(q - 1)].getMoney() + units.get(i).getMaxHp() * 2);
                             }
+                        } else {
+                            model.getPlayers()[q].setMoney(model.getPlayers()[q].getMoney() + enemyUnitsNearby.get(rand).getMaxHp() * 2);
+                            if (units.get(i).getHp() > enemyUnitsNearby.get(rand).getPower() && "Fighter".equals(enemyUnitsNearby.get(rand).getType())) {
+                                units.get(i).setHp(units.get(i).getHp() - enemyUnitsNearby.get(rand).getPower());
+                            } else if("Fighter".equals(enemyUnitsNearby.get(rand).getType())) {
+                                model.getPlayers()[q].deleteUnit(units.get(i));
+                                model.getPlayers()[Math.abs(q - 1)].setMoney(model.getPlayers()[Math.abs(q - 1)].getMoney() + units.get(i).getMaxHp() * 2);
+                            }
+                            model.getPlayers()[(q + 1) % 2].deleteUnit(enemyUnitsNearby.get(rand));
                         }
+
                     }
 
                     ArrayList<Tower> towersNearby = model.towersNearby(q, units.get(i));
@@ -473,7 +483,13 @@ public class GameWindow extends JPanel implements ActionListener {
                             for (int j = 0; j < towersNearby.size(); j++) {
                                 if (towersNearby.get(j).getHp() > 50) {
                                     towersNearby.get(j).setHp(towersNearby.get(j).getHp() - 50);
-                                } else {
+                                    int index = model.getPlayers()[Math.abs(q - 1)].getTowerIndex(towersNearby.get(j));
+                                    if(index != -1)
+                                        model.getPlayers()[Math.abs(q - 1)].getTowers().get(index).setExploded(true);
+
+                                    model.getPlayers()[q].deleteUnit(units.get(i));
+                                    break;
+                                } else if(towersNearby.get(j).getHp() > 0) {
 
                                     towersNearby.get(j).setHp(0);
                                     towersNearby.get(j).setPower(0);
@@ -482,10 +498,13 @@ public class GameWindow extends JPanel implements ActionListener {
                                     model.getPlayers()[(q + 1) % 2].demolish(towersNearby.get(j).getX() / (model.getSize() / 30),
                                             towersNearby.get(j).getY() / (model.getSize() / 30), model.getSize());
                                     model.getPlayers()[q].setMoney(model.getPlayers()[q].getMoney() + towersNearby.get(j).getMaxHp() * 3);
+                                    int index = model.getPlayers()[q].getTowerIndex(towersNearby.get(j));
+                                    if(index != -1)
+                                        model.getPlayers()[q].getTowers().get(index).setExploded(true);
+                                    model.getPlayers()[q].deleteUnit(units.get(i));
+                                    break;
                                 }
                             }
-                            model.getPlayers()[q].deleteUnit(units.get(i));
-
                         }
                     }
 
