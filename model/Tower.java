@@ -1,5 +1,6 @@
 package model;
 
+
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -18,10 +19,32 @@ public abstract class Tower extends Sprite {
     protected int level;
     protected int maxHp;
     protected Color color;
+    protected Node shootCords;
+    protected boolean exploded;
+
+    public boolean isExploded() {
+        return exploded;
+    }
+
+    public void setExploded(boolean exploded) {
+        this.exploded = exploded;
+    }
+
+    public void setShootCords(int x, int y){
+        shootCords.setX(x);
+        shootCords.setY(y);
+    }
+
+    public Node getShootCords(){
+        return shootCords;
+    }
+
 
     public Tower(String scolor, int x, int y, int height, int width, Image img) {
         super(x, y, height, width, img);
-
+        exploded = false;
+        shootCords = new Node();
+        setShootCords(-1,-1);
         this.demolishedIn = -1;
         level = 1;
         if (scolor == "red") {

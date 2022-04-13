@@ -369,6 +369,18 @@ public class Player {
         return bestway;
     }
 
+    public int getTowerIndex(Tower t){
+        int i = 0;
+        System.out.println(towers.size());
+         for(Tower x : towers){
+             if(x.getX() == t.getX() && x.getY() == t.getY()){
+                 return i;
+             }
+             i++;
+        }
+         return -1;
+    }
+
     public ArrayList<Node> convertWay(ArrayList<String> src) {
 
         ArrayList<Node> way = new ArrayList<Node>();

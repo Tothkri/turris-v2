@@ -16,6 +16,7 @@ public abstract class Unit extends Sprite {
     protected ArrayList<Node> way;
     protected Color color;
     protected int maxHp;
+    protected boolean blood;
 
     public int getMaxHp() {
         return maxHp;
@@ -40,8 +41,17 @@ public abstract class Unit extends Sprite {
 
     }
 
+    public boolean isBlood() {
+        return blood;
+    }
+
+    public void setBlood(boolean blood) {
+        this.blood = blood;
+    }
+
     public Unit(String scolor, int x, int y, int height, int width, Image img) {
         super(x, y, height, width, img);
+        blood = false;
         if (scolor.equals("red")) {
             this.color = Color.red;
             this.img = new ImageIcon("src/res/Unitred.png").getImage();
