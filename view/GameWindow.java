@@ -339,6 +339,13 @@ public class GameWindow extends JPanel implements ActionListener {
                 } else {
                     ticks = (1000 / timerInterval) * 30;
                 }
+                if(!simulationTime){
+                    if (model.getPlayers()[0].getCastle().getHp() <= 0 || model.getPlayers()[1].getCastle().getHp() <= 0) {
+                        simulationTime = false;
+                        board.repaint();
+                        gameOver();
+                    }
+                }
             } else {
                 for (int i = 0; i < 5; i++) {
                     if (model.getActivePlayer() == 0) {
@@ -533,12 +540,6 @@ public class GameWindow extends JPanel implements ActionListener {
 
                 }
             }
-        }
-
-        if (isOver) {
-            simulationTime = false;
-            board.repaint();
-            gameOver();
         }
 
         return moreDistance;
