@@ -267,19 +267,23 @@ public class GameWindow extends JPanel implements ActionListener {
                 int y = e.getY() / (model.getSize() / 30);
 
                 if (buttonAction.equals("placeTower")) {
-                    model=(model.getPlayers()[model.getActivePlayer()].build(x, y, selectedTower, model));
+                    model = (model.getPlayers()[model.getActivePlayer()].build(x, y, selectedTower, model));
                     buttonAction = "";
                 } else if (buttonAction.equals("upgrade")) {
-                    model.getPlayers()[model.getActivePlayer()].upgrade(x, y, model.getSize());
-                    model.setSelectables(new ArrayList<>());
+                    if (model.getTowerFromPosition(x, y) != null && model.getPosition()[x][y] == 'T') {
+                        model.getPlayers()[model.getActivePlayer()].upgrade(x, y, model.getSize());
+                        model.setSelectables(new ArrayList<>());
+                    }
+
                     buttonAction = "";
                 } else if (buttonAction.equals("demolish")) {
-                    model.setPosition(x,y, 'D');
+                    if (model.getTowerFromPosition(x, y) != null && model.getPosition()[x][y] == 'T') {
+                        model.setPosition(x, y, 'D');
+                        model.getPlayers()[model.getActivePlayer()].setMoney(model.getPlayers()[model.getActivePlayer()].getMoney() + model.getTowerFromPosition(x, y).getPrice() / 2);
+                        model.getPlayers()[model.getActivePlayer()].demolish(x, y, model.getSize());
+                        model.setSelectables(new ArrayList<>());
+                    }
 
-                    model.getPlayers()[model.getActivePlayer()].demolish(x, y, model.getSize());
-                    model.getPlayers()[model.getActivePlayer()].setMoney(model.getPlayers()[model.getActivePlayer()].getMoney() + model.getTowerFromPosition(x, y).getMaxHp());
-                    model.getPlayers()[model.getActivePlayer()].demolish(x, y, model.getSize());
-                    model.setSelectables(new ArrayList<>());
                     buttonAction = "";
                 }
 
@@ -287,15 +291,14 @@ public class GameWindow extends JPanel implements ActionListener {
                 playerDataUpdate();
             }
         });
-        if(!(ticks>0)) //ticks has been set while loading game
+        if (!(ticks > 0)) //ticks has been set while loading game
         {
             ticks = (1000 / timerInterval) * 60;
         }
-        
 
         timer = new Timer(timerInterval, (ActionEvent ae) -> {
-           // showWays();
-           // printDiffMatrices();
+            //showWays();
+            // printDiffMatrices();
             PointerInfo a = MouseInfo.getPointerInfo();
 
             Point b = a.getLocation();
@@ -304,6 +307,14 @@ public class GameWindow extends JPanel implements ActionListener {
             int y = (int) b.getY() - 75;
             y /= (board.getModel().getSize() / 30);
 
+            /*
+            //helper
+            boolean showCoordinates=true;
+            if (showCoordinates) {
+                ToolTipManager.sharedInstance().setEnabled(true);
+                board.setToolTipText(x+";"+y);
+            } 
+            else */
             if (!model.getInfo(x, y).equals("")) {
                 ToolTipManager.sharedInstance().setEnabled(true);
                 board.setToolTipText(model.getInfo(x, y));
@@ -313,15 +324,16 @@ public class GameWindow extends JPanel implements ActionListener {
 
             if (simulationTime) {
                 simulationTime = simulation();
+
                 for (int i = 0; i < 2; i++) {
-                    ArrayList<Tower> towers = model.getPlayers()[i].getTowers();
+                    ArrayList<Tower> towers = model.getPlayers()[i].getNotDemolishedTowers();
                     for (int j = 0; j < towers.size(); j++) {
-                        double tickPerAttack = (1 / towers.get(j).getAttack_speed());
+                        double tickPerAttack = towers.get(j).getAttack_speed() / 0.25;
                         if (simulationticks % tickPerAttack == 0) {
                             ArrayList<Unit> enemyUnitsNearby = model.enemyUnitsNearby(i, towers.get(j));
-                            if(enemyUnitsNearby.size() > 0){
+                            if (enemyUnitsNearby.size() > 0) {
                                 int rand = (int) (Math.random() * enemyUnitsNearby.size());
-                                towers.get(j).setShootCords(enemyUnitsNearby.get(rand).getX(),enemyUnitsNearby.get(rand).getY());
+                                towers.get(j).setShootCords(enemyUnitsNearby.get(rand).getX(), enemyUnitsNearby.get(rand).getY());
                                 if (enemyUnitsNearby.get(rand).getHp() > towers.get(j).getPower()) {
                                     enemyUnitsNearby.get(rand).setHp(enemyUnitsNearby.get(rand).getHp() - towers.get(j).getPower());
                                 } else {
@@ -332,19 +344,11 @@ public class GameWindow extends JPanel implements ActionListener {
                         }
                     }
                 }
-
                 simulationticks++;
                 if (model.getRound() == 1 || model.getRound() == 2) {
                     ticks = (1000 / timerInterval) * 60;
                 } else {
                     ticks = (1000 / timerInterval) * 30;
-                }
-                if(!simulationTime){
-                    if (model.getPlayers()[0].getCastle().getHp() <= 0 || model.getPlayers()[1].getCastle().getHp() <= 0) {
-                        simulationTime = false;
-                        board.repaint();
-                        gameOver();
-                    }
                 }
             } else {
                 for (int i = 0; i < 5; i++) {
@@ -374,9 +378,9 @@ public class GameWindow extends JPanel implements ActionListener {
                         ArrayList<Node> bestway = new ArrayList<>();
 
                         for (int i = 0; i < 4; i++) {
-                            ArrayList<String> wayString = model.getPlayers()[q].findWay(u.getX() / (model.getSize() / 30), 
-                                    u.getY() / (model.getSize() / 30),model.getCastleCoordinates()[i + defender][0], 
-                                    model.getCastleCoordinates()[i + defender][1], model.getPlayers()[q].getDifficulty(model, u.getType(),q));
+                            ArrayList<String> wayString = model.getPlayers()[q].findWay(u.getX() / (model.getSize() / 30),
+                                    u.getY() / (model.getSize() / 30), model.getCastleCoordinates()[i + defender][0],
+                                    model.getCastleCoordinates()[i + defender][1], model.getPlayers()[q].getDifficulty(model, u.getType(), q));
 
                             if (minWayDiff > model.wayDiff(q, wayString, u.getType())) {
                                 bestway = model.getPlayers()[q].convertWay(wayString);
@@ -384,7 +388,10 @@ public class GameWindow extends JPanel implements ActionListener {
 
                             }
                         }
-                        u.setWay(bestway);
+                        if (!bestway.isEmpty()) {
+                            u.setWay(bestway);
+                        }
+
                         model.getPlayers()[q].setUnits(updateUnits);
                     }
 
@@ -408,11 +415,10 @@ public class GameWindow extends JPanel implements ActionListener {
         timer.start();
         activePlayerPanelSetter();
     }
-    
-   
 
     public boolean simulation() {
         //first the units move
+
         boolean moreDistance = false;
         boolean isOver = false;
         for (int q = 0; q < 2; q++) {
@@ -461,7 +467,7 @@ public class GameWindow extends JPanel implements ActionListener {
                             enemyUnitsNearby.get(rand).setHp(enemyUnitsNearby.get(rand).getHp() - units.get(i).getPower());
                             if (units.get(i).getHp() > enemyUnitsNearby.get(rand).getPower() && "Fighter".equals(enemyUnitsNearby.get(rand).getType())) {
                                 units.get(i).setHp(units.get(i).getHp() - enemyUnitsNearby.get(rand).getPower());
-                            } else if("Fighter".equals(enemyUnitsNearby.get(rand).getType())) {
+                            } else if ("Fighter".equals(enemyUnitsNearby.get(rand).getType())) {
                                 model.getPlayers()[q].deleteUnit(units.get(i));
                                 model.getPlayers()[Math.abs(q - 1)].setMoney(model.getPlayers()[Math.abs(q - 1)].getMoney() + units.get(i).getMaxHp() * 2);
                             }
@@ -469,7 +475,7 @@ public class GameWindow extends JPanel implements ActionListener {
                             model.getPlayers()[q].setMoney(model.getPlayers()[q].getMoney() + enemyUnitsNearby.get(rand).getMaxHp() * 2);
                             if (units.get(i).getHp() > enemyUnitsNearby.get(rand).getPower() && "Fighter".equals(enemyUnitsNearby.get(rand).getType())) {
                                 units.get(i).setHp(units.get(i).getHp() - enemyUnitsNearby.get(rand).getPower());
-                            } else if("Fighter".equals(enemyUnitsNearby.get(rand).getType())) {
+                            } else if ("Fighter".equals(enemyUnitsNearby.get(rand).getType())) {
                                 model.getPlayers()[q].deleteUnit(units.get(i));
                                 model.getPlayers()[Math.abs(q - 1)].setMoney(model.getPlayers()[Math.abs(q - 1)].getMoney() + units.get(i).getMaxHp() * 2);
                             }
@@ -491,12 +497,13 @@ public class GameWindow extends JPanel implements ActionListener {
                                 if (towersNearby.get(j).getHp() > 50) {
                                     towersNearby.get(j).setHp(towersNearby.get(j).getHp() - 50);
                                     int index = model.getPlayers()[Math.abs(q - 1)].getTowerIndex(towersNearby.get(j));
-                                    if(index != -1)
+                                    if (index != -1) {
                                         model.getPlayers()[Math.abs(q - 1)].getTowers().get(index).setExploded(true);
+                                    }
 
                                     model.getPlayers()[q].deleteUnit(units.get(i));
                                     break;
-                                } else if(towersNearby.get(j).getHp() > 0) {
+                                } else if (towersNearby.get(j).getHp() > 0) {
 
                                     towersNearby.get(j).setHp(0);
                                     towersNearby.get(j).setPower(0);
@@ -506,8 +513,9 @@ public class GameWindow extends JPanel implements ActionListener {
                                             towersNearby.get(j).getY() / (model.getSize() / 30), model.getSize());
                                     model.getPlayers()[q].setMoney(model.getPlayers()[q].getMoney() + towersNearby.get(j).getMaxHp() * 3);
                                     int index = model.getPlayers()[q].getTowerIndex(towersNearby.get(j));
-                                    if(index != -1)
+                                    if (index != -1) {
                                         model.getPlayers()[q].getTowers().get(index).setExploded(true);
+                                    }
                                     model.getPlayers()[q].deleteUnit(units.get(i));
                                     break;
                                 }
@@ -519,27 +527,35 @@ public class GameWindow extends JPanel implements ActionListener {
                     startAnimation();
                 }
 
-                //u.setWay(model.getPlayers()[q].findWay());
             }
+
             Player currentPlayer = model.getPlayers()[q];
             ArrayList<Unit> currentPlayerUnits = currentPlayer.getUnits();
             Player enemyPlayer = model.getPlayers()[Math.abs(q - 1)];
-            for (int i = 0; i < currentPlayerUnits.size(); i++) {
-                ArrayList<Node> way = currentPlayerUnits.get(i).getWay();
-                if (way.isEmpty()) {
-                    if (enemyPlayer.getCastle().getHp() - currentPlayerUnits.get(i).getPower() > 0) {
-                        enemyPlayer.getCastle().setHp(enemyPlayer.getCastle().getHp() - currentPlayerUnits.get(i).getPower());
-                        board.repaint();
-                        playerDataUpdate();
+            for (int i = 0; i < currentPlayerUnits.size();) {
+                Unit cpu = currentPlayerUnits.get(i);
+                //ArrayList<Node> way = cpu.getWay();
+
+                if (model.isItEnemyCastleCoordinate(q, cpu.getX() / (model.getSize() / 30), cpu.getY() / (model.getSize() / 30))) {
+                    if (enemyPlayer.getCastle().getHp() - cpu.getPower() > 0) {
+                        enemyPlayer.getCastle().setHp(enemyPlayer.getCastle().getHp() - cpu.getPower());
                     } else {
                         enemyPlayer.getCastle().setHp(0);
                         isOver = true;
                     }
-                    model.getPlayers()[q].deleteUnit(currentPlayerUnits.get(i));
+                    model.getPlayers()[q].deleteUnit(cpu);
+                    board.repaint();
                     //remove units who reached Castle after dealing damage to it
-
+                } else {
+                    i++;
                 }
             }
+        }
+
+        if (isOver) {
+            simulationTime = false;
+            board.repaint();
+            gameOver();
         }
 
         return moreDistance;
@@ -586,27 +602,53 @@ public class GameWindow extends JPanel implements ActionListener {
             System.out.println(u.getWay());
         }
     }
-    
-     private void printDiffMatrices(){
-        ArrayList<Unit> units1= model.getPlayers()[0].getUnits();
-          ArrayList<Unit> units2= model.getPlayers()[1].getUnits();
-        for(Unit u :units1){
-            int diffM[][]=model.getPlayers()[0].getDifficulty(model, u.getType(),0);
-            for(int i=0;i<30;i++){
-                for(int j=0;j<30;j++){
-                    System.out.print(diffM[i][j]+" ");
+
+    private void printDiffMatrices() {
+        ArrayList<Unit> units1 = model.getPlayers()[0].getUnits();
+        ArrayList<Unit> units2 = model.getPlayers()[1].getUnits();
+        for (Unit u : units1) {
+            int diffM[][] = model.getPlayers()[0].getDifficulty(model, u.getType(), 0);
+            for (int i = 0; i < 30; i++) {
+                for (int j = 0; j < 30; j++) {
+                    System.out.print(diffM[i][j] + " ");
                 }
-                 System.out.println();
+                System.out.println();
             }
+            System.out.println();
         }
-        for(Unit u :units2){
-            int diffM[][]=model.getPlayers()[1].getDifficulty(model, u.getType(),1);
-            for(int i=0;i<30;i++){
-                for(int j=0;j<30;j++){
-                    System.out.print(diffM[i][j]+" ");
+
+        for (Unit u : units2) {
+            int diffM[][] = model.getPlayers()[1].getDifficulty(model, u.getType(), 1);
+            for (int i = 0; i < 30; i++) {
+                for (int j = 0; j < 30; j++) {
+                    System.out.print(diffM[i][j] + " ");
                 }
-                 System.out.println();
+                System.out.println();
             }
+            System.out.println();
+        }
+    }
+
+    private void printWayDiff() {
+        ArrayList<Unit> units1 = model.getPlayers()[0].getUnits();
+
+        ArrayList<Unit> units2 = model.getPlayers()[1].getUnits();
+        for (Unit u : units1) {
+            ArrayList<Node> way = u.getWay();
+            int diffM[][] = model.getPlayers()[0].getDifficulty(model, u.getType(), 0);
+            for (Node n : way) {
+                System.out.print(diffM[n.getX()][n.getY()] + ", ");
+            }
+            System.out.println();
+        }
+
+        for (Unit u : units2) {
+            ArrayList<Node> way = u.getWay();
+            int diffM[][] = model.getPlayers()[1].getDifficulty(model, u.getType(), 1);
+            for (Node n : way) {
+                System.out.print(diffM[n.getX()][n.getY()] + ", ");
+            }
+            System.out.println();
         }
     }
 
@@ -1282,6 +1324,5 @@ public class GameWindow extends JPanel implements ActionListener {
     public void setTicks(int ticks) {
         this.ticks = ticks;
     }
-    
-    
+
 }

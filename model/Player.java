@@ -1,16 +1,15 @@
 package model;
 
-import java.awt.Color;
 import static java.lang.Integer.max;
 import static java.lang.Integer.parseInt;
 import static java.lang.Math.abs;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
 import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
 
 public class Player {
 
@@ -225,7 +224,7 @@ public class Player {
 
     public Model sendUnits(String type, String color, int amount, Model model) {
 
-        int minDistance = 10000;
+        int minDistance=0;
         ArrayList<Node> bestWay = new ArrayList<>();
 
         /*
@@ -273,6 +272,7 @@ public class Player {
         }
 
         for (int i = 0; i < amount; i++) {
+            
 
             int attacker = model.getActivePlayer() * 4;
             int defender = Math.abs(model.getActivePlayer() * 4 - 4);
@@ -280,15 +280,17 @@ public class Player {
                 for (int k = 0; k < 4; k++) {
                     ArrayList<String> wayString = findWay(model.getCastleCoordinates()[j + attacker][0], model.getCastleCoordinates()[j + attacker][1],
                             model.getCastleCoordinates()[k + defender][0], model.getCastleCoordinates()[k + defender][1], difficulty);
+                   
                     ArrayList<Node> nodeWay = convertWay(wayString);
-                    if (model.wayDiff(model.getActivePlayer(), wayString, type) < minDistance) {
+                    if (minDistance==0||model.wayDiff(model.getActivePlayer(), wayString, type) < minDistance) {
                         bestWay = nodeWay;
                         minDistance = model.wayDiff(model.getActivePlayer(), wayString, type);
                     }
                 }
             }
-
-            if (bestWay != null && bestWay.size() > 0) {
+            
+            if (bestWay != null && !bestWay.isEmpty()) {
+                
                 Unit newUnit;
                 int unitSize = model.getSize() / 30;
                 if (type.equals("General")) {
@@ -371,7 +373,7 @@ public class Player {
 
     public int getTowerIndex(Tower t){
         int i = 0;
-        System.out.println(towers.size());
+        //System.out.println(towers.size());
          for(Tower x : towers){
              if(x.getX() == t.getX() && x.getY() == t.getY()){
                  return i;
@@ -442,7 +444,7 @@ public class Player {
 
     public void deleteUnit(Unit unitToDelete) {
 
-        units.remove(unitToDelete);
+       units.remove(unitToDelete);
 
     }
 
@@ -498,6 +500,17 @@ public class Player {
 
     public void setName(String name) {
         this.name = name;
+    }
+    
+    public ArrayList<Tower> getNotDemolishedTowers() {
+        ArrayList<Tower> notDemolished=new ArrayList<Tower>();
+        for(Tower t : towers){
+            if(t.demolishedIn==-1){
+                 notDemolished.add(t);
+            }
+           
+        }
+        return notDemolished;
     }
 
     public ArrayList<Tower> getTowers() {

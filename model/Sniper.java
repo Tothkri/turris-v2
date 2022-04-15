@@ -16,6 +16,7 @@ public class Sniper extends Tower {
         this.demolishedIn = -1;
         this.type = "Sniper";
         this.maxHp=25;
+        this.upgradePrice=price+200;
     }
 
     //constructor for loaded towers

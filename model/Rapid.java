@@ -16,6 +16,7 @@ public class Rapid extends Tower {
         this.demolishedIn = -1;
         this.type = "Rapid";
         this.maxHp = 45;
+        this.upgradePrice=price+150;
     }
 
     //constructor for loaded towers

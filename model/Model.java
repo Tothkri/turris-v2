@@ -57,7 +57,6 @@ public class Model {
         this.terrain = new ArrayList<>();
         this.selectables = new ArrayList<>();
         position = new char[30][30];
-        this.size = size;
         this.players = new Player[2];
     }
 
@@ -206,12 +205,7 @@ public class Model {
      */
     //simulates if Tower is placed -> is there a way between the two Castles or not & is there a way from units to castles
     public boolean placable(int x, int y, int matrix[][]) {
-        int newMatrix[][] = new int[30][30];
-        for (int i = 0; i < 30; i++) {
-            for (int j = 0; j < 30; j++) {
-                newMatrix[i][j] = matrix[i][j];
-            }
-        }
+        int newMatrix[][] = matrix;
 
         //there's something already in this position
         if (newMatrix[x][y] != 1 || isThereUnit(x, y)) {
@@ -221,7 +215,7 @@ public class Model {
         newMatrix[x][y] = 1000;
 
         ArrayList<String> wayString;
-        for (int q = 0; q < 2; q++) {
+        /*for (int q = 0; q < 2; q++) {
             ArrayList<Unit> units = players[q].getUnits();
             for (int i = 0; i < 4; i++) {
                 for (Unit u : units) {
@@ -235,6 +229,7 @@ public class Model {
                 }
             }
         }
+        */
 
         //check all possible start and destination coordinates (Castle1, Castle2)
         for (int j = 0; j < 4; j++) {
@@ -337,6 +332,18 @@ public class Model {
             }
         }
     }
+    
+    public boolean isItEnemyCastleCoordinate(int actPl,int x, int y)////0<=x,y<30
+    {
+        int enemy=(actPl+1)%2;
+        for(int i=enemy*4;i<(enemy+1)*4;i++){
+            if(castleCoordinates[i][0]==x&&castleCoordinates[i][1]==y){
+                return true;
+            }
+        }
+            
+        return false;
+    }
 
     private boolean isThereUnit(int x, int y) ////0<=x,y<30
     {
@@ -379,13 +386,15 @@ public class Model {
             }
         }
     }
+    
+  
 
     public String getInfo(int x, int y) {
         String info = "";
         boolean found = false;
 
-        for (int i = 0; i < players[activePlayer].getTowers().size() && !found; i++) {
-            Tower t = players[activePlayer].getTowers().get(i);
+        for (int i = 0; i < players[activePlayer].getNotDemolishedTowers().size() && !found; i++) {
+            Tower t = players[activePlayer].getNotDemolishedTowers().get(i);
             if (t.x / (size / 30) == x && t.y / (size / 30) == y) {
                 info = "<html><font face=\"sansserif\" color=\"black\">Tower type: " + t.type + "<br>level: " + t.level + "<br>hp: " + t.hp + ""
                         + "<br>attack speed: " + t.attack_speed + "<br>power: " + t.power + "<br>range: " + t.range + "</font></html>";
@@ -456,7 +465,7 @@ public class Model {
         if (enemyTowers.size() > 0) {
             for (Tower t : enemyTowers) {
                 //System.out.println(distance(u.x/(size/30),t.x/(size/30),u.y/(size/30),t.y/(size/30)));
-                if (distance(u.x / (size / 30), t.x / (size / 30), u.y / (size / 30), t.y / (size / 30)) == 1) {
+                if (distance(u.x / (size / 30), t.x / (size / 30), u.y / (size / 30), t.y / (size / 30)) == 1&&t.demolishedIn==-1) {
                     towersNB.add(t);
                 }
             }

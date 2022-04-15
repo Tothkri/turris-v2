@@ -16,7 +16,7 @@ public class Fortified extends Tower {
         this.power = 2;
         this.demolishedIn = -1;
         this.type = "Fortified";
-        this.upgradePrice=350;
+        this.upgradePrice=price+150;
     }
 
     //constructor for loaded towers

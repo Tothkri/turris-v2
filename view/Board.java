@@ -120,8 +120,12 @@ public class Board extends JPanel {
             for (Tower t : p2towers) {
                 t.draw(g2);
                 if(t.isExploded()){
-                    grphcs.drawLine(t.getX() + 15, t.getY() + 15, t.getShootCords().getX() + 15, t.getShootCords().getY() + 15);
+                   grphcs.drawImage(new ImageIcon("src/res/Explosion.png").getImage(), t.getX(), t.getY(), 30, 30, null);
                     t.setExploded(false);
+                }
+                if(t.getShootCords().getX() != -1){
+                    grphcs.drawLine(t.getX() + 15, t.getY() + 15, t.getShootCords().getX() + 15, t.getShootCords().getY() + 15);
+                    t.setShootCords(-1,-1);
                 }
             }
         }
