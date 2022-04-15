@@ -44,3 +44,19 @@ Ki mit csinált:
     
     Szálkai Olivér Dávid (ONLQ05): kezdőoldal GUI javítás, GameWindow GUI kialakítás, Javadoc
 
+6. hét (04.06 - 04.13)
+
+    Tóth Kristóf (SONXZF): bugok és funkciók javítása: legjobb út, torony lerakás/rombolás/fejlesztés, unit eltűnése miután beért a célba, attack speed
+
+    Tóth Kristóf (YPENKF): 
+    
+    Szálkai Olivér Dávid (ONLQ05): 
+
+7. hét (04.13 - 04.20)
+
+    Tóth Kristóf (SONXZF): 
+
+    Tóth Kristóf (YPENKF): 
+    
+    Szálkai Olivér Dávid (ONLQ05): 
+
