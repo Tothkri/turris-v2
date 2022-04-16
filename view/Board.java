@@ -32,7 +32,6 @@ public class Board extends JPanel {
 
     /**
      * board méretének beállítása
-     *
      * @param width
      * @param height
      */
@@ -72,15 +71,11 @@ public class Board extends JPanel {
         ArrayList<Tower> p2towers = model.getPlayers()[1].getTowers();
         ArrayList<Sprite> selectables = model.getSelectables();
         for (Sprite s : terrain) {
-            if (!isCastleDestroyed(s.getX(), s.getY())) {
-                s.draw(g2);
-            }
+            if (!isCastleDestroyed(s.getX(), s.getY())) { s.draw(g2); }
         }
 
         if (!selectables.isEmpty()) {
-            for (Sprite s : selectables) {
-                s.draw(g2);
-            }
+            for (Sprite s : selectables) { s.draw(g2); }
         }
 
         if (!p1units.isEmpty()) {
@@ -102,6 +97,7 @@ public class Board extends JPanel {
                 }
             }
         }
+
         if (!p1towers.isEmpty()) {
             for (Tower t : p1towers) {
                 t.draw(g2);
@@ -109,6 +105,7 @@ public class Board extends JPanel {
                     grphcs.drawImage(new ImageIcon("src/res/Explosion.png").getImage(), t.getX(), t.getY(), 30, 30, null);
                     t.setExploded(false);
                 }
+
                 if(t.getShootCords().getX() != -1){
                     grphcs.drawLine(t.getX() + 15, t.getY() + 15, t.getShootCords().getX() + 15, t.getShootCords().getY() + 15);
                     t.setShootCords(-1,-1);
@@ -123,6 +120,7 @@ public class Board extends JPanel {
                    grphcs.drawImage(new ImageIcon("src/res/Explosion.png").getImage(), t.getX(), t.getY(), 30, 30, null);
                     t.setExploded(false);
                 }
+
                 if(t.getShootCords().getX() != -1){
                     grphcs.drawLine(t.getX() + 15, t.getY() + 15, t.getShootCords().getX() + 15, t.getShootCords().getY() + 15);
                     t.setShootCords(-1,-1);
@@ -132,13 +130,8 @@ public class Board extends JPanel {
     }
 
     /**
-     * Getterek, setterek
-     */
-    public Model getModel() {
-        return model;
-    }
-
-    public void setModel(Model m) {
-        model = m;
-    }
+    * Getterek, setterek
+    */
+    public Model getModel()         { return model; }
+    public void setModel(Model m)   { model = m; }
 }
