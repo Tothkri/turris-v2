@@ -42,7 +42,7 @@ Ki mit csinált:
 
     Tóth Kristóf (YPENKF): játék mentés kiválasztása, játék helyesen betöltődik, torony rombolásakor eltűnik az élet csík, torony lerakás/fejlesztés/építés másodszori          megnyomásakor a kijelölések eltűnnek
     
-    Szálkai Olivér Dávid (ONLQ05): kezdőoldal GUI javítás, GameWindow GUI kialakítás, Javadoc
+    Szálkai Olivér Dávid (ONLQ05): StartScreen GUI javítás, GameWindow GUI kialakítás, Javadoc
 
 6. hét (04.06 - 04.13)
 
@@ -50,7 +50,7 @@ Ki mit csinált:
 
     Tóth Kristóf (YPENKF): Képek/animációk megjelenése: torony lövésekor, fighter harcbalépésekor. Torony és a Fighter csak egy Unitra lő egy körben
     
-    Szálkai Olivér Dávid (ONLQ05): 
+    Szálkai Olivér Dávid (ONLQ05): GameWindow Player UI, Board UI rework, StartScreen UI visual javítások, CleanCode javítások
 
 7. hét (04.13 - 04.20)
 
