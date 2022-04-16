@@ -48,7 +48,7 @@ Ki mit csinált:
 
     Tóth Kristóf (SONXZF): bugok és funkciók javítása: legjobb út, torony lerakás/rombolás/fejlesztés, unit eltűnése miután beért a célba, attack speed
 
-    Tóth Kristóf (YPENKF): 
+    Tóth Kristóf (YPENKF): Képek/animációk megjelenése: torony lövésekor, fighter harcbalépésekor. Torony és a Fighter csak egy Unitra lő egy körben
     
     Szálkai Olivér Dávid (ONLQ05): 
 
