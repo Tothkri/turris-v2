@@ -40,7 +40,7 @@ Ki mit csinált:
 
     Tóth Kristóf (SONXZF): életerő megjelenítése (kastély, tornyok, egységek), tornyok lehelyezésének szabályozása, pénzszerzési módok kialakítása, tornyok lőnek, fighter sebez
 
-    Tóth Kristóf (YPENKF): 
+    Tóth Kristóf (YPENKF): játék mentés kiválasztása, játék helyesen betöltődik, torony rombolásakor eltűnik az élet csík, torony lerakás/fejlesztés/építés másodszori          megnyomásakor a kijelölések eltűnnek
     
     Szálkai Olivér Dávid (ONLQ05): kezdőoldal GUI javítás, GameWindow GUI kialakítás, Javadoc
 
