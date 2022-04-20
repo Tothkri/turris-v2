@@ -570,4 +570,393 @@ public class MainTest {
         assertTrue(cY != m.getPlayers()[0].getUnits().get(0).getY() &&
                 dX != m.getPlayers()[1].getUnits().get(0).getX());
     }
+    /**
+     * Checks castles health and the winner
+     */
+    @Test
+    public void testWinner(){
+        Initialize("plain1U.txt");
+        for (int q = 0; q < 2; q++) {
+            int defender = Math.abs(q * 4 - 4);
+            ArrayList<Unit> updateUnits = m.getPlayers()[q].getUnits();
+            for (Unit u : updateUnits) {
+                if (q == 0) {
+                    gw.getPlayer1distances().add(u.getDistance());
+                } else {
+                    gw.getPlayer2distances().add(u.getDistance());
+                }
+                int minWayDiff = 10000;
+                ArrayList<Node> bestway = new ArrayList<>();
+
+                for (int i = 0; i < 4; i++) {
+                    ArrayList<String> wayString = m.getPlayers()[q].findWay(u.getX() / (m.getSize() / 30),
+                            u.getY() / (m.getSize() / 30), m.getCastleCoordinates()[i + defender][0],
+                            m.getCastleCoordinates()[i + defender][1], m.getPlayers()[q].getDifficulty(m, u.getType(), q));
+
+                    if (minWayDiff > m.wayDiff(q, wayString, u.getType())) {
+                        bestway = m.getPlayers()[q].convertWay(wayString);
+                        minWayDiff = m.wayDiff(q, wayString, u.getType());
+
+                    }
+                }
+                if (!bestway.isEmpty()) {
+                    u.setWay(bestway);
+                }
+
+                m.getPlayers()[q].setUnits(updateUnits);
+            }
+        }
+        gw.setModel(m);
+        
+        gw.getBoard().getModel().getPlayers()[1].getCastle().setHp(1);
+        gw.setTestMode(true);
+        gw.simulation();
+        gw.simulation();
+        gw.simulation();
+        gw.simulation();
+        assertTrue(gw.getBoard().getModel().getPlayers()[1].getCastle().getHp() == 0);
+    }
+    
+    @Test
+    public void testDraw(){
+        Initialize("plain2U.txt");
+        for (int q = 0; q < 2; q++) {
+            int defender = Math.abs(q * 4 - 4);
+            ArrayList<Unit> updateUnits = m.getPlayers()[q].getUnits();
+            for (Unit u : updateUnits) {
+                if (q == 0) {
+                    gw.getPlayer1distances().add(u.getDistance());
+                } else {
+                    gw.getPlayer2distances().add(u.getDistance());
+                }
+                int minWayDiff = 10000;
+                ArrayList<Node> bestway = new ArrayList<>();
+
+                for (int i = 0; i < 4; i++) {
+                    ArrayList<String> wayString = m.getPlayers()[q].findWay(u.getX() / (m.getSize() / 30),
+                            u.getY() / (m.getSize() / 30), m.getCastleCoordinates()[i + defender][0],
+                            m.getCastleCoordinates()[i + defender][1], m.getPlayers()[q].getDifficulty(m, u.getType(), q));
+
+                    if (minWayDiff > m.wayDiff(q, wayString, u.getType())) {
+                        bestway = m.getPlayers()[q].convertWay(wayString);
+                        minWayDiff = m.wayDiff(q, wayString, u.getType());
+
+                    }
+                }
+                if (!bestway.isEmpty()) {
+                    u.setWay(bestway);
+                }
+
+                m.getPlayers()[q].setUnits(updateUnits);
+            }
+        }
+        gw.setModel(m);
+        
+        gw.getBoard().getModel().getPlayers()[1].getCastle().setHp(1);
+        gw.getBoard().getModel().getPlayers()[0].getCastle().setHp(1);
+        gw.setTestMode(true);
+        gw.simulation();
+        gw.simulation();
+        gw.simulation();
+        gw.simulation();
+        assertTrue(gw.getBoard().getModel().getPlayers()[1].getCastle().getHp() == 0);
+        assertTrue(gw.getBoard().getModel().getPlayers()[0].getCastle().getHp() == 0);
+    }
+    
+    /**
+     * Checks if tower is shooting correctly
+     * Checks if destroyed tower shoots or not
+     */
+    @Test
+    public void testTowerShooting(){
+        Initialize("plain1U2T.txt");
+        for (int q = 0; q < 2; q++) {
+            int defender = Math.abs(q * 4 - 4);
+            ArrayList<Unit> updateUnits = m.getPlayers()[q].getUnits();
+            for (Unit u : updateUnits) {
+                if (q == 0) {
+                    gw.getPlayer1distances().add(u.getDistance());
+                } else {
+                    gw.getPlayer2distances().add(u.getDistance());
+                }
+                int minWayDiff = 10000;
+                ArrayList<Node> bestway = new ArrayList<>();
+
+                for (int i = 0; i < 4; i++) {
+                    ArrayList<String> wayString = m.getPlayers()[q].findWay(u.getX() / (m.getSize() / 30),
+                            u.getY() / (m.getSize() / 30), m.getCastleCoordinates()[i + defender][0],
+                            m.getCastleCoordinates()[i + defender][1], m.getPlayers()[q].getDifficulty(m, u.getType(), q));
+
+                    if (minWayDiff > m.wayDiff(q, wayString, u.getType())) {
+                        bestway = m.getPlayers()[q].convertWay(wayString);
+                        minWayDiff = m.wayDiff(q, wayString, u.getType());
+
+                    }
+                }
+                if (!bestway.isEmpty()) {
+                    u.setWay(bestway);
+                }
+
+                m.getPlayers()[q].setUnits(updateUnits);
+            }
+        }
+        gw.setModel(m);
+        int simulationticks = 0;
+        assertTrue(m.getPlayers()[0].getUnits().get(0).getHp() == m.getPlayers()[0].getUnits().get(0).getMaxHp());
+        
+        gw.simulation();
+        for (int i = 0; i < 2; i++) {
+        ArrayList<Tower> towers = gw.getBoard().getModel().getPlayers()[i].getNotDemolishedTowers();
+        for (int j = 0; j < towers.size(); j++) {
+            double tickPerAttack = towers.get(j).getAttack_speed() / 0.25;
+            if (simulationticks % tickPerAttack == 0) {
+                ArrayList<Unit> enemyUnitsNearby = gw.getBoard().getModel().enemyUnitsNearby(i, towers.get(j));
+                if (enemyUnitsNearby.size() > 0) {
+                    int rand = (int) (Math.random() * enemyUnitsNearby.size());
+                    towers.get(j).setShootCords(enemyUnitsNearby.get(rand).getX(), enemyUnitsNearby.get(rand).getY());
+                    if (enemyUnitsNearby.get(rand).getHp() > towers.get(j).getPower()) {
+                        enemyUnitsNearby.get(rand).setHp(enemyUnitsNearby.get(rand).getHp() - towers.get(j).getPower());
+                    } else {
+                            gw.getBoard().getModel().getPlayers()[(i + 1) % 2].deleteUnit(enemyUnitsNearby.get(rand));
+                            gw.getBoard().getModel().getPlayers()[i].setMoney(gw.getBoard().getModel().getPlayers()[i].getMoney() + enemyUnitsNearby.get(rand).getMaxHp() * 2);
+                        }
+                    }
+                }
+            }
+        }
+        simulationticks++;
+        gw.simulation();
+        for (int i = 0; i < 2; i++) {
+        ArrayList<Tower> towers = gw.getBoard().getModel().getPlayers()[i].getNotDemolishedTowers();
+        for (int j = 0; j < towers.size(); j++) {
+            double tickPerAttack = towers.get(j).getAttack_speed() / 0.25;
+            if (simulationticks % tickPerAttack == 0) {
+                ArrayList<Unit> enemyUnitsNearby = gw.getBoard().getModel().enemyUnitsNearby(i, towers.get(j));
+                if (enemyUnitsNearby.size() > 0) {
+                    int rand = (int) (Math.random() * enemyUnitsNearby.size());
+                    towers.get(j).setShootCords(enemyUnitsNearby.get(rand).getX(), enemyUnitsNearby.get(rand).getY());
+                    if (enemyUnitsNearby.get(rand).getHp() > towers.get(j).getPower()) {
+                        enemyUnitsNearby.get(rand).setHp(enemyUnitsNearby.get(rand).getHp() - towers.get(j).getPower());
+                    } else {
+                            gw.getBoard().getModel().getPlayers()[(i + 1) % 2].deleteUnit(enemyUnitsNearby.get(rand));
+                            gw.getBoard().getModel().getPlayers()[i].setMoney(gw.getBoard().getModel().getPlayers()[i].getMoney() + enemyUnitsNearby.get(rand).getMaxHp() * 2);
+                        }
+                    }
+                }
+            }
+        }
+        simulationticks++;
+        gw.simulation();
+        for (int i = 0; i < 2; i++) {
+        ArrayList<Tower> towers = gw.getBoard().getModel().getPlayers()[i].getNotDemolishedTowers();
+        for (int j = 0; j < towers.size(); j++) {
+            double tickPerAttack = towers.get(j).getAttack_speed() / 0.25;
+            if (simulationticks % tickPerAttack == 0) {
+                ArrayList<Unit> enemyUnitsNearby = gw.getBoard().getModel().enemyUnitsNearby(i, towers.get(j));
+                if (enemyUnitsNearby.size() > 0) {
+                    int rand = (int) (Math.random() * enemyUnitsNearby.size());
+                    towers.get(j).setShootCords(enemyUnitsNearby.get(rand).getX(), enemyUnitsNearby.get(rand).getY());
+                    if (enemyUnitsNearby.get(rand).getHp() > towers.get(j).getPower()) {
+                        enemyUnitsNearby.get(rand).setHp(enemyUnitsNearby.get(rand).getHp() - towers.get(j).getPower());
+                    } else {
+                            gw.getBoard().getModel().getPlayers()[(i + 1) % 2].deleteUnit(enemyUnitsNearby.get(rand));
+                            gw.getBoard().getModel().getPlayers()[i].setMoney(gw.getBoard().getModel().getPlayers()[i].getMoney() + enemyUnitsNearby.get(rand).getMaxHp() * 2);
+                        }
+                    }
+                }
+            }
+        }
+        simulationticks++;
+        gw.simulation();
+        for (int i = 0; i < 2; i++) {
+        ArrayList<Tower> towers = gw.getBoard().getModel().getPlayers()[i].getNotDemolishedTowers();
+        for (int j = 0; j < towers.size(); j++) {
+            double tickPerAttack = towers.get(j).getAttack_speed() / 0.25;
+            if (simulationticks % tickPerAttack == 0) {
+                ArrayList<Unit> enemyUnitsNearby = gw.getBoard().getModel().enemyUnitsNearby(i, towers.get(j));
+                if (enemyUnitsNearby.size() > 0) {
+                    int rand = (int) (Math.random() * enemyUnitsNearby.size());
+                    towers.get(j).setShootCords(enemyUnitsNearby.get(rand).getX(), enemyUnitsNearby.get(rand).getY());
+                    if (enemyUnitsNearby.get(rand).getHp() > towers.get(j).getPower()) {
+                        enemyUnitsNearby.get(rand).setHp(enemyUnitsNearby.get(rand).getHp() - towers.get(j).getPower());
+                    } else {
+                            gw.getBoard().getModel().getPlayers()[(i + 1) % 2].deleteUnit(enemyUnitsNearby.get(rand));
+                            gw.getBoard().getModel().getPlayers()[i].setMoney(gw.getBoard().getModel().getPlayers()[i].getMoney() + enemyUnitsNearby.get(rand).getMaxHp() * 2);
+                        }
+                    }
+                }
+            }
+        }
+        simulationticks++;
+        gw.simulation();
+        for (int i = 0; i < 2; i++) {
+        ArrayList<Tower> towers = gw.getBoard().getModel().getPlayers()[i].getNotDemolishedTowers();
+        for (int j = 0; j < towers.size(); j++) {
+            double tickPerAttack = towers.get(j).getAttack_speed() / 0.25;
+            if (simulationticks % tickPerAttack == 0) {
+                ArrayList<Unit> enemyUnitsNearby = gw.getBoard().getModel().enemyUnitsNearby(i, towers.get(j));
+                if (enemyUnitsNearby.size() > 0) {
+                    int rand = (int) (Math.random() * enemyUnitsNearby.size());
+                    towers.get(j).setShootCords(enemyUnitsNearby.get(rand).getX(), enemyUnitsNearby.get(rand).getY());
+                    if (enemyUnitsNearby.get(rand).getHp() > towers.get(j).getPower()) {
+                        enemyUnitsNearby.get(rand).setHp(enemyUnitsNearby.get(rand).getHp() - towers.get(j).getPower());
+                    } else {
+                            gw.getBoard().getModel().getPlayers()[(i + 1) % 2].deleteUnit(enemyUnitsNearby.get(rand));
+                            gw.getBoard().getModel().getPlayers()[i].setMoney(gw.getBoard().getModel().getPlayers()[i].getMoney() + enemyUnitsNearby.get(rand).getMaxHp() * 2);
+                        }
+                    }
+                }
+            }
+        }
+        simulationticks++;
+        m = gw.getBoard().getModel();
+        assertTrue(m.getPlayers()[0].getUnits().get(0).getHp() == m.getPlayers()[0].getUnits().get(0).getMaxHp() - m.getPlayers()[1].getTowers().get(0).getPower());
+        
+        gw.getPlayer1distances().clear();
+        gw.getPlayer2distances().clear();
+        
+        for(int k = 0; k < 2; k++){
+            simulationticks = 0;
+            for (int q = 0; q < 2; q++) {
+            ArrayList<Unit> updateUnits = m.getPlayers()[q].getUnits();
+            for (Unit u : updateUnits) {
+                    if (q == 0) {
+                        gw.getPlayer1distances().add(u.getDistance());
+                    } else {
+                        gw.getPlayer2distances().add(u.getDistance());
+                    }
+                }
+            }
+            gw.simulation();
+            for (int i = 0; i < 2; i++) {
+                ArrayList<Tower> towers = gw.getBoard().getModel().getPlayers()[i].getNotDemolishedTowers();
+                for (int j = 0; j < towers.size(); j++) {
+                    double tickPerAttack = towers.get(j).getAttack_speed() / 0.25;
+                    if (simulationticks % tickPerAttack == 0) {
+                        ArrayList<Unit> enemyUnitsNearby = gw.getBoard().getModel().enemyUnitsNearby(i, towers.get(j));
+                        if (enemyUnitsNearby.size() > 0) {
+                            int rand = (int) (Math.random() * enemyUnitsNearby.size());
+                            towers.get(j).setShootCords(enemyUnitsNearby.get(rand).getX(), enemyUnitsNearby.get(rand).getY());
+                            if (enemyUnitsNearby.get(rand).getHp() > towers.get(j).getPower()) {
+                                enemyUnitsNearby.get(rand).setHp(enemyUnitsNearby.get(rand).getHp() - towers.get(j).getPower());
+                            } else {
+                                gw.getBoard().getModel().getPlayers()[(i + 1) % 2].deleteUnit(enemyUnitsNearby.get(rand));
+                                gw.getBoard().getModel().getPlayers()[i].setMoney(gw.getBoard().getModel().getPlayers()[i].getMoney() + enemyUnitsNearby.get(rand).getMaxHp() * 2);
+                            }
+                        }
+                    }
+                }
+            }
+            simulationticks++;
+            gw.simulation();
+            for (int i = 0; i < 2; i++) {
+                ArrayList<Tower> towers = gw.getBoard().getModel().getPlayers()[i].getNotDemolishedTowers();
+                for (int j = 0; j < towers.size(); j++) {
+                    double tickPerAttack = towers.get(j).getAttack_speed() / 0.25;
+                    if (simulationticks % tickPerAttack == 0) {
+                        ArrayList<Unit> enemyUnitsNearby = gw.getBoard().getModel().enemyUnitsNearby(i, towers.get(j));
+                        if (enemyUnitsNearby.size() > 0) {
+                            int rand = (int) (Math.random() * enemyUnitsNearby.size());
+                            towers.get(j).setShootCords(enemyUnitsNearby.get(rand).getX(), enemyUnitsNearby.get(rand).getY());
+                            if (enemyUnitsNearby.get(rand).getHp() > towers.get(j).getPower()) {
+                                enemyUnitsNearby.get(rand).setHp(enemyUnitsNearby.get(rand).getHp() - towers.get(j).getPower());
+                            } else {
+                                gw.getBoard().getModel().getPlayers()[(i + 1) % 2].deleteUnit(enemyUnitsNearby.get(rand));
+                                gw.getBoard().getModel().getPlayers()[i].setMoney(gw.getBoard().getModel().getPlayers()[i].getMoney() + enemyUnitsNearby.get(rand).getMaxHp() * 2);
+                            }
+                        }
+                    }
+                }
+            }
+            simulationticks++;
+            gw.simulation();
+            for (int i = 0; i < 2; i++) {
+                ArrayList<Tower> towers = gw.getBoard().getModel().getPlayers()[i].getNotDemolishedTowers();
+                for (int j = 0; j < towers.size(); j++) {
+                    double tickPerAttack = towers.get(j).getAttack_speed() / 0.25;
+                    if (simulationticks % tickPerAttack == 0) {
+                        ArrayList<Unit> enemyUnitsNearby = gw.getBoard().getModel().enemyUnitsNearby(i, towers.get(j));
+                        if (enemyUnitsNearby.size() > 0) {
+                            int rand = (int) (Math.random() * enemyUnitsNearby.size());
+                            towers.get(j).setShootCords(enemyUnitsNearby.get(rand).getX(), enemyUnitsNearby.get(rand).getY());
+                            if (enemyUnitsNearby.get(rand).getHp() > towers.get(j).getPower()) {
+                                enemyUnitsNearby.get(rand).setHp(enemyUnitsNearby.get(rand).getHp() - towers.get(j).getPower());
+                            } else {
+                                gw.getBoard().getModel().getPlayers()[(i + 1) % 2].deleteUnit(enemyUnitsNearby.get(rand));
+                                gw.getBoard().getModel().getPlayers()[i].setMoney(gw.getBoard().getModel().getPlayers()[i].getMoney() + enemyUnitsNearby.get(rand).getMaxHp() * 2);
+                            }
+                        }
+                    }
+                }
+            }
+            simulationticks++;
+            gw.simulation();
+            for (int i = 0; i < 2; i++) {
+                ArrayList<Tower> towers = gw.getBoard().getModel().getPlayers()[i].getNotDemolishedTowers();
+                for (int j = 0; j < towers.size(); j++) {
+                    double tickPerAttack = towers.get(j).getAttack_speed() / 0.25;
+                    if (simulationticks % tickPerAttack == 0) {
+                        ArrayList<Unit> enemyUnitsNearby = gw.getBoard().getModel().enemyUnitsNearby(i, towers.get(j));
+                        if (enemyUnitsNearby.size() > 0) {
+                            int rand = (int) (Math.random() * enemyUnitsNearby.size());
+                            towers.get(j).setShootCords(enemyUnitsNearby.get(rand).getX(), enemyUnitsNearby.get(rand).getY());
+                            if (enemyUnitsNearby.get(rand).getHp() > towers.get(j).getPower()) {
+                                enemyUnitsNearby.get(rand).setHp(enemyUnitsNearby.get(rand).getHp() - towers.get(j).getPower());
+                            } else {
+                                gw.getBoard().getModel().getPlayers()[(i + 1) % 2].deleteUnit(enemyUnitsNearby.get(rand));
+                                gw.getBoard().getModel().getPlayers()[i].setMoney(gw.getBoard().getModel().getPlayers()[i].getMoney() + enemyUnitsNearby.get(rand).getMaxHp() * 2);
+                            }
+                        }
+                    }
+                }
+            }
+            simulationticks++;
+            gw.simulation();
+            for (int i = 0; i < 2; i++) {
+                ArrayList<Tower> towers = gw.getBoard().getModel().getPlayers()[i].getNotDemolishedTowers();
+                for (int j = 0; j < towers.size(); j++) {
+                    double tickPerAttack = towers.get(j).getAttack_speed() / 0.25;
+                    if (simulationticks % tickPerAttack == 0) {
+                        ArrayList<Unit> enemyUnitsNearby = gw.getBoard().getModel().enemyUnitsNearby(i, towers.get(j));
+                        if (enemyUnitsNearby.size() > 0) {
+                            int rand = (int) (Math.random() * enemyUnitsNearby.size());
+                            towers.get(j).setShootCords(enemyUnitsNearby.get(rand).getX(), enemyUnitsNearby.get(rand).getY());
+                            if (enemyUnitsNearby.get(rand).getHp() > towers.get(j).getPower()) {
+                                enemyUnitsNearby.get(rand).setHp(enemyUnitsNearby.get(rand).getHp() - towers.get(j).getPower());
+                            } else {
+                                gw.getBoard().getModel().getPlayers()[(i + 1) % 2].deleteUnit(enemyUnitsNearby.get(rand));
+                                gw.getBoard().getModel().getPlayers()[i].setMoney(gw.getBoard().getModel().getPlayers()[i].getMoney() + enemyUnitsNearby.get(rand).getMaxHp() * 2);
+                            }
+                        }
+                    }
+                }
+            }
+            simulationticks++;
+            gw.simulation();
+            for (int i = 0; i < 2; i++) {
+                ArrayList<Tower> towers = gw.getBoard().getModel().getPlayers()[i].getNotDemolishedTowers();
+                for (int j = 0; j < towers.size(); j++) {
+                    double tickPerAttack = towers.get(j).getAttack_speed() / 0.25;
+                    if (simulationticks % tickPerAttack == 0) {
+                        ArrayList<Unit> enemyUnitsNearby = gw.getBoard().getModel().enemyUnitsNearby(i, towers.get(j));
+                        if (enemyUnitsNearby.size() > 0) {
+                            int rand = (int) (Math.random() * enemyUnitsNearby.size());
+                            towers.get(j).setShootCords(enemyUnitsNearby.get(rand).getX(), enemyUnitsNearby.get(rand).getY());
+                            if (enemyUnitsNearby.get(rand).getHp() > towers.get(j).getPower()) {
+                                enemyUnitsNearby.get(rand).setHp(enemyUnitsNearby.get(rand).getHp() - towers.get(j).getPower());
+                            } else {
+                                gw.getBoard().getModel().getPlayers()[(i + 1) % 2].deleteUnit(enemyUnitsNearby.get(rand));
+                                gw.getBoard().getModel().getPlayers()[i].setMoney(gw.getBoard().getModel().getPlayers()[i].getMoney() + enemyUnitsNearby.get(rand).getMaxHp() * 2);
+                            }
+                        }
+                    }
+                }
+            }
+            simulationticks++;
+            gw.getPlayer1distances().clear();
+            gw.getPlayer2distances().clear();
+        }
+        m = gw.getBoard().getModel();
+        assertTrue(m.getPlayers()[0].getUnits().get(0).getHp() == m.getPlayers()[0].getUnits().get(0).getMaxHp() - m.getPlayers()[1].getTowers().get(0).getPower());
+    }
 }
