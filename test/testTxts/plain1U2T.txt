@@ -35,11 +35,13 @@ FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 p:
 w
 1280
+300
 U blue 62 527 31 31 General 10
 
 p:
 d
 1000
+300
 T Fortified red 2 1 1.0 100 1 93 589 31 31 -1
 T Fortified red 2 1 1.0 100 1 93 775 31 31 4
 

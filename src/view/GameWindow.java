@@ -789,10 +789,10 @@ public class GameWindow extends JPanel implements ActionListener {
         JLabel p1TwrMan     = new JLabel("Tower Management");
         JLabel p1UnitLab    = new JLabel("Units");
         JLabel p1GenStat    = new JLabel("20 coins");
-        JLabel p1DivStat    = new JLabel("30 coins");
-        JLabel p1ClimStat   = new JLabel("30 coins");
-        JLabel p1FigStat    = new JLabel("30 coins");
-        JLabel p1DesStat    = new JLabel("30 coins");
+        JLabel p1DivStat    = new JLabel("20 coins");
+        JLabel p1ClimStat   = new JLabel("20 coins");
+        JLabel p1FigStat    = new JLabel("40 coins");
+        JLabel p1DesStat    = new JLabel("40 coins");
 
         JPanel p2Panel          = new JPanel();
         JPanel p2Stats          = new JPanel();
@@ -811,10 +811,10 @@ public class GameWindow extends JPanel implements ActionListener {
         JLabel p2TwrMan     = new JLabel("Tower Management");
         JLabel p2UnitLab    = new JLabel("Units");
         JLabel p2GenStat    = new JLabel("20 coins");
-        JLabel p2DivStat    = new JLabel("30 coins");
-        JLabel p2ClimStat   = new JLabel("30 coins");
-        JLabel p2FigStat    = new JLabel("30 coins");
-        JLabel p2DesStat    = new JLabel("30 coins");
+        JLabel p2DivStat    = new JLabel("20 coins");
+        JLabel p2ClimStat   = new JLabel("20 coins");
+        JLabel p2FigStat    = new JLabel("40 coins");
+        JLabel p2DesStat    = new JLabel("40 coins");
 
         playerDataUpdate();
 

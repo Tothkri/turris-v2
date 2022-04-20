@@ -35,10 +35,12 @@ FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 p:
 w
 1360
+300
 U blue 62 434 31 31 Destroyer 15
 
 p:
 d
 1200
+300
 T Fortified red 2 1 1.0 100 1 93 527 31 31 -1
 

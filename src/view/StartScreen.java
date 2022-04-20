@@ -134,6 +134,7 @@ public class StartScreen extends JPanel {
         int money = Integer.parseInt(myReader.nextLine());
         model.getPlayers()[0] = new Player(money, name);
         model.getPlayers()[0].setCastle(c1);
+        model.getPlayers()[0].getCastle().setHp(Integer.parseInt(myReader.nextLine()));
         
         String data = myReader.nextLine();
         while (!data.equals("p:")) {
@@ -188,9 +189,11 @@ public class StartScreen extends JPanel {
         name = myReader.nextLine();
 
         money = Integer.parseInt(myReader.nextLine());
-        data = myReader.nextLine();
         model.getPlayers()[1] = new Player(money, name);
         model.getPlayers()[1].setCastle(c2);
+        model.getPlayers()[1].getCastle().setHp(Integer.parseInt(myReader.nextLine()));
+        data = myReader.nextLine();
+        
         
         while (!data.equals("")) {
             String[] arr;
