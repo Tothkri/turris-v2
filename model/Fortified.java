@@ -16,20 +16,22 @@ public class Fortified extends Tower {
         this.power = 2;
         this.demolishedIn = -1;
         this.type = "Fortified";
+        this.upgradePrice=price+150;
     }
 
     //constructor for loaded towers
-    public Fortified(String type, String scolor, int power, int range, double attack_speed, int hp, int price, int x, int y, int height, int width, Image img) {
+    public Fortified(String type, String scolor, int power, int range, double attack_speed, int hp, int level, int x, int y, int height, int width, Image img) {
         super(scolor, x, y, height, width, img);
         this.type = type;
         this.power = power;
         this.range = range;
         this.attack_speed = attack_speed;
         this.hp = hp;
-        this.price = price;
+        this.level=level;
+        this.price = 50+level*150;
+        this.upgradePrice=price+150;
         this.demolishedIn = -1;
         this.maxHp = 75+level*25;
-        level = 1;
     }
 
     @Override
@@ -39,12 +41,10 @@ public class Fortified extends Tower {
         }
         power = 3;
         hp += 25;
-        price += 150;
-        level++;
+        level++; 
+        price =100+level*150;
+        upgradePrice=price+150;
         maxHp=75+level*25;
     }
-    @Override
-    public void setMaxHp(){
-        maxHp=75+level*25;
-    }
+    
 }

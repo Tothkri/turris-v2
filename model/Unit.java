@@ -16,6 +16,7 @@ public abstract class Unit extends Sprite {
     protected ArrayList<Node> way;
     protected Color color;
     protected int maxHp;
+    protected boolean blood;
 
     public int getMaxHp() {
         return maxHp;
@@ -40,8 +41,17 @@ public abstract class Unit extends Sprite {
 
     }
 
+    public boolean isBlood() {
+        return blood;
+    }
+
+    public void setBlood(boolean blood) {
+        this.blood = blood;
+    }
+
     public Unit(String scolor, int x, int y, int height, int width, Image img) {
         super(x, y, height, width, img);
+        blood = false;
         if (scolor.equals("red")) {
             this.color = Color.red;
             this.img = new ImageIcon("src/res/Unitred.png").getImage();
@@ -102,12 +112,12 @@ public abstract class Unit extends Sprite {
 
     @Override
     public void draw(Graphics2D g2) {
-
+        
         g2.drawImage(img, x, y, height, width, null);
         g2.setColor(color);
-        g2.drawLine(x + 2, y + height - 2, x + (int) hpLine() - 2, y + height - 2);
-        g2.drawLine(x + 2, y + height - 3, x + (int) hpLine() - 2, y + height - 3);
-        g2.drawLine(x + 2, y + height - 4, x + (int) hpLine() - 2, y + height - 4);
+        g2.drawLine(x + 4, y + height - 2, x + (int) hpLine() - 4, y + height - 2);
+        g2.drawLine(x + 4, y + height - 3, x + (int) hpLine() - 4, y + height - 3);
+        g2.drawLine(x + 4, y + height - 4, x + (int) hpLine() - 4, y + height - 4);
         
     }
 

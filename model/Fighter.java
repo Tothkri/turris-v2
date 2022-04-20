@@ -25,5 +25,6 @@ public class Fighter extends Unit {
         this.price = 40;
         this.type = "Fighter";
         this.maxHp = 15;
+        this.way=way;
     }
 }

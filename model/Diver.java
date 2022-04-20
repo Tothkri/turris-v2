@@ -25,5 +25,6 @@ public class Diver extends Unit {
         this.price = 20;
         this.type = "Diver";
         this.maxHp=10;
+        this.way=way;
     }
 }

@@ -18,6 +18,10 @@ public class Node {
         this.parent = null;
     }
 
+    public Node() {
+
+    }
+
     public int getX() {
         return x;
     }

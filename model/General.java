@@ -25,6 +25,6 @@ public class General extends Unit{
         this.price = 20;
         this.type="General";
         this.maxHp=10;
-        this.setWay(way);
+        this.way=way;
     }
 }
