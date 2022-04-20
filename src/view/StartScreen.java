@@ -28,6 +28,7 @@ import model.*;
 public class StartScreen extends JPanel {
 
     private final JButton startButton;
+    private final JButton exitButton;
     private final JButton loadButton;
     private final JTextField p1Name;
     private final JTextField p2Name;
