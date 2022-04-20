@@ -225,10 +225,9 @@ public class Player {
     }
 
     public Model sendUnits(String type, String color, int amount, Model model) {
-
-        if(type.equals("General") && amount * 20 > money){
+        if((type.equals("General") || type.equals("Diver") || type.equals("Climber")) && amount * 20 > money){
             return model;
-        }else if(amount * 30 > money){
+        }else if((type.equals("Fighter") || type.equals("Destroyer")) && amount * 40 > money){
             return model;
         }
         int minDistance=0;

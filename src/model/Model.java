@@ -271,7 +271,8 @@ public class Model {
             for (int i = 0; i < 2; i++) {
                 writer.write("p:\n");
                 writer.write(players[i].getName() + "\n");
-                writer.write("" + players[i].getMoney());
+                writer.write("" + players[i].getMoney() + "\n");
+                writer.write("" + players[i].getCastle().getHp());
 
                 writer.write(System.getProperty("line.separator"));
 
