@@ -55,7 +55,8 @@ public class StartScreen extends JPanel {
         super();
         this.width = width;
         this.height = height;
-        startButton = new JButton("Start Game");
+        startButton = new JButton("Start");
+        exitButton = new JButton("Exit");
         loadButton = new JButton("Load Game");
         p1Name = new JTextField(15);
         p2Name = new JTextField(15);
