@@ -1447,4 +1447,7 @@ public class GameWindow extends JPanel implements ActionListener {
     public ArrayList<Integer> getPlayer1distances() { return player1distances; }
     public ArrayList<Integer> getPlayer2distances() { return player2distances; }
     public void setRNDPROTECTION(int RNDPROTECTION) { this.RNDPROTECTION = RNDPROTECTION; }
+    public void setTestMode(boolean b){
+        testMode = b;
+    }
 }
