@@ -458,7 +458,6 @@ public class GameWindow extends JPanel implements ActionListener {
                             }
                             model.getPlayers()[(q + 1) % 2].deleteUnit(enemyUnitsNearby.get(rand));
                         }
-
                     }
 
                     ArrayList<Tower> towersNearby = model.towersNearby(q, units.get(i));
@@ -642,8 +641,6 @@ public class GameWindow extends JPanel implements ActionListener {
         } else {
             ticks = (1000 / timerInterval) * 30;
         }
-        //rounds.setText("Round: " + model.getRound());
-        //timeAndRoundLabel.setText("Time left: " + (ticks + 1) / 2 + " s, round: " + (model.getRound() + 1)/ 2);
 
         model.setActivePlayer((1 + model.getActivePlayer()) % 2);
         playerDataUpdate();
@@ -732,37 +729,37 @@ public class GameWindow extends JPanel implements ActionListener {
         Color blueGray = new Color(102,153,204);    //blue: NOT ON round
         Color darkHoneyBrown = new Color(184, 151, 128);
         
-        //left main ui
+        //1st layer UI (bottom)
         grph.setColor(Color.DARK_GRAY);
-        grphcs2.fillRoundRect(27, 113, 437, 891, 25, 25);
-        grph.setColor(blueGray); //Color.BLUE
-        grphcs2.fillRoundRect(35, 121, 421, 875, 25, 25);
-        grph.setColor(Color.DARK_GRAY);
-        grphcs2.fillRoundRect(41, 126, 408, 865, 22, 22);
+        grphcs2.fillRoundRect(27, 113, 437, 891, 25, 25);   //left
+        grphcs2.fillRoundRect(1456, 113, 437, 891, 25, 25); //right
+        grphcs2.fillRoundRect(480, 10, 959, 1062, 22, 22);  //center
+        grphcs2.fillRoundRect(27, 23, 437, 70, 25, 25);     //save
+        grphcs2.fillRoundRect(1456, 23, 437, 70, 25, 25);   //exit
         
-        //right main ui
-        grph.setColor(Color.DARK_GRAY);
-        grphcs2.fillRoundRect(1456, 113, 437, 891, 25, 25);
-        grph.setColor(pastelRed);    //Color.RED
-        grphcs2.fillRoundRect(1465, 121, 421, 875, 25, 25);
-        grph.setColor(Color.DARK_GRAY);
-        grphcs2.fillRoundRect(1471, 126, 408, 865, 22, 22);
-        
-        //if(model.getRound())
-        
-        //main board
-        grph.setColor(Color.DARK_GRAY);
-        grphcs2.fillRoundRect(480, 10, 959, 1062, 22, 22);
+        //2nd layer UI (middle - coloring)
+        if(model.getActivePlayer() == 0){
+            grph.setColor(royalBlue);
+            grphcs2.fillRoundRect(35, 121, 421, 875, 25, 25);   //left
+            grph.setColor(pastelRed);
+            grphcs2.fillRoundRect(1465, 121, 421, 875, 25, 25); //right
+        } else {
+            grph.setColor(blueGray);
+            grphcs2.fillRoundRect(35, 121, 421, 875, 25, 25);   //left
+            grph.setColor(cinnabar);
+            grphcs2.fillRoundRect(1465, 121, 421, 875, 25, 25); //right
+        }
         grph.setColor(sandBrown);
-        grphcs2.fillRoundRect(489, 18, 942, 985 , 22, 22);
+        grphcs2.fillRoundRect(34, 30, 423, 56, 22, 22);     //save
+        grphcs2.fillRoundRect(1463, 30, 423, 56, 22, 22);   //exit
+        grphcs2.fillRoundRect(489, 18, 942, 985 , 22, 22);  //center
         
-        //save button
-        /*grph.setColor(sandBrown);
-        grphcs2.fillRect(45, 25, 390, 60);
-        
-        //exit button
+        //3rd layer UI (top)
         grph.setColor(Color.DARK_GRAY);
-        grphcs2.fillRoundRect(1467, 10, 426, 90, 25, 25);*/
+        grphcs2.fillRoundRect(41, 126, 408, 865, 22, 22);   //left
+        grphcs2.fillRoundRect(1471, 126, 408, 865, 22, 22); //right
+        grphcs2.fillRect(114, 35, 266, 46);                 //save
+        grphcs2.fillRect(1539, 35, 266, 46);                //exit
     }
 
     /**
@@ -785,8 +782,8 @@ public class GameWindow extends JPanel implements ActionListener {
         p1Data = new JLabel();
         JLabel p1Twr        = new JLabel("Towers");
         JLabel p1FortStat   = new JLabel("200 coins");
-        JLabel p1SnipStat   = new JLabel("300 coins");
         JLabel p1RapStat    = new JLabel("250 coins");
+        JLabel p1SnipStat   = new JLabel("300 coins");
         JLabel p1TwrMan     = new JLabel("Tower Management");
         JLabel p1UnitLab    = new JLabel("Units");
         JLabel p1GenStat    = new JLabel("20 coins");
@@ -807,8 +804,8 @@ public class GameWindow extends JPanel implements ActionListener {
         p2Data = new JLabel();
         JLabel p2Twr        = new JLabel("Towers");
         JLabel p2FortStat   = new JLabel("200 coins");
-        JLabel p2SnipStat   = new JLabel("300 coins");
         JLabel p2RapStat    = new JLabel("250 coins");
+        JLabel p2SnipStat   = new JLabel("300 coins");
         JLabel p2TwrMan     = new JLabel("Tower Management");
         JLabel p2UnitLab    = new JLabel("Units");
         JLabel p2GenStat    = new JLabel("20 coins");
@@ -878,20 +875,26 @@ public class GameWindow extends JPanel implements ActionListener {
         this.add(board, gbc);
         
         
-        //Save game BUTTON
+        /**
+         * Save game BUTTON
+         */
         saveButton.setPreferredSize(new Dimension(260, 40));
         saveButton.setFont(new Font("Calibri", Font.PLAIN, 25));
         saveButton.setMargin(new Insets(8, 0, 0, 0));
-        gbc.insets = new Insets(0, 0, 0, 0);    //0, 0, -3, 0
+        saveButton.setFocusPainted(false);
+        gbc.insets = new Insets(0, 0, -22, 0);    //0, 0, 0, 0
         gbc.gridx = 0;
         gbc.gridy = 0;
         this.add(saveButton, gbc);
 
-        //Exit game BUTTON
+        /**
+         * Exit game BUTTON
+         */
         exitButton.setPreferredSize(new Dimension(260, 40));
         exitButton.setFont(new Font("Calibri", Font.PLAIN, 25));
         exitButton.setMargin(new Insets(8, 0, 0, 0));
-        gbc.insets = new Insets(0, 0, 0, 0);
+        exitButton.setFocusPainted(false);
+        gbc.insets = new Insets(0, 0, -22, 0);
         gbc.gridx = 2;
         gbc.gridy = 0;
         this.add(exitButton, gbc);
@@ -902,6 +905,7 @@ public class GameWindow extends JPanel implements ActionListener {
         newRoundButton.setPreferredSize(new Dimension(932, 50));
         newRoundButton.setFont(new Font("Calibri", Font.PLAIN, 32));
         newRoundButton.setMargin(new Insets(12, 0, 0, 0));
+        newRoundButton.setFocusPainted(false);
         gbc.insets = new Insets(15, 0, -10, 0);  //10, 0, -5, 0
         gbc.gridx = 1;
         gbc.gridy = 2;
@@ -954,6 +958,7 @@ public class GameWindow extends JPanel implements ActionListener {
         p1TowerButtons[0].setPreferredSize(new Dimension(180, 40)); //260, 40
         p1TowerButtons[0].setFont(new Font("Calibri", Font.PLAIN, 25));
         p1TowerButtons[0].setMargin(new Insets(8, 0, 0, 0));
+        p1TowerButtons[0].setFocusPainted(false);
         gbtl.insets = new Insets(2, -170, 3, 0);    //2, -220, 3, 0
         gbtl.gridx = 0;
         gbtl.gridy = 0;
@@ -968,30 +973,32 @@ public class GameWindow extends JPanel implements ActionListener {
         p1TowerButtons[1].setPreferredSize(new Dimension(180, 40));
         p1TowerButtons[1].setFont(new Font("Calibri", Font.PLAIN, 25));
         p1TowerButtons[1].setMargin(new Insets(8, 0, 0, 0));
+        p1TowerButtons[1].setFocusPainted(false);
         gbtl.insets = new Insets(2, -170, 3, 0);
         gbtl.gridx = 0;
         gbtl.gridy = 1;
         p1TwrOptRow.add(p1TowerButtons[1], gbtl);
         
-        p1SnipStat.setFont(new Font("Calibri", Font.PLAIN, 30));
+        p1RapStat.setFont(new Font("Calibri", Font.PLAIN, 30));
         gbtl.insets = new Insets(8, 12, 0, -180);
         gbtl.gridx = 1;
         gbtl.gridy = 1;
-        p1TwrOptRow.add(p1SnipStat, gbtl);
+        p1TwrOptRow.add(p1RapStat, gbtl);
 
         p1TowerButtons[2].setPreferredSize(new Dimension(180, 40));
         p1TowerButtons[2].setFont(new Font("Calibri", Font.PLAIN, 25));
         p1TowerButtons[2].setMargin(new Insets(8, 0, 0, 0));
+        p1TowerButtons[2].setFocusPainted(false);
         gbtl.insets = new Insets(2, -170, 3, 0);
         gbtl.gridx = 0;
         gbtl.gridy = 2;
         p1TwrOptRow.add(p1TowerButtons[2], gbtl);
         
-        p1RapStat.setFont(new Font("Calibri", Font.PLAIN, 30));
+        p1SnipStat.setFont(new Font("Calibri", Font.PLAIN, 30));
         gbtl.insets = new Insets(8, 12, 0, -180);
         gbtl.gridx = 1;
         gbtl.gridy = 2;
-        p1TwrOptRow.add(p1RapStat, gbtl);
+        p1TwrOptRow.add(p1SnipStat, gbtl);
 
         p1TwrOptRow.setBackground(Color.LIGHT_GRAY);
         p1TwrOptRow.setPreferredSize(new Dimension(390, 160));
@@ -1020,6 +1027,7 @@ public class GameWindow extends JPanel implements ActionListener {
         p1TowerButtons[3].setPreferredSize(new Dimension(260, 40));
         p1TowerButtons[3].setFont(new Font("Calibri", Font.PLAIN, 25));
         p1TowerButtons[3].setMargin(new Insets(8, 0, 0, 0));
+        p1TowerButtons[3].setFocusPainted(false);
         gbml.insets = new Insets(4, 0, 3, 0);
         gbml.gridx = 0;
         gbml.gridy = 0;
@@ -1028,6 +1036,7 @@ public class GameWindow extends JPanel implements ActionListener {
         p1TowerButtons[4].setPreferredSize(new Dimension(260, 40));
         p1TowerButtons[4].setFont(new Font("Calibri", Font.PLAIN, 25));
         p1TowerButtons[4].setMargin(new Insets(8, 0, 0, 0));
+        p1TowerButtons[4].setFocusPainted(false);
         gbml.insets = new Insets(3, 0, 4, 0);
         gbml.gridx = 0;
         gbml.gridy = 1;
@@ -1060,6 +1069,7 @@ public class GameWindow extends JPanel implements ActionListener {
         p1UnitButtons[0].setPreferredSize(new Dimension(180, 40));
         p1UnitButtons[0].setFont(new Font("Calibri", Font.PLAIN, 25));
         p1UnitButtons[0].setMargin(new Insets(8, 0, 0, 0));
+        p1UnitButtons[0].setFocusPainted(false);
         gbul.insets = new Insets(2, -170, 3, 0);   //3, -20, 3, 0
         gbul.gridx = 0;
         gbul.gridy = 0;
@@ -1074,6 +1084,7 @@ public class GameWindow extends JPanel implements ActionListener {
         p1UnitButtons[1].setPreferredSize(new Dimension(180, 40));
         p1UnitButtons[1].setFont(new Font("Calibri", Font.PLAIN, 25));
         p1UnitButtons[1].setMargin(new Insets(8, 0, 0, 0));
+        p1UnitButtons[1].setFocusPainted(false);
         gbul.insets = new Insets(2, -170, 3, 0);
         gbul.gridx = 0;
         gbul.gridy = 1;
@@ -1088,6 +1099,7 @@ public class GameWindow extends JPanel implements ActionListener {
         p1UnitButtons[2].setPreferredSize(new Dimension(180, 40));
         p1UnitButtons[2].setFont(new Font("Calibri", Font.PLAIN, 25));
         p1UnitButtons[2].setMargin(new Insets(8, 0, 0, 0));
+        p1UnitButtons[2].setFocusPainted(false);
         gbul.insets = new Insets(2, -170, 3, 0);
         gbul.gridx = 0;
         gbul.gridy = 2;
@@ -1102,6 +1114,7 @@ public class GameWindow extends JPanel implements ActionListener {
         p1UnitButtons[3].setPreferredSize(new Dimension(180, 40));
         p1UnitButtons[3].setFont(new Font("Calibri", Font.PLAIN, 25));
         p1UnitButtons[3].setMargin(new Insets(8, 0, 0, 0));
+        p1UnitButtons[3].setFocusPainted(false);
         gbul.insets = new Insets(2, -170, 3, 0);
         gbul.gridx = 0;
         gbul.gridy = 3;
@@ -1116,6 +1129,7 @@ public class GameWindow extends JPanel implements ActionListener {
         p1UnitButtons[4].setPreferredSize(new Dimension(180, 40));
         p1UnitButtons[4].setFont(new Font("Calibri", Font.PLAIN, 25));
         p1UnitButtons[4].setMargin(new Insets(8, 0, 0, 0));
+        p1UnitButtons[4].setFocusPainted(false);
         gbul.insets = new Insets(2, -170, 3, 0);
         gbul.gridx = 0;
         gbul.gridy = 4;
@@ -1179,6 +1193,7 @@ public class GameWindow extends JPanel implements ActionListener {
         p2TowerButtons[0].setPreferredSize(new Dimension(180, 40));
         p2TowerButtons[0].setFont(new Font("Calibri", Font.PLAIN, 25));
         p2TowerButtons[0].setMargin(new Insets(8, 0, 0, 0));
+        p2TowerButtons[0].setFocusPainted(false);
         gbtr.insets = new Insets(2, -170, 3, 0);
         gbtr.gridx = 0;
         gbtr.gridy = 0;
@@ -1193,30 +1208,32 @@ public class GameWindow extends JPanel implements ActionListener {
         p2TowerButtons[1].setPreferredSize(new Dimension(180, 40));
         p2TowerButtons[1].setFont(new Font("Calibri", Font.PLAIN, 25));
         p2TowerButtons[1].setMargin(new Insets(8, 0, 0, 0));
+        p2TowerButtons[1].setFocusPainted(false);
         gbtr.insets = new Insets(2, -170, 3, 0);
         gbtr.gridx = 0;
         gbtr.gridy = 1;
         p2TwrOptRow.add(p2TowerButtons[1], gbtr);
         
-        p2SnipStat.setFont(new Font("Calibri", Font.PLAIN, 30));
+        p2RapStat.setFont(new Font("Calibri", Font.PLAIN, 30));
         gbtr.insets = new Insets(8, 12, 0, -180);
         gbtr.gridx = 1;
         gbtr.gridy = 1;
-        p2TwrOptRow.add(p2SnipStat, gbtr);
+        p2TwrOptRow.add(p2RapStat, gbtr);
 
         p2TowerButtons[2].setPreferredSize(new Dimension(180, 40));
         p2TowerButtons[2].setFont(new Font("Calibri", Font.PLAIN, 25));
         p2TowerButtons[2].setMargin(new Insets(8, 0, 0, 0));
+        p2TowerButtons[2].setFocusPainted(false);
         gbtr.insets = new Insets(2, -170, 3, 0);
         gbtr.gridx = 0;
         gbtr.gridy = 2;
         p2TwrOptRow.add(p2TowerButtons[2], gbtr);
         
-        p2RapStat.setFont(new Font("Calibri", Font.PLAIN, 30));
+        p2SnipStat.setFont(new Font("Calibri", Font.PLAIN, 30));
         gbtr.insets = new Insets(8, 12, 0, -180);
         gbtr.gridx = 1;
         gbtr.gridy = 2;
-        p2TwrOptRow.add(p2RapStat, gbtr);
+        p2TwrOptRow.add(p2SnipStat, gbtr);
 
         p2TwrOptRow.setBackground(Color.LIGHT_GRAY);
         p2TwrOptRow.setPreferredSize(new Dimension(390, 160));
@@ -1245,6 +1262,7 @@ public class GameWindow extends JPanel implements ActionListener {
         p2TowerButtons[3].setPreferredSize(new Dimension(260, 40));
         p2TowerButtons[3].setFont(new Font("Calibri", Font.PLAIN, 25));
         p2TowerButtons[3].setMargin(new Insets(8, 0, 0, 0));
+        p2TowerButtons[3].setFocusPainted(false);
         gbmr.insets = new Insets(4, 0, 3, 0);
         gbmr.gridx = 0;
         gbmr.gridy = 0;
@@ -1253,6 +1271,7 @@ public class GameWindow extends JPanel implements ActionListener {
         p2TowerButtons[4].setPreferredSize(new Dimension(260, 40));
         p2TowerButtons[4].setFont(new Font("Calibri", Font.PLAIN, 25));
         p2TowerButtons[4].setMargin(new Insets(8, 0, 0, 0));
+        p2TowerButtons[4].setFocusPainted(false);
         gbmr.insets = new Insets(3, 0, 4, 0);
         gbmr.gridx = 0;
         gbmr.gridy = 1;
@@ -1285,6 +1304,7 @@ public class GameWindow extends JPanel implements ActionListener {
         p2UnitButtons[0].setPreferredSize(new Dimension(180, 40));
         p2UnitButtons[0].setFont(new Font("Calibri", Font.PLAIN, 25));
         p2UnitButtons[0].setMargin(new Insets(8, 0, 0, 0));
+        p2UnitButtons[0].setFocusPainted(false);
         gbur.insets = new Insets(2, -170, 3, 0);
         gbur.gridx = 0;
         gbur.gridy = 0;
@@ -1299,6 +1319,7 @@ public class GameWindow extends JPanel implements ActionListener {
         p2UnitButtons[1].setPreferredSize(new Dimension(180, 40));
         p2UnitButtons[1].setFont(new Font("Calibri", Font.PLAIN, 25));
         p2UnitButtons[1].setMargin(new Insets(8, 0, 0, 0));
+        p2UnitButtons[1].setFocusPainted(false);
         gbur.insets = new Insets(2, -170, 3, 0);
         gbur.gridx = 0;
         gbur.gridy = 1;
@@ -1313,6 +1334,7 @@ public class GameWindow extends JPanel implements ActionListener {
         p2UnitButtons[2].setPreferredSize(new Dimension(180, 40));
         p2UnitButtons[2].setFont(new Font("Calibri", Font.PLAIN, 25));
         p2UnitButtons[2].setMargin(new Insets(8, 0, 0, 0));
+        p2UnitButtons[2].setFocusPainted(false);
         gbur.insets = new Insets(2, -170, 3, 0);
         gbur.gridx = 0;
         gbur.gridy = 2;
@@ -1327,6 +1349,7 @@ public class GameWindow extends JPanel implements ActionListener {
         p2UnitButtons[3].setPreferredSize(new Dimension(180, 40));
         p2UnitButtons[3].setFont(new Font("Calibri", Font.PLAIN, 25));
         p2UnitButtons[3].setMargin(new Insets(8, 0, 0, 0));
+        p2UnitButtons[3].setFocusPainted(false);
         gbur.insets = new Insets(2, -170, 3, 0);
         gbur.gridx = 0;
         gbur.gridy = 3;
@@ -1341,6 +1364,7 @@ public class GameWindow extends JPanel implements ActionListener {
         p2UnitButtons[4].setPreferredSize(new Dimension(180, 40));
         p2UnitButtons[4].setFont(new Font("Calibri", Font.PLAIN, 25));
         p2UnitButtons[4].setMargin(new Insets(8, 0, 0, 0));
+        p2UnitButtons[4].setFocusPainted(false);
         gbur.insets = new Insets(2, -170, 3, 0);
         gbur.gridx = 0;
         gbur.gridy = 4;
@@ -1408,38 +1432,17 @@ public class GameWindow extends JPanel implements ActionListener {
     /**
      * Getterek, setterek
      */
-   public Board getBoard()                 { return board; }
+    public Board getBoard()                 { return board; }
     public void setBoard(Board bd)          { board = bd; }
     public int getTicks()                   { return ticks; }
     public void setTicks(int ticks)         { this.ticks = ticks; }
     public void setModel(Model model)       { this.model = model; }
     public JLabel getTimeAndRoundLabel()    { return timeAndRoundLabel; }
-
-    public JButton[] getP1TowerButtons() {
-        return p1TowerButtons;
-    }
-
-    public JButton[] getP1UnitButtons() {
-        return p1UnitButtons;
-    }
-
-    public JButton[] getP2TowerButtons() {
-        return p2TowerButtons;
-    }
-
-    public JButton[] getP2UnitButtons() {
-        return p2UnitButtons;
-    }
-
-    public ArrayList<Integer> getPlayer1distances() {
-        return player1distances;
-    }
-
-    public ArrayList<Integer> getPlayer2distances() {
-        return player2distances;
-    }
-
-    public void setRNDPROTECTION(int RNDPROTECTION) {
-        this.RNDPROTECTION = RNDPROTECTION;
-    }
+    public JButton[] getP1TowerButtons()    { return p1TowerButtons; }
+    public JButton[] getP1UnitButtons()     { return p1UnitButtons; }
+    public JButton[] getP2TowerButtons()    { return p2TowerButtons; }
+    public JButton[] getP2UnitButtons()     { return p2UnitButtons; }
+    public ArrayList<Integer> getPlayer1distances() { return player1distances; }
+    public ArrayList<Integer> getPlayer2distances() { return player2distances; }
+    public void setRNDPROTECTION(int RNDPROTECTION) { this.RNDPROTECTION = RNDPROTECTION; }
 }

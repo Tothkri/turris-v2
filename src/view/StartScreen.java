@@ -10,6 +10,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
@@ -39,6 +41,8 @@ public class StartScreen extends JPanel {
     private final Image Lake        = new ImageIcon("src/res/Lake.png").getImage();
     private final Image Mountain    = new ImageIcon("src/res/Mountain.png").getImage();
     private final Image Castle      = new ImageIcon("src/res/Castle.png").getImage();
+
+    private String mapVal = "";
 
     /**
      * Játék kezdőképernyője
@@ -302,6 +306,12 @@ public class StartScreen extends JPanel {
         }
         return u;
     }
+
+    public void getMapPickVal(Boolean mf, Boolean ms, Boolean mt){
+        if(mf)       { mapVal = "src/res/mnl_map.png"; repaint(); } 
+        else if(ms)  { mapVal = "src/res/mm_map.png"; repaint(); } 
+        else         { mapVal = "src/res/ml_map.png"; repaint(); }
+    }
     
     /**
     * Outlines
@@ -313,10 +323,10 @@ public class StartScreen extends JPanel {
         Color veryLightGray = new Color(220, 220, 220);
         
         grph.setColor(Color.DARK_GRAY);
-        grphcs2.fillRoundRect(595, 20, 790, 175, 50, 50);   //Game name LABEL
+        grphcs2.fillRoundRect(595, 20, 790, 175, 50, 50);   //Game name LABEL - OFFSET!!!
         grphcs2.fillRoundRect(157, 215, 765, 840, 50, 50);  //Player name LABEL
         grphcs2.fillRoundRect(1013, 855, 765, 201, 50, 50); //Start game LABEL
-        grphcs2.fillRoundRect(1050, 215, 691, 620, 50, 50); 
+        grphcs2.fillRoundRect(1050, 215, 691, 620, 50, 50); //map overview bot.
 
         grph.setColor(Color.LIGHT_GRAY);
         grphcs2.fillRoundRect(605, 30, 770, 155, 30, 30);   //Game name LABEL
@@ -332,10 +342,15 @@ public class StartScreen extends JPanel {
         grphcs2.fillRoundRect(167, 720, 745, 125, 30, 30);
         grphcs2.fillRect(167, 964, 745, 60);
         grphcs2.fillRoundRect(167, 995, 745, 50, 30, 30);
-        grphcs2.fillRoundRect(1060, 225, 671, 600, 30, 30);
+        grphcs2.fillRoundRect(1060, 225, 671, 600, 30, 30); //map overview top
         
-        grphcs2.fillRect(1023, 969, 745, 60);
-        grphcs2.fillRoundRect(1023, 995, 745, 50, 30, 30);
+        grphcs2.fillRect(1023, 969, 745, 60);               //Start game lower
+        grphcs2.fillRoundRect(1023, 995, 745, 50, 30, 30);  //Start game lower
+        
+        grph.setColor(Color.DARK_GRAY);
+        grphcs2.fillRect(1130, 259, 531, 531);
+        
+        grph.drawImage(new ImageIcon(mapVal).getImage(), 1140, 269, 511, 511, null);
     }
 
     /**
@@ -345,6 +360,7 @@ public class StartScreen extends JPanel {
         this.setPreferredSize(new Dimension(width, height));
         this.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
+        GridBagConstraints gbsx = new GridBagConstraints();
 
         JLabel gameName         = new JLabel("Tower Defense Game");
         JLabel playerNames      = new JLabel("Player Names");
@@ -352,7 +368,7 @@ public class StartScreen extends JPanel {
         JLabel p2NameLabel      = new JLabel("Player 2    ");
         JLabel pickMap          = new JLabel("Choose Map");
         JLabel loadGameLabel    = new JLabel("Load Saved Game");
-        JLabel startGameLabel   = new JLabel("Start the Game");
+        JLabel startGameLabel   = new JLabel("Start Game // Exit Game");
 
         JPanel gameNameRow          = new JPanel();
         JPanel playerNamesRow       = new JPanel();
@@ -367,6 +383,7 @@ public class StartScreen extends JPanel {
         p1NameRow.setLayout(new FlowLayout());
         p2NameRow.setLayout(new FlowLayout());
                 
+        
         /**
         * játék oldalán használt színek
         */
@@ -376,6 +393,8 @@ public class StartScreen extends JPanel {
         
         this.setBackground(algaeGreen);
         
+
+        //FONT TYPE-OT ÁLLÍTANI / CUSTOM FONT TYPE!!!
         /**
         * Game Name LABEL
         */
@@ -391,6 +410,7 @@ public class StartScreen extends JPanel {
         
         this.add(gameNameRow, gbc);
         
+
         /**
         * Player Name LABEL
         */
@@ -405,6 +425,7 @@ public class StartScreen extends JPanel {
         gbc.gridx = 0;
         gbc.gridy = 1;
         this.add(playerNamesRow, gbc);
+        
         
         /**
         * Player1 name TEXTBOX
@@ -425,6 +446,7 @@ public class StartScreen extends JPanel {
         gbc.gridy = 2;
         this.add(p1NameRow, gbc);
         
+        
         /**
         * Player2 name TEXTBOX
         */
@@ -444,6 +466,7 @@ public class StartScreen extends JPanel {
         gbc.gridy = 3;
         this.add(p2NameRow, gbc);
         
+        
         /**
         * Map LABEL
         */
@@ -459,11 +482,13 @@ public class StartScreen extends JPanel {
         gbc.gridy = 4;
         this.add(pickMapLabelRow, gbc);
         
+
         /**
         * Map selection LABEL
         */
         ButtonGroup group = new ButtonGroup();
         map1.setSelected(true);
+        mapVal = "src/res/mnl_map.png";
         
         group.add(map1);
         group.add(map2);
@@ -475,7 +500,16 @@ public class StartScreen extends JPanel {
         map1.setFont               (new Font("Calibri", Font.PLAIN, 50));
         map1.setPreferredSize      (new Dimension(700, 80));
         map1.setBorder             (new EmptyBorder(20, 40, 0, 0));
+        map1.setFocusPainted       (false);
         map1.setBackground         (veryLightGray);
+        
+        map1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                getMapPickVal(map1.isSelected(), map2.isSelected(), map3.isSelected());
+                repaint();
+            }
+        });
         
         gbc.insets = new Insets(0, -800, -150, 0);
         gbc.gridx = 0;
@@ -488,7 +522,16 @@ public class StartScreen extends JPanel {
         map2.setFont               (new Font("Calibri", Font.PLAIN, 50));
         map2.setPreferredSize      (new Dimension(700, 80));
         map2.setBorder             (new EmptyBorder(20, 40, 0, 0));
+        map2.setFocusPainted       (false);
         map2.setBackground         (veryLightGray);
+        
+        map2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                getMapPickVal(map1.isSelected(), map2.isSelected(), map3.isSelected());
+                repaint();
+            }
+        });
             
         gbc.insets = new Insets(70, -800, -240, 0);
         gbc.gridx = 0;
@@ -501,13 +544,24 @@ public class StartScreen extends JPanel {
         map3.setFont               (new Font("Calibri", Font.PLAIN, 50));
         map3.setPreferredSize      (new Dimension(700, 80));
         map3.setBorder             (new EmptyBorder(20, 40, 0, 0));
+        map3.setFocusPainted       (false);
         map3.setBackground         (veryLightGray);
+        
+        map3.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                getMapPickVal(map1.isSelected(), map2.isSelected(), map3.isSelected());
+                repaint();
+            }
+        });
         
         gbc.insets = new Insets(190, -800, -150, 0);
         gbc.gridx = 0;
         gbc.gridy = 7;
         this.add(map3, gbc);
 
+        
+        
         /**
         * Load game LABEL
         */
@@ -523,12 +577,14 @@ public class StartScreen extends JPanel {
         gbc.gridy = 8;
         this.add(loadGameLabelRow, gbc);
         
+
         /**
         * Load game BUTTON
         */
         loadButton.setFont                  (new Font("Calibri", Font.PLAIN, 35));
         loadButton.setPreferredSize         (new Dimension(400, 55));
         loadButton.setBorder                (new EmptyBorder(13, 0, 0, 0));
+        loadButton.setFocusPainted          (false);
         
         loadGameButtonRow.setPreferredSize  (new Dimension(700, 90));
         loadGameButtonRow.setBackground     (veryLightGray);
@@ -539,6 +595,7 @@ public class StartScreen extends JPanel {
         gbc.gridx = 0;
         gbc.gridy = 9;
         this.add(loadGameButtonRow, gbc);
+        
         
         /**
         * Start button LABEL
@@ -556,20 +613,46 @@ public class StartScreen extends JPanel {
         gbc.gridy = 8;
         this.add(startGameLabelRow, gbc);
         
+        
         /**
         * Start BUTTON
         */
-        startButton.setFont                     (new Font("Calibri", Font.PLAIN, 35));
-        startButton.setPreferredSize            (new Dimension(400, 55));
+        startButton.setFont                     (new Font("Calibri", Font.BOLD, 35));
+        startButton.setPreferredSize            (new Dimension(300, 55));   //400, 55
         startButton.setBorder                   (new EmptyBorder(13, 0, 0, 0));
+        startButton.setFocusPainted             (false);
+
+        gbsx.insets = new Insets(0, 0, 0, 0);
+        gbsx.gridx = 0;
+        gbsx.gridy = 0;
+        startGameButtonRow.add(startButton, gbsx);
+        
+        /**
+        * Exit BUTTON
+        */
+        exitButton.setFont                     (new Font("Calibri", Font.BOLD, 35));
+        exitButton.setPreferredSize            (new Dimension(300, 55));   //400, 55
+        exitButton.setBorder                   (new EmptyBorder(13, 0, 0, 0));
+        exitButton.setFocusPainted             (false);
+        
+        exitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
+
+        gbsx.insets = new Insets(0, 0, 0, 0);
+        gbsx.gridx = 0;
+        gbsx.gridy = 1;
+        startGameButtonRow.add(exitButton, gbsx);
+        
         
         startGameButtonRow.setPreferredSize     (new Dimension(700, 90));
         startGameButtonRow.setBackground        (veryLightGray);
         startGameButtonRow.setBorder            (new EmptyBorder(22, 0, 0, 0));
-        startGameButtonRow.add(startButton);
         
-        gbc.insets = new Insets(260, -320, 0, -340);
-        
+        gbc.insets = new Insets(260, -320, 0, -340);    //260, -320, 0, -340
         gbc.gridx = 1;
         gbc.gridy = 9;
         this.add(startGameButtonRow, gbc);
