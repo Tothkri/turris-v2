@@ -61,6 +61,7 @@ public class GameWindow extends JPanel implements ActionListener {
     private Model model;
     private int simulationticks;
     private int RNDPROTECTION;
+    private boolean testMode = false;
 
     public GameWindow() {
         super();
@@ -532,7 +533,8 @@ public class GameWindow extends JPanel implements ActionListener {
         if (isOver) {
             simulationTime = false;
             board.repaint();
-            gameOver();
+            if(!testMode)
+                gameOver();
         }
 
         return moreDistance;
