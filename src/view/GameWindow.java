@@ -337,7 +337,6 @@ public class GameWindow extends JPanel implements ActionListener {
                         p2TowerButtons[i].setEnabled(true);
                         p2UnitButtons[i].setEnabled(true);
                     }
-
                 }
                 newRoundButton.setEnabled(true);
                 player1distances.clear();
@@ -363,16 +362,13 @@ public class GameWindow extends JPanel implements ActionListener {
                             if (minWayDiff > model.wayDiff(q, wayString, u.getType())) {
                                 bestway = model.getPlayers()[q].convertWay(wayString);
                                 minWayDiff = model.wayDiff(q, wayString, u.getType());
-
                             }
                         }
                         if (!bestway.isEmpty()) {
                             u.setWay(bestway);
                         }
-
                         model.getPlayers()[q].setUnits(updateUnits);
                     }
-
                 }
             }
 
@@ -645,6 +641,7 @@ public class GameWindow extends JPanel implements ActionListener {
         }
 
         model.setActivePlayer((1 + model.getActivePlayer()) % 2);
+        repaint();
         playerDataUpdate();
         activePlayerPanelSetter();
 
@@ -1419,14 +1416,14 @@ public class GameWindow extends JPanel implements ActionListener {
         p1Data.setText(
             "<html>"
             + p1.getName()
-            + "<br>Money - " + p1.getMoney()
+            + "<br>Money // " + p1.getMoney()
             + "</html>"
         );
 
         p2Data.setText(
             "<html>"
             + p2.getName()
-            + "<br>Money - " + p2.getMoney()
+            + "<br>Money // " + p2.getMoney()
             + "</html>"
         );
     }
@@ -1447,7 +1444,5 @@ public class GameWindow extends JPanel implements ActionListener {
     public ArrayList<Integer> getPlayer1distances() { return player1distances; }
     public ArrayList<Integer> getPlayer2distances() { return player2distances; }
     public void setRNDPROTECTION(int RNDPROTECTION) { this.RNDPROTECTION = RNDPROTECTION; }
-    public void setTestMode(boolean b){
-        testMode = b;
-    }
+    public void setTestMode(boolean b)              { testMode = b; }
 }
