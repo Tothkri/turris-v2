@@ -60,7 +60,11 @@ Ki mit csinált:
 
     Tóth Kristóf (SONXZF): Kisebb bug fixek, tesztesetek megírása
 
-    Tóth Kristóf (YPENKF): 
+    Tóth Kristóf (YPENKF): tesztesetek implementálása + CI
     
     Szálkai Olivér Dávid (ONLQ05): 
+
+
+
+
 
