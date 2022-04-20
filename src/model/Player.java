@@ -5,7 +5,6 @@ import static java.lang.Integer.parseInt;
 import static java.lang.Math.abs;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
@@ -150,7 +149,8 @@ public class Player {
 
     }
 
-    public void upgrade(int x, int y, int size) {
+    public void upgrade(int x, int y, int size, char c) {
+        if(c != 'T') return;
         x *= (size / 30);
         y *= (size / 30);
         boolean canUpgrade = false;
@@ -160,7 +160,7 @@ public class Player {
                 switch (t.getType()) {
                     case "Fortified":
                         if (t.getLevel() < 3) {
-                            canUpgrade = enoughMoney(t.getLevel(), 350, 500);
+                            canUpgrade = enoughMoney(t.getLevel(), 350, 550);
                         } else {
                             canUpgrade = false;
                         }
@@ -207,11 +207,13 @@ public class Player {
         }
     }
 
-    public void demolish(int x, int y, int size) {
+    public void demolish(int x, int y, int size, char c) {
+        if(c != 'T') return;
         x *= (size / 30);
         y *= (size / 30);
         for (var t : towers) {
             if (t.getX() == x && t.getY() == y) {
+                money += t.getPrice() / 2;
                 t.demolish();
             }
         }
@@ -224,6 +226,11 @@ public class Player {
 
     public Model sendUnits(String type, String color, int amount, Model model) {
 
+        if(type.equals("General") && amount * 20 > money){
+            return model;
+        }else if(amount * 30 > money){
+            return model;
+        }
         int minDistance=0;
         ArrayList<Node> bestWay = new ArrayList<>();
 
@@ -348,8 +355,12 @@ public class Player {
 
                 return bestway;
             }
-
-            int currentValue = difficulty[i][j];
+            int currentValue = 0;
+            try{
+                currentValue = difficulty[i][j];
+            }catch(Exception e){
+                
+            }
 
             for (int k = 0; k < row.length; k++) {
                 currentX = i + (row[k] * currentValue);
@@ -443,9 +454,7 @@ public class Player {
     }
 
     public void deleteUnit(Unit unitToDelete) {
-
        units.remove(unitToDelete);
-
     }
 
     public int[][] getDifficulty(Model model, String type, int activePlayer) {

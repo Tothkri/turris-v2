@@ -36,4 +36,27 @@ Ki mit csinált:
     
     Szálkai Olivér Dávid (ONLQ05): Javadoc, StartScreen GUI véglegesítés
 
+5. hét (03.30 - 04.06)
+
+    Tóth Kristóf (SONXZF): életerő megjelenítése (kastély, tornyok, egységek), tornyok lehelyezésének szabályozása, pénzszerzési módok kialakítása, tornyok lőnek, fighter sebez
+
+    Tóth Kristóf (YPENKF): játék mentés kiválasztása, játék helyesen betöltődik, torony rombolásakor eltűnik az élet csík, torony lerakás/fejlesztés/építés másodszori          megnyomásakor a kijelölések eltűnnek
+    
+    Szálkai Olivér Dávid (ONLQ05): StartScreen GUI javítás, GameWindow GUI kialakítás, Javadoc
+
+6. hét (04.06 - 04.13)
+
+    Tóth Kristóf (SONXZF): bugok és funkciók javítása: legjobb út, torony lerakás/rombolás/fejlesztés, unit eltűnése miután beért a célba, attack speed
+
+    Tóth Kristóf (YPENKF): Képek/animációk megjelenése: torony lövésekor, fighter harcbalépésekor. Torony és a Fighter csak egy Unitra lő egy körben
+    
+    Szálkai Olivér Dávid (ONLQ05): GameWindow Player UI, Board UI rework, StartScreen UI visual javítások, CleanCode javítások
+
+7. hét (04.13 - 04.20)
+
+    Tóth Kristóf (SONXZF): 
+
+    Tóth Kristóf (YPENKF): 
+    
+    Szálkai Olivér Dávid (ONLQ05): 
 

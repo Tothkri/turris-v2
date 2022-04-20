@@ -10,7 +10,7 @@ public class Sniper extends Tower {
         this.attack_speed = 1.5;
         this.hp = 25;
         this.level = 1;
-        this.price = 350;
+        this.price = 300;
         this.range = 1;
         this.power = 2;
         this.demolishedIn = -1;

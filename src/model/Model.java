@@ -27,6 +27,8 @@ public class Model {
     private ArrayList<Sprite> selectables;
     private int castleCoordinates[][] = new int[8][2];
     private int selectedMap;
+    private int mcount;
+    private int lcount;
 
     /**
      * Storing the field components in a matrix in order to make it easier to
@@ -117,7 +119,6 @@ public class Model {
         /**
          * Amount of mountains and lakes
          */
-        int mcount, lcount;
 
         if (selectedMap == 1) {         //Mountains and lakes in the same amount
             mcount = rand.nextInt(10) + 15;
@@ -367,7 +368,7 @@ public class Model {
         for (int i = 0; i < 30; i++) {
             for (int j = activePlayer * 15; j < activePlayer * 15 + 15; j++) {
                 if (position[i][j] == 'T' && upgradable(i, j) && money >= getTowerFromPosition(i, j).getUpgradePrice()) {
-                    // System.out.println(money+", "+getTowerFromPosition(i,j).getPrice());
+                    //System.out.println(money+", "+getTowerFromPosition(i,j).getPrice());
                     selectables.add(new Selectable(i * (size / 30), j * (size / 30),
                             (size / 30), (size / 30)));
                 }
@@ -458,16 +459,19 @@ public class Model {
     }
 
     public ArrayList<Tower> towersNearby(int actPlayer, Unit u) {
-        ArrayList<Tower> towersNB = new ArrayList<Tower>();
+        ArrayList<Tower> towersNB = new ArrayList<>();
         ArrayList<Tower> enemyTowers = players[(actPlayer + 1) % 2].getTowers();
-
         //System.out.println("enemy towers: "+enemyTowers.toString());
         if (enemyTowers.size() > 0) {
             for (Tower t : enemyTowers) {
-                //System.out.println(distance(u.x/(size/30),t.x/(size/30),u.y/(size/30),t.y/(size/30)));
-                if (distance(u.x / (size / 30), t.x / (size / 30), u.y / (size / 30), t.y / (size / 30)) == 1&&t.demolishedIn==-1) {
+                            //System.out.println(t.getDemolishedIn());
+
+               /* if (distance(u.x / (size / 30), t.x / (size / 30), u.y / (size / 30), t.y / (size / 30)) == 1 && t.demolishedIn == -1) {
                     towersNB.add(t);
-                }
+                }*/
+               if (distance(u.x / (size / 30), t.x / (size / 30), u.y / (size / 30), t.y / (size / 30)) == 1 && position[t.x / 30][t.y / 30] == 'T') {
+                    towersNB.add(t);
+               }
             }
         }
 
@@ -517,78 +521,25 @@ public class Model {
         return null;
     }
 
-    //GETTER/SETTER RÉSZT ÁTNÉZNI!!!
-    public ArrayList<Sprite> getSelectables() {
-        return selectables;
-    }
-
-    public void setSelectables(ArrayList<Sprite> sc) {
-        selectables = sc;
-    }
-
-    public void setMap(int sc) {
-        selectedMap = sc;
-    }
-
-    public int getMap() {
-        return selectedMap;
-    }
-
-    public boolean roundOver() {
-        return false;
-    }
-
-    public void unitAttack() {
-    }
-
-    public void towerDefense() {
-    }
-
-    public int getLevel() {
-        return level;
-    }
-
-    public void setLevel(int level) {
-        this.level = level;
-    }
-
-    public Player[] getPlayers() {
-        return players;
-    }
-
-    public int getActivePlayer() {
-        return activePlayer;
-    }
-
-    public void setActivePlayer(int activePlayer) {
-        this.activePlayer = activePlayer;
-    }
-
-    public int getRound() {
-        return round;
-    }
-
-    public void setRound(int round) {
-        this.round = round;
-    }
-
-    public ArrayList<Sprite> getTerrain() {
-        return terrain;
-    }
-
-    public void addTerrainElement(Sprite newElement) {
-        terrain.add(newElement);
-    }
-
-    public char[][] getPosition() {
-        return position;
-    }
-
-    public void setPosition(int x, int y, char newChar) {
-        position[x][y] = newChar;
-    }
-
-    public int getSize() {
-        return size;
-    }
+    public ArrayList<Sprite> getSelectables()           {return selectables; }
+    public void setSelectables(ArrayList<Sprite> sc)    { selectables = sc; }
+    public void setMap(int sc)                          { selectedMap = sc; }
+    public int getMap()                                 { return selectedMap; }
+    public boolean roundOver()                          { return false; }
+    public void unitAttack()                            {  }
+    public void towerDefense()                          {  }
+    public int getLevel()                               { return level; }
+    public void setLevel(int level)                     { this.level = level; }
+    public Player[] getPlayers()                        { return players; }
+    public int getActivePlayer()                        { return activePlayer; }
+    public void setActivePlayer(int activePlayer)       { this.activePlayer = activePlayer; }
+    public int getRound()                               { return round; }
+    public void setRound(int round)                     { this.round = round; }
+    public ArrayList<Sprite> getTerrain()               { return terrain; }
+    public void addTerrainElement(Sprite newElement)    { terrain.add(newElement); }
+    public char[][] getPosition()                       { return position; }
+    public void setPosition(int x, int y, char newChar) { position[x][y] = newChar; }
+    public int getSize()                                { return size; }
+    public int getMcount()                              { return mcount; }
+    public int getLcount()                              { return lcount; }
 }

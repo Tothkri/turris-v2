@@ -81,4 +81,12 @@ public class Game {
         frame.pack();
         frame.setVisible(true);
     }
+
+    public GameWindow getGw() {
+        return gw;
+    }
+
+    public StartScreen getSs() {
+        return ss;
+    }
 }
