@@ -521,86 +521,25 @@ public class Model {
         return null;
     }
 
-    public ArrayList<Sprite> getSelectables() {
-        return selectables;
-    }
-
-    public void setSelectables(ArrayList<Sprite> sc) {
-        selectables = sc;
-    }
-
-    public void setMap(int sc) {
-        selectedMap = sc;
-    }
-
-    public int getMap() {
-        return selectedMap;
-    }
-
-    public boolean roundOver() {
-        return false;
-    }
-
-    public void unitAttack() {
-    }
-
-    public void towerDefense() {
-    }
-
-    public int getLevel() {
-        return level;
-    }
-
-    public void setLevel(int level) {
-        this.level = level;
-    }
-
-    public Player[] getPlayers() {
-        return players;
-    }
-
-    public int getActivePlayer() {
-        return activePlayer;
-    }
-
-    public void setActivePlayer(int activePlayer) {
-        this.activePlayer = activePlayer;
-    }
-
-    public int getRound() {
-        return round;
-    }
-
-    public void setRound(int round) {
-        this.round = round;
-    }
-
-    public ArrayList<Sprite> getTerrain() {
-        return terrain;
-    }
-
-    public void addTerrainElement(Sprite newElement) {
-        terrain.add(newElement);
-    }
-
-    public char[][] getPosition() {
-        return position;
-    }
-
-    public void setPosition(int x, int y, char newChar) {
-        position[x][y] = newChar;
-    }
-
-    public int getSize() {
-        return size;
-    }
-
-    public int getMcount() {
-        return mcount;
-    }
-
-    public int getLcount() {
-        return lcount;
-    }
-    
+    public ArrayList<Sprite> getSelectables()           {return selectables; }
+    public void setSelectables(ArrayList<Sprite> sc)    { selectables = sc; }
+    public void setMap(int sc)                          { selectedMap = sc; }
+    public int getMap()                                 { return selectedMap; }
+    public boolean roundOver()                          { return false; }
+    public void unitAttack()                            {  }
+    public void towerDefense()                          {  }
+    public int getLevel()                               { return level; }
+    public void setLevel(int level)                     { this.level = level; }
+    public Player[] getPlayers()                        { return players; }
+    public int getActivePlayer()                        { return activePlayer; }
+    public void setActivePlayer(int activePlayer)       { this.activePlayer = activePlayer; }
+    public int getRound()                               { return round; }
+    public void setRound(int round)                     { this.round = round; }
+    public ArrayList<Sprite> getTerrain()               { return terrain; }
+    public void addTerrainElement(Sprite newElement)    { terrain.add(newElement); }
+    public char[][] getPosition()                       { return position; }
+    public void setPosition(int x, int y, char newChar) { position[x][y] = newChar; }
+    public int getSize()                                { return size; }
+    public int getMcount()                              { return mcount; }
+    public int getLcount()                              { return lcount; }
 }
