@@ -157,6 +157,7 @@ public abstract class Tower extends Sprite {
 
     @Override
     public void draw(Graphics2D g2) {
+        if(demolishedIn != -1) img = new ImageIcon("src/res/Destroyed.png").getImage();
         g2.drawImage(img, x, y, height, width, null);
         if (demolishedIn <=0) {
             g2.setColor(color);

@@ -12,7 +12,6 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Scanner;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -105,6 +104,8 @@ public class StartScreen extends JPanel {
                     model.addTerrainElement(new Lake(j * (size / 30), i * (size / 30), (size / 30), (size / 30), Lake));
                 } else if (data.charAt(j) == 'T') {
                     model.getPosition()[j][i] = 'T';
+                }else if (data.charAt(j) == 'D') {
+                    model.getPosition()[j][i] = 'D';
                 }
             }
         }
@@ -244,33 +245,33 @@ public class StartScreen extends JPanel {
 
     public Tower setTower(String[] arr) {
         String png = "Tower"+arr[2];
-        if (!arr[11].equals("-1")) { png = "destroyed"; }
+        if (!arr[12].equals("-1")) { png = "Destroyed"; }
         Tower t;
         switch (arr[1]) {
             case "Rapid":
                 t = new Rapid(arr[1], arr[2], Integer.parseInt(arr[3]), Integer.parseInt(arr[4]), Double.parseDouble(arr[5]),
                         Integer.parseInt(arr[6]), Integer.parseInt(arr[7]), Integer.parseInt(arr[8]), Integer.parseInt(arr[9]), Integer.parseInt(arr[10]),
                         Integer.parseInt(arr[11]), new ImageIcon("src/res/" + png + ".png").getImage());
-                t.setDemolishedIn(Integer.parseInt(arr[12]));
+                //t.setDemolishedIn(Integer.parseInt(arr[12]));
                 break;
             case "Sniper":
                 t = new Sniper(arr[1], arr[2], Integer.parseInt(arr[3]), Integer.parseInt(arr[4]), Double.parseDouble(arr[5]),
                         Integer.parseInt(arr[6]), Integer.parseInt(arr[7]), Integer.parseInt(arr[8]), Integer.parseInt(arr[9]), Integer.parseInt(arr[10]),
                         Integer.parseInt(arr[11]), new ImageIcon("src/res/" + png + ".png").getImage());
-                t.setDemolishedIn(Integer.parseInt(arr[12]));
+                //t.setDemolishedIn(Integer.parseInt(arr[12]));
                 break;
             default:    //Fortified
                 t = new Fortified(arr[1], arr[2], Integer.parseInt(arr[3]), Integer.parseInt(arr[4]), Double.parseDouble(arr[5]),
                         Integer.parseInt(arr[6]), Integer.parseInt(arr[7]), Integer.parseInt(arr[8]), Integer.parseInt(arr[9]), Integer.parseInt(arr[10]),
                         Integer.parseInt(arr[11]), new ImageIcon("src/res/" + png + ".png").getImage());
-                t.setDemolishedIn(Integer.parseInt(arr[12]));
+                //t.setDemolishedIn(Integer.parseInt(arr[12]));
                 break;
         }
-        /*if (Integer.parseInt(arr[12]) == -1) {
+        if (Integer.parseInt(arr[12]) == -1) {
             t.setDemolishedIn(0);//-1
         } else {
             t.setDemolishedIn((Integer.parseInt(arr[12]) + 1) * -1);//can change
-        }*/
+        }
         return t;
     }
 

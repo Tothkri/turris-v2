@@ -60,6 +60,7 @@ public class GameWindow extends JPanel implements ActionListener {
     private final int timerInterval = 250;
     private Model model;
     private int simulationticks;
+    private int RNDPROTECTION;
 
     public GameWindow() {
         super();
@@ -80,6 +81,7 @@ public class GameWindow extends JPanel implements ActionListener {
 
     public void constructor(int width, int height) {
         buttonAction = "";
+        RNDPROTECTION = 0;
         setSize(width, height);
         player1distances = new ArrayList<>();
         player2distances = new ArrayList<>();
@@ -251,15 +253,14 @@ public class GameWindow extends JPanel implements ActionListener {
                     buttonAction = "";
                 } else if (buttonAction.equals("upgrade")) {
                     if (model.getTowerFromPosition(x, y) != null && model.getPosition()[x][y] == 'T') {
-                        model.getPlayers()[model.getActivePlayer()].upgrade(x, y, model.getSize());
+                        model.getPlayers()[model.getActivePlayer()].upgrade(x, y, model.getSize(),'T');
                         model.setSelectables(new ArrayList<>());
                     }
                     buttonAction = "";
                 } else if (buttonAction.equals("demolish")) {
-                    if (model.getTowerFromPosition(x, y) != null && model.getPosition()[x][y] == 'T') {
+                    if (model.getTowerFromPosition(x, y) != null) {
+                        model.getPlayers()[model.getActivePlayer()].demolish(x, y, model.getSize(), model.getPosition()[x][y]);
                         model.setPosition(x, y, 'D');
-                        model.getPlayers()[model.getActivePlayer()].setMoney(model.getPlayers()[model.getActivePlayer()].getMoney() + model.getTowerFromPosition(x, y).getPrice() / 2);
-                        model.getPlayers()[model.getActivePlayer()].demolish(x, y, model.getSize());
                         model.setSelectables(new ArrayList<>());
                     }
                     buttonAction = "";
@@ -402,11 +403,11 @@ public class GameWindow extends JPanel implements ActionListener {
                 ArrayList<Unit> units = model.getPlayers()[q].getUnits();
                 for (int i = 0; i < units.size(); i++) {
                     if (q == 0) {
-                        if (player1distances.get(i) < 0) {
+                        if (player1distances.get(i) <= 0) {
                             continue;
                         }
                     } else {
-                        if (player2distances.get(i) < 0) {
+                        if (player2distances.get(i) <= 0) {
                             continue;
                         }
                     }
@@ -466,11 +467,14 @@ public class GameWindow extends JPanel implements ActionListener {
                     //then destroyer attacks 
                     if ("Destroyer".equals(units.get(i).getType()) && towersNearby.size() > 0) {
                         int rand = (int) (Math.random() * 2); //the chance to attack towers is 50%
-
+                        if(RNDPROTECTION != 0) rand = RNDPROTECTION;
                         //destroyer attacks nearby towers with 50% chance (direct next to it) with full power, then disappears
                         if (rand == 1) {
                             //destroyer deals 50 damage when attacking towers, removes towers if their hp reaches 0
                             for (int j = 0; j < towersNearby.size(); j++) {
+                                
+                                if(towersNearby.get(j).getDemolishedIn() != -1) continue;
+
                                 if (towersNearby.get(j).getHp() > 50) {
                                     towersNearby.get(j).setHp(towersNearby.get(j).getHp() - 50);
                                     int index = model.getPlayers()[Math.abs(q - 1)].getTowerIndex(towersNearby.get(j));
@@ -485,7 +489,7 @@ public class GameWindow extends JPanel implements ActionListener {
                                     towersNearby.get(j).setRange(0);
                                     towersNearby.get(j).setAttack_speed(0);
                                     model.getPlayers()[(q + 1) % 2].demolish(towersNearby.get(j).getX() / (model.getSize() / 30),
-                                            towersNearby.get(j).getY() / (model.getSize() / 30), model.getSize());
+                                            towersNearby.get(j).getY() / (model.getSize() / 30), model.getSize(), 'T');
                                     model.getPlayers()[q].setMoney(model.getPlayers()[q].getMoney() + towersNearby.get(j).getMaxHp() * 3);
                                     int index = model.getPlayers()[q].getTowerIndex(towersNearby.get(j));
 
@@ -1410,4 +1414,32 @@ public class GameWindow extends JPanel implements ActionListener {
     public void setTicks(int ticks)         { this.ticks = ticks; }
     public void setModel(Model model)       { this.model = model; }
     public JLabel getTimeAndRoundLabel()    { return timeAndRoundLabel; }
+
+    public JButton[] getP1TowerButtons() {
+        return p1TowerButtons;
+    }
+
+    public JButton[] getP1UnitButtons() {
+        return p1UnitButtons;
+    }
+
+    public JButton[] getP2TowerButtons() {
+        return p2TowerButtons;
+    }
+
+    public JButton[] getP2UnitButtons() {
+        return p2UnitButtons;
+    }
+
+    public ArrayList<Integer> getPlayer1distances() {
+        return player1distances;
+    }
+
+    public ArrayList<Integer> getPlayer2distances() {
+        return player2distances;
+    }
+
+    public void setRNDPROTECTION(int RNDPROTECTION) {
+        this.RNDPROTECTION = RNDPROTECTION;
+    }
 }
