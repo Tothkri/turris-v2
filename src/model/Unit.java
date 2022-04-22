@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.util.ArrayList;
-import javax.swing.ImageIcon;
 
 public abstract class Unit extends Sprite {
 
@@ -35,9 +34,9 @@ public abstract class Unit extends Sprite {
         return false;
     }
 
-    private double hpLine() {
-        double d = (double) hp / maxHp;
-            return d * width;
+    private double hpLineWidth() {
+        double lineWidth = (double) hp / maxHp;
+        return lineWidth * width;
 
     }
 
@@ -54,12 +53,11 @@ public abstract class Unit extends Sprite {
         blood = false;
         if (scolor.equals("red")) {
             this.color = Color.red;
-            this.img = new ImageIcon("src/res/Unitred.png").getImage();
         } else {
             this.color = Color.blue;
-            this.img = new ImageIcon("src/res/Unitblue.png").getImage();
         }
-        this.way=null;
+        this.img = img;
+        this.way = null;
     }
 
     public String getType() {
@@ -112,13 +110,13 @@ public abstract class Unit extends Sprite {
 
     @Override
     public void draw(Graphics2D g2) {
-        
+
         g2.drawImage(img, x, y, height, width, null);
         g2.setColor(color);
-        g2.drawLine(x + 4, y + height - 2, x + (int) hpLine() - 4, y + height - 2);
-        g2.drawLine(x + 4, y + height - 3, x + (int) hpLine() - 4, y + height - 3);
-        g2.drawLine(x + 4, y + height - 4, x + (int) hpLine() - 4, y + height - 4);
-        
+        g2.drawLine(x + 4, y + height - 2, x + (int) hpLineWidth()- 4, y + height - 2);
+        g2.drawLine(x + 4, y + height - 3, x + (int) hpLineWidth()- 4, y + height - 3);
+        g2.drawLine(x + 4, y + height - 4, x + (int) hpLineWidth()- 4, y + height - 4);
+
     }
 
 }

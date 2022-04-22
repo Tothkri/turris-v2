@@ -14,11 +14,11 @@ import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.PointerInfo;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Random;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -35,69 +35,74 @@ import javax.swing.text.BadLocationException;
 import model.Model;
 import model.Player;
 
-public class GameWindow extends JPanel implements ActionListener {
+public class GameWindow extends JPanel {
 
     private Timer timer;
-    private Timer animationTimer;
-    private int current;
     private Board board;
     private JButton exitButton;
     private JButton newRoundButton;
     private JButton saveButton;
-    private JButton[] p1TowerButtons;
-    private JButton[] p1UnitButtons;
-    private JButton[] p2TowerButtons;
-    private JButton[] p2UnitButtons;
-    private JLabel p1Data;
-    private JLabel p2Data;
-    private JLabel timeAndRoundLabel = new JLabel();
+    private JButton[] player1TowerButtons;
+    private JButton[] player1UnitButtons;
+    private JButton[] player2TowerButtons;
+    private JButton[] player2UnitButtons;
+    private JLabel player1Data;
+    private JLabel player2Data;
+    private JLabel timeAndRoundLabel;
     private String selectedTower;
     private String buttonAction;
-    private int ticks;
+    private int timerTicks;
     private boolean simulationTime = false;
-    private ArrayList<Integer> player1distances;
-    private ArrayList<Integer> player2distances;
+    private ArrayList<Integer> player1Distances;
+    private ArrayList<Integer> player2Distances;
     private final int timerInterval = 250;
     private Model model;
-    private int simulationticks;
+    private int simulationTicks;
     private int RNDPROTECTION;
     private boolean testMode = false;
+    private int fieldSize;
 
     public GameWindow() {
         super();
     }
 
-    public GameWindow(int width, int height, String p1Name, String p2Name, int selectedMap) {
+    public GameWindow(int gameWindowWidth, int gameWindowHeight, String player1Name, String player2Name, int selectedMap) {
         super();
-        board = new Board(selectedMap, p1Name, p2Name, width, height);
+        board = new Board(selectedMap, player1Name, player2Name, gameWindowWidth, gameWindowHeight);
         this.model = board.getModel();
         model.setRound(1);
 
-        //players have 50% chance to start the game
-        Random rand = new Random();
+        //50% eséllyel kezdenek a játékosok
+        Random whichPlayerStarts = new Random();
+        model.setActivePlayer(whichPlayerStarts.nextInt(2));
 
-        model.setActivePlayer(rand.nextInt(2));
-        constructor(width, height);
+        constructor(gameWindowWidth, gameWindowHeight);
     }
 
-    public void constructor(int width, int height) {
+    public void constructor(int gameWindowWidth, int gameWindowHeight) {
         buttonAction = "";
         RNDPROTECTION = 0;
-        setSize(width, height);
-        player1distances = new ArrayList<>();
-        player2distances = new ArrayList<>();
-        this.setPreferredSize(new Dimension(width, height));
+        fieldSize = (model.getBoardSize() / 30);
+        setSize(gameWindowWidth, gameWindowHeight);
+        player1Distances = new ArrayList<>();
+        player2Distances = new ArrayList<>();
+        timeAndRoundLabel = new JLabel();
+        this.setPreferredSize(new Dimension(gameWindowWidth, gameWindowHeight));
         exitButton = new JButton("Exit game");
         exitButton.addActionListener((event) -> System.exit(0));
         newRoundButton = new JButton("Finish round");
-        newRoundButton.addActionListener((event) -> { newRound(); });
+        newRoundButton.addActionListener((event) -> {
+            newRound();
+        });
 
+        //kurzor utáni info megjelenítéshez
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
                 try {
                     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {  }
+                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+                }
 
                 JTextPane text = new JTextPane() {
                     @Override
@@ -126,10 +131,10 @@ public class GameWindow extends JPanel implements ActionListener {
 
         this.setLayout(new GridBagLayout());
 
-        p1TowerButtons = new JButton[5];
-        p1UnitButtons = new JButton[5];
-        p2TowerButtons = new JButton[5];
-        p2UnitButtons = new JButton[5];
+        player1TowerButtons = new JButton[5];
+        player1UnitButtons = new JButton[5];
+        player2TowerButtons = new JButton[5];
+        player2UnitButtons = new JButton[5];
 
         setPanels();
 
@@ -137,14 +142,20 @@ public class GameWindow extends JPanel implements ActionListener {
         /**
          * PLAYER1 Tower típusok
          */
-        p1TowerButtons[0].addActionListener(ae -> { towerPlaceAction("Fortified"); });
-        p1TowerButtons[1].addActionListener(ae -> { towerPlaceAction("Rapid"); });
-        p1TowerButtons[2].addActionListener(ae -> { towerPlaceAction("Sniper"); });
+        player1TowerButtons[0].addActionListener(ae -> {
+            towerPlaceAction("Fortified");
+        });
+        player1TowerButtons[1].addActionListener(ae -> {
+            towerPlaceAction("Rapid");
+        });
+        player1TowerButtons[2].addActionListener(ae -> {
+            towerPlaceAction("Sniper");
+        });
 
         /**
          * PLAYER1 Tower management
          */
-        p1TowerButtons[3].addActionListener(ae -> {
+        player1TowerButtons[3].addActionListener(ae -> {
             if (!buttonAction.equals("")) {
                 model.setSelectables(new ArrayList<>());
                 buttonAction = "";
@@ -154,7 +165,7 @@ public class GameWindow extends JPanel implements ActionListener {
 
             }
         });
-        p1TowerButtons[4].addActionListener(ae -> {
+        player1TowerButtons[4].addActionListener(ae -> {
             if (!buttonAction.equals("")) {
                 model.setSelectables(new ArrayList<>());
                 buttonAction = "";
@@ -167,23 +178,23 @@ public class GameWindow extends JPanel implements ActionListener {
         /**
          * PLAYER1 Unit típusok
          */
-        p1UnitButtons[0].addActionListener(ae -> {
+        player1UnitButtons[0].addActionListener(ae -> {
             board.setModel(model.getPlayers()[0].sendUnits("General", "blue", 1, model));
             playerDataUpdate();
         });
-        p1UnitButtons[1].addActionListener(ae -> {
+        player1UnitButtons[1].addActionListener(ae -> {
             board.setModel(model.getPlayers()[0].sendUnits("Fighter", "blue", 1, model));
             playerDataUpdate();
         });
-        p1UnitButtons[2].addActionListener(ae -> {
+        player1UnitButtons[2].addActionListener(ae -> {
             board.setModel(model.getPlayers()[0].sendUnits("Climber", "blue", 1, model));
             playerDataUpdate();
         });
-        p1UnitButtons[3].addActionListener(ae -> {
+        player1UnitButtons[3].addActionListener(ae -> {
             board.setModel(model.getPlayers()[0].sendUnits("Diver", "blue", 1, model));
             playerDataUpdate();
         });
-        p1UnitButtons[4].addActionListener(ae -> {
+        player1UnitButtons[4].addActionListener(ae -> {
             board.setModel(model.getPlayers()[0].sendUnits("Destroyer", "blue", 1, model));
             playerDataUpdate();
         });
@@ -192,14 +203,20 @@ public class GameWindow extends JPanel implements ActionListener {
         /**
          * PLAYER2 Tower típusok
          */
-        p2TowerButtons[0].addActionListener(ae -> { towerPlaceAction("Fortified"); });
-        p2TowerButtons[1].addActionListener(ae -> { towerPlaceAction("Rapid"); });
-        p2TowerButtons[2].addActionListener(ae -> { towerPlaceAction("Sniper"); });
+        player2TowerButtons[0].addActionListener(ae -> {
+            towerPlaceAction("Fortified");
+        });
+        player2TowerButtons[1].addActionListener(ae -> {
+            towerPlaceAction("Rapid");
+        });
+        player2TowerButtons[2].addActionListener(ae -> {
+            towerPlaceAction("Sniper");
+        });
 
         /**
          * PLAYER2 Tower management
          */
-        p2TowerButtons[3].addActionListener(ae -> {
+        player2TowerButtons[3].addActionListener(ae -> {
             if (!buttonAction.equals("")) {
                 model.setSelectables(new ArrayList<>());
                 buttonAction = "";
@@ -208,7 +225,7 @@ public class GameWindow extends JPanel implements ActionListener {
                 model.setSelectableTowersToUpgrade(model.getPlayers()[model.getActivePlayer()].getMoney());
             }
         });
-        p2TowerButtons[4].addActionListener(ae -> {
+        player2TowerButtons[4].addActionListener(ae -> {
             if (!buttonAction.equals("")) {
                 model.setSelectables(new ArrayList<>());
                 buttonAction = "";
@@ -221,47 +238,49 @@ public class GameWindow extends JPanel implements ActionListener {
         /**
          * PLAYER2 Unit típusok
          */
-        p2UnitButtons[0].addActionListener(ae -> {
+        player2UnitButtons[0].addActionListener(ae -> {
             board.setModel(model.getPlayers()[1].sendUnits("General", "red", 1, model));
             playerDataUpdate();
         });
-        p2UnitButtons[1].addActionListener(ae -> {
+        player2UnitButtons[1].addActionListener(ae -> {
             board.setModel(model.getPlayers()[1].sendUnits("Fighter", "red", 1, model));
             playerDataUpdate();
         });
-        p2UnitButtons[2].addActionListener(ae -> {
+        player2UnitButtons[2].addActionListener(ae -> {
             board.setModel(model.getPlayers()[1].sendUnits("Climber", "red", 1, model));
             playerDataUpdate();
         });
-        p2UnitButtons[3].addActionListener(ae -> {
+        player2UnitButtons[3].addActionListener(ae -> {
             board.setModel(model.getPlayers()[1].sendUnits("Diver", "red", 1, model));
             playerDataUpdate();
         });
-        p2UnitButtons[4].addActionListener(ae -> {
+        player2UnitButtons[4].addActionListener(ae -> {
             board.setModel(model.getPlayers()[1].sendUnits("Destroyer", "red", 1, model));
             playerDataUpdate();
         });
 
-        // after selecting tower type, players must click where they want to place it
+        // torony helyének meghatározása kattintással
         board.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                int x = e.getX() / (model.getSize() / 30);
-                int y = e.getY() / (model.getSize() / 30);
+            public void mouseClicked(MouseEvent me) {
+                int matrixPositionX = me.getX() / fieldSize;
+                int matrixPositionY = me.getY() / fieldSize;
+
+                int activePlayerIndex = model.getActivePlayer();
 
                 if (buttonAction.equals("placeTower")) {
-                    model = (model.getPlayers()[model.getActivePlayer()].build(x, y, selectedTower, model));
+                    model.getPlayers()[activePlayerIndex].build(matrixPositionX, matrixPositionY, selectedTower, model);
                     buttonAction = "";
                 } else if (buttonAction.equals("upgrade")) {
-                    if (model.getTowerFromPosition(x, y) != null && model.getPosition()[x][y] == 'T') {
-                        model.getPlayers()[model.getActivePlayer()].upgrade(x, y, model.getSize(),'T');
+                    if (model.getTowerFromPosition(matrixPositionX, matrixPositionY) != null && model.getPosition()[matrixPositionX][matrixPositionY] == 'T') {
+                        model.getPlayers()[activePlayerIndex].upgrade(matrixPositionX, matrixPositionY, model.getBoardSize());
                         model.setSelectables(new ArrayList<>());
                     }
                     buttonAction = "";
                 } else if (buttonAction.equals("demolish")) {
-                    if (model.getTowerFromPosition(x, y) != null) {
-                        model.getPlayers()[model.getActivePlayer()].demolish(x, y, model.getSize(), model.getPosition()[x][y]);
-                        model.setPosition(x, y, 'D');
+                    if (model.getTowerFromPosition(matrixPositionX, matrixPositionY) != null) {
+                        model.getPlayers()[activePlayerIndex].demolish(matrixPositionX, matrixPositionY, model.getBoardSize());
+                        model.setPosition(matrixPositionX, matrixPositionY, 'D');
                         model.setSelectables(new ArrayList<>());
                     }
                     buttonAction = "";
@@ -271,31 +290,25 @@ public class GameWindow extends JPanel implements ActionListener {
             }
         });
 
-        //ticks has been set while loading game
-        if (!(ticks > 0)) { ticks = (1000 / timerInterval) * 60; }
+        //timerTicks-et betöltés közben állítjuk be
+        if (!(timerTicks > 0)) {
+            timerTicks = (1000 / timerInterval) * 60;
+        }
 
         timer = new Timer(timerInterval, (ActionEvent ae) -> {
-            //showWays();
-            // printDiffMatrices();
-            PointerInfo a = MouseInfo.getPointerInfo();
+            PointerInfo hover = MouseInfo.getPointerInfo();
+            Point hoveredPoint = hover.getLocation();
 
-            Point b = a.getLocation();
-            int x = (int) b.getX() - 500;
-            x /= (board.getModel().getSize() / 30);
-            int y = (int) b.getY() - 75;
-            y /= (board.getModel().getSize() / 30);
+            int fieldSize = model.getBoardSize() / 30;
 
-            /*
-            //helper
-            boolean showCoordinates=true;
-            if (showCoordinates) {
+            int boardPositionX = (int) hoveredPoint.getX() - 500;
+            int matrixPositionX = boardPositionX / fieldSize;
+            int boardPositionY = (int) hoveredPoint.getY() - 75;
+            int matrixPositionY = boardPositionY / fieldSize;
+
+            if (!model.getInfo(matrixPositionX, matrixPositionY).equals("")) {
                 ToolTipManager.sharedInstance().setEnabled(true);
-                board.setToolTipText(x+";"+y);
-            } 
-            else */
-            if (!model.getInfo(x, y).equals("")) {
-                ToolTipManager.sharedInstance().setEnabled(true);
-                board.setToolTipText(model.getInfo(x, y));
+                board.setToolTipText(model.getInfo(matrixPositionX, matrixPositionY));
             } else {
                 ToolTipManager.sharedInstance().setEnabled(false);
             }
@@ -303,86 +316,84 @@ public class GameWindow extends JPanel implements ActionListener {
             if (simulationTime) {
                 simulationTime = simulation();
 
-                for (int i = 0; i < 2; i++) {
-                    ArrayList<Tower> towers = model.getPlayers()[i].getNotDemolishedTowers();
-                    for (int j = 0; j < towers.size(); j++) {
-                        double tickPerAttack = towers.get(j).getAttack_speed() / 0.25;
-                        if (simulationticks % tickPerAttack == 0) {
-                            ArrayList<Unit> enemyUnitsNearby = model.enemyUnitsNearby(i, towers.get(j));
+                for (int playerIndex = 0; playerIndex < 2; playerIndex++) {
+                    ArrayList<Tower> towers = model.getPlayers()[playerIndex].getNotDemolishedTowers();
+                    for (int towerIndex = 0; towerIndex < towers.size(); towerIndex++) {
+                        double tickPerAttack = towers.get(towerIndex).getAttackFrequency() / 0.25;
+                        if (simulationTicks % tickPerAttack == 0) {
+                            ArrayList<Unit> enemyUnitsNearby = model.enemyUnitsNearby(playerIndex, towers.get(towerIndex));
                             if (enemyUnitsNearby.size() > 0) {
-                                int rand = (int) (Math.random() * enemyUnitsNearby.size());
-                                towers.get(j).setShootCords(enemyUnitsNearby.get(rand).getX(), enemyUnitsNearby.get(rand).getY());
-                                if (enemyUnitsNearby.get(rand).getHp() > towers.get(j).getPower()) {
-                                    enemyUnitsNearby.get(rand).setHp(enemyUnitsNearby.get(rand).getHp() - towers.get(j).getPower());
+                                int randomEnemyUnit = (int) (Math.random() * enemyUnitsNearby.size());
+                                towers.get(towerIndex).setShootCords(enemyUnitsNearby.get(randomEnemyUnit).getX(), enemyUnitsNearby.get(randomEnemyUnit).getY());
+                                if (enemyUnitsNearby.get(randomEnemyUnit).getHp() > towers.get(towerIndex).getPower()) {
+                                    enemyUnitsNearby.get(randomEnemyUnit).setHp(enemyUnitsNearby.get(randomEnemyUnit).getHp() - towers.get(towerIndex).getPower());
                                 } else {
-                                    model.getPlayers()[(i + 1) % 2].deleteUnit(enemyUnitsNearby.get(rand));
-                                    model.getPlayers()[i].setMoney(model.getPlayers()[i].getMoney() + enemyUnitsNearby.get(rand).getMaxHp() * 2);
+                                    model.getPlayers()[(playerIndex + 1) % 2].deleteUnit(enemyUnitsNearby.get(randomEnemyUnit));
+                                    model.getPlayers()[playerIndex].setMoney(model.getPlayers()[playerIndex].getMoney() + enemyUnitsNearby.get(randomEnemyUnit).getMaxHp() * 2);
+                                     playerDataUpdate();
                                 }
                             }
                         }
                     }
                 }
-                simulationticks++;
+                simulationTicks++;
                 if (model.getRound() == 1 || model.getRound() == 2) {
-                    ticks = (1000 / timerInterval) * 60;
+                    timerTicks = (1000 / timerInterval) * 60;
                 } else {
-                    ticks = (1000 / timerInterval) * 30;
+                    timerTicks = (1000 / timerInterval) * 30;
                 }
             } else {
-                for (int i = 0; i < 5; i++) {
+                for (int buttonIndex = 0; buttonIndex < 5; buttonIndex++) {
                     if (model.getActivePlayer() == 0) {
-                        p1TowerButtons[i].setEnabled(true);
-                        p1UnitButtons[i].setEnabled(true);
+                        player1TowerButtons[buttonIndex].setEnabled(true);
+                        player1UnitButtons[buttonIndex].setEnabled(true);
                     } else {
-                        p2TowerButtons[i].setEnabled(true);
-                        p2UnitButtons[i].setEnabled(true);
+                        player2TowerButtons[buttonIndex].setEnabled(true);
+                        player2UnitButtons[buttonIndex].setEnabled(true);
                     }
-
                 }
                 newRoundButton.setEnabled(true);
-                player1distances.clear();
-                player2distances.clear();
+                player1Distances.clear();
+                player2Distances.clear();
 
-                for (int q = 0; q < 2; q++) {
-                    int defender = Math.abs(q * 4 - 4);
-                    ArrayList<Unit> updateUnits = model.getPlayers()[q].getUnits();
+                for (int playerIndex = 0; playerIndex < 2; playerIndex++) {
+                    int defendingPlayer = Math.abs(playerIndex * 4 - 4);
+                    ArrayList<Unit> updateUnits = model.getPlayers()[playerIndex].getUnits();
                     for (Unit u : updateUnits) {
-                        if (q == 0) {
-                            player1distances.add(u.getDistance());
+                        if (playerIndex == 0) {
+                            player1Distances.add(u.getDistance());
                         } else {
-                            player2distances.add(u.getDistance());
+                            player2Distances.add(u.getDistance());
                         }
-                        int minWayDiff = 10000;
-                        ArrayList<Node> bestway = new ArrayList<>();
+                        int minWayDifficulty = 10000;
+                        ArrayList<Node> bestWayNode = new ArrayList<>();
 
-                        for (int i = 0; i < 4; i++) {
-                            ArrayList<String> wayString = model.getPlayers()[q].findWay(u.getX() / (model.getSize() / 30),
-                                    u.getY() / (model.getSize() / 30), model.getCastleCoordinates()[i + defender][0],
-                                    model.getCastleCoordinates()[i + defender][1], model.getPlayers()[q].getDifficulty(model, u.getType(), q));
-
-                            if (minWayDiff > model.wayDiff(q, wayString, u.getType())) {
-                                bestway = model.getPlayers()[q].convertWay(wayString);
-                                minWayDiff = model.wayDiff(q, wayString, u.getType());
-
+                        for (int castleCoordinateIndex = 0; castleCoordinateIndex < 4; castleCoordinateIndex++) {
+                            Player actualPlayer=model.getPlayers()[playerIndex];
+                            ArrayList<String> bestWayString = actualPlayer.findBestWay(u.getX() / fieldSize, u.getY() / fieldSize, 
+                                    model.getCastleCoordinates()[castleCoordinateIndex + defendingPlayer][0],
+                                    model.getCastleCoordinates()[castleCoordinateIndex + defendingPlayer][1], actualPlayer.getDifficulty(model, u.getType(), playerIndex));
+                            int actualWayDifficulty=model.wayDifficulty(playerIndex, actualPlayer.convertWay(bestWayString), u.getType());
+                            if (minWayDifficulty > actualWayDifficulty) {
+                                minWayDifficulty =  actualWayDifficulty;
+                                bestWayNode=actualPlayer.convertWay(bestWayString);
                             }
                         }
-                        if (!bestway.isEmpty()) {
-                            u.setWay(bestway);
+                        if (!bestWayNode.isEmpty()) {
+                            u.setWay(bestWayNode);
                         }
-
-                        model.getPlayers()[q].setUnits(updateUnits);
+                        model.getPlayers()[playerIndex].setUnits(updateUnits);
                     }
-
                 }
             }
 
-            ticks--;
+            timerTicks--;
 
-            int newtime = (ticks + 1) / 2;
-            if (newtime == 0) {
+            int newTimerTicks = (timerTicks + 1) / 2;
+            if (newTimerTicks == 0) {
                 newRound();
             } else {
-                timeAndRoundLabel.setText("Time left: " + (ticks + 1) / (1000 / timerInterval)
+                timeAndRoundLabel.setText("Time left: " + (timerTicks + 1) / (1000 / timerInterval)
                         + " sec // Round: " + (model.getRound() + 1) / 2);
             }
             board.repaint();
@@ -395,136 +406,136 @@ public class GameWindow extends JPanel implements ActionListener {
     }
 
     public boolean simulation() {
-        //first the units move
+        //először az egységek mozognak
 
         boolean moreDistance = false;
         boolean isOver = false;
-        for (int q = 0; q < 2; q++) {
-            if (!model.getPlayers()[q].getUnits().isEmpty()) {
-                ArrayList<Unit> units = model.getPlayers()[q].getUnits();
-                for (int i = 0; i < units.size(); i++) {
-                    if (q == 0) {
-                        if (player1distances.get(i) <= 0) {
+        for (int playerIndex = 0; playerIndex < 2; playerIndex++) {
+            if (!model.getPlayers()[playerIndex].getUnits().isEmpty()) {
+                ArrayList<Unit> units = model.getPlayers()[playerIndex].getUnits();
+                for (int unitIndex = 0; unitIndex < units.size(); unitIndex++) {
+                    if (playerIndex == 0) {
+                        if (player1Distances.get(unitIndex) <= 0) {
                             continue;
                         }
                     } else {
-                        if (player2distances.get(i) <= 0) {
+                        if (player2Distances.get(unitIndex) <= 0) {
                             continue;
                         }
                     }
 
-                    if (!units.get(i).getWay().isEmpty()) {
-                        ArrayList<Node> way = units.get(i).getWay();
-                        //System.out.println("simulation bestway: " + way);
-                        Node next = way.get(0);
-                        units.get(i).setX(next.getX() * (model.getSize() / 30));
-                        units.get(i).setY(next.getY() * (model.getSize() / 30));
+                    if (units.get(unitIndex).getWay()!=null&&!units.get(unitIndex).getWay().isEmpty()) {
+                        ArrayList<Node> unitWay = units.get(unitIndex).getWay();
+                        Node next = unitWay.get(0);
+                        units.get(unitIndex).setX(next.getX() * fieldSize);
+                        units.get(unitIndex).setY(next.getY() * fieldSize);
                         board.repaint();
-                        way.remove(0);
-                        units.get(i).setWay(way);
+                        unitWay.remove(0);
+                        units.get(unitIndex).setWay(unitWay);
                     }
 
-                    if (q == 0) {
-                        player1distances.set(i, player1distances.get(i) - 1);
-                        if (player1distances.get(i) > 0) {
+                    if (playerIndex == 0) {
+                        player1Distances.set(unitIndex, player1Distances.get(unitIndex) - 1);
+                        if (player1Distances.get(unitIndex) > 0) {
                             moreDistance = true;
                         }
                     } else {
-                        player2distances.set(i, player2distances.get(i) - 1);
-                        if (player2distances.get(i) > 0) {
+                        player2Distances.set(unitIndex, player2Distances.get(unitIndex) - 1);
+                        if (player2Distances.get(unitIndex) > 0) {
                             moreDistance = true;
                         }
                     }
-
-                    //then fighter deal damage to enemy units if they are in the same position
-                    ArrayList<Unit> enemyUnitsNearby = model.enemyUnitsNearby(q, units.get(i));
-                    if ("Fighter".equals(units.get(i).getType()) && enemyUnitsNearby.size() > 0) {
-                        int rand = (int) (Math.random() * enemyUnitsNearby.size());
-                        units.get(i).setBlood(true);
-                        if (enemyUnitsNearby.get(rand).getHp() > units.get(i).getPower()) {
-                            enemyUnitsNearby.get(rand).setHp(enemyUnitsNearby.get(rand).getHp() - units.get(i).getPower());
-                            if (units.get(i).getHp() > enemyUnitsNearby.get(rand).getPower() && "Fighter".equals(enemyUnitsNearby.get(rand).getType())) {
-                                units.get(i).setHp(units.get(i).getHp() - enemyUnitsNearby.get(rand).getPower());
-                            } else if ("Fighter".equals(enemyUnitsNearby.get(rand).getType())) {
-                                model.getPlayers()[q].deleteUnit(units.get(i));
-                                model.getPlayers()[Math.abs(q - 1)].setMoney(model.getPlayers()[Math.abs(q - 1)].getMoney() + units.get(i).getMaxHp() * 2);
+                    //Fighter sebzi az elhaladó ellenséges egységeket, ha azonos mezőre értek
+                    ArrayList<Unit> enemyUnitsNearby = model.enemyUnitsNearby(playerIndex, units.get(unitIndex));
+                    if ("Fighter".equals(units.get(unitIndex).getType()) && enemyUnitsNearby.size() > 0) {
+                        int randomEnemyUnit = (int) (Math.random() * enemyUnitsNearby.size());
+                        units.get(unitIndex).setBlood(true);
+                        if (enemyUnitsNearby.get(randomEnemyUnit).getHp() > units.get(unitIndex).getPower()) {
+                            enemyUnitsNearby.get(randomEnemyUnit).setHp(enemyUnitsNearby.get(randomEnemyUnit).getHp() - units.get(unitIndex).getPower());
+                            if (units.get(unitIndex).getHp() > enemyUnitsNearby.get(randomEnemyUnit).getPower() && "Fighter".equals(enemyUnitsNearby.get(randomEnemyUnit).getType())) {
+                                units.get(unitIndex).setHp(units.get(unitIndex).getHp() - enemyUnitsNearby.get(randomEnemyUnit).getPower());
+                            } else if ("Fighter".equals(enemyUnitsNearby.get(randomEnemyUnit).getType())) {
+                                model.getPlayers()[playerIndex].deleteUnit(units.get(unitIndex));
+                                model.getPlayers()[Math.abs(playerIndex - 1)].setMoney(model.getPlayers()[Math.abs(playerIndex - 1)].getMoney() + units.get(unitIndex).getMaxHp() * 2);
                             }
                         } else {
-                            model.getPlayers()[q].setMoney(model.getPlayers()[q].getMoney() + enemyUnitsNearby.get(rand).getMaxHp() * 2);
-                            if (units.get(i).getHp() > enemyUnitsNearby.get(rand).getPower() && "Fighter".equals(enemyUnitsNearby.get(rand).getType())) {
-                                units.get(i).setHp(units.get(i).getHp() - enemyUnitsNearby.get(rand).getPower());
-                            } else if ("Fighter".equals(enemyUnitsNearby.get(rand).getType())) {
-                                model.getPlayers()[q].deleteUnit(units.get(i));
-                                model.getPlayers()[Math.abs(q - 1)].setMoney(model.getPlayers()[Math.abs(q - 1)].getMoney() + units.get(i).getMaxHp() * 2);
+                            model.getPlayers()[playerIndex].setMoney(model.getPlayers()[playerIndex].getMoney() + enemyUnitsNearby.get(randomEnemyUnit).getMaxHp() * 2);
+                            if (units.get(unitIndex).getHp() > enemyUnitsNearby.get(randomEnemyUnit).getPower() && "Fighter".equals(enemyUnitsNearby.get(randomEnemyUnit).getType())) {
+                                units.get(unitIndex).setHp(units.get(unitIndex).getHp() - enemyUnitsNearby.get(randomEnemyUnit).getPower());
+                            } else if ("Fighter".equals(enemyUnitsNearby.get(randomEnemyUnit).getType())) {
+                                model.getPlayers()[playerIndex].deleteUnit(units.get(unitIndex));
+                                model.getPlayers()[Math.abs(playerIndex - 1)].setMoney(model.getPlayers()[Math.abs(playerIndex - 1)].getMoney() + units.get(unitIndex).getMaxHp() * 2);
                             }
-                            model.getPlayers()[(q + 1) % 2].deleteUnit(enemyUnitsNearby.get(rand));
+                            model.getPlayers()[(playerIndex + 1) % 2].deleteUnit(enemyUnitsNearby.get(randomEnemyUnit));
                         }
                     }
 
-                    ArrayList<Tower> towersNearby = model.towersNearby(q, units.get(i));
-                    //System.out.println(towersNearby.toString());
+                    ArrayList<Tower> towersNearby = model.towersNearby(playerIndex, units.get(unitIndex));
 
-                    //then destroyer attacks 
-                    if ("Destroyer".equals(units.get(i).getType()) && towersNearby.size() > 0) {
-                        int rand = (int) (Math.random() * 2); //the chance to attack towers is 50%
-                        if(RNDPROTECTION != 0) rand = RNDPROTECTION;
-                        //destroyer attacks nearby towers with 50% chance (direct next to it) with full power, then disappears
-                        if (rand == 1) {
-                            //destroyer deals 50 damage when attacking towers, removes towers if their hp reaches 0
-                            for (int j = 0; j < towersNearby.size(); j++) {
-                                
-                                if(towersNearby.get(j).getDemolishedIn() != -1) continue;
+                    //Destroyer támadja a mellette lévő tornyot
+                    if ("Destroyer".equals(units.get(unitIndex).getType()) && towersNearby.size() > 0) {
+                        int attackTower = (int) (Math.random() * 2); //a támadás esélye 50% (randomizált)
+                        if (RNDPROTECTION != 0) {
+                            attackTower = RNDPROTECTION;
+                        }
+                        if (attackTower == 1) {
+                            //Destroyer 50-et sebez a toronyba, majd mesemmisül
+                            for (int towerIndex = 0; towerIndex < towersNearby.size(); towerIndex++) {
 
-                                if (towersNearby.get(j).getHp() > 50) {
-                                    towersNearby.get(j).setHp(towersNearby.get(j).getHp() - 50);
-                                    int index = model.getPlayers()[Math.abs(q - 1)].getTowerIndex(towersNearby.get(j));
-                                    if (index != -1) {
-                                        model.getPlayers()[Math.abs(q - 1)].getTowers().get(index).setExploded(true);
+                                if (towersNearby.get(towerIndex).getDemolishedIn() != -1) {
+                                    continue;
+                                }
+
+                                if (towersNearby.get(towerIndex).getHp() > 50) {
+                                    towersNearby.get(towerIndex).setHp(towersNearby.get(towerIndex).getHp() - 50);
+                                    int towerToDemolishIndex = model.getPlayers()[Math.abs(playerIndex - 1)].getTowerIndex(towersNearby.get(towerIndex));
+                                    if (towerToDemolishIndex != -1) {
+                                        model.getPlayers()[Math.abs(playerIndex - 1)].getTowers().get(towerToDemolishIndex).setExploded(true);
                                     }
-                                    model.getPlayers()[q].deleteUnit(units.get(i));
+                                    model.getPlayers()[playerIndex].deleteUnit(units.get(unitIndex));
                                     break;
-                                } else if (towersNearby.get(j).getHp() > 0) {
-                                    towersNearby.get(j).setHp(0);
-                                    towersNearby.get(j).setPower(0);
-                                    towersNearby.get(j).setRange(0);
-                                    towersNearby.get(j).setAttack_speed(0);
-                                    model.getPlayers()[(q + 1) % 2].demolish(towersNearby.get(j).getX() / (model.getSize() / 30),
-                                            towersNearby.get(j).getY() / (model.getSize() / 30), model.getSize(), 'T');
-                                    model.getPlayers()[q].setMoney(model.getPlayers()[q].getMoney() + towersNearby.get(j).getMaxHp() * 3);
-                                    int index = model.getPlayers()[q].getTowerIndex(towersNearby.get(j));
+                                } else if (towersNearby.get(towerIndex).getHp() > 0) //torony megsemmisül
+                                {
+                                    towersNearby.get(towerIndex).setHp(0);
+                                    towersNearby.get(towerIndex).setPower(0);
+                                    towersNearby.get(towerIndex).setRange(0);
+                                    towersNearby.get(towerIndex).setAttackFrequency(0);
+                                    model.getPlayers()[(playerIndex + 1) % 2].demolish(towersNearby.get(towerIndex).getX() / fieldSize,
+                                            towersNearby.get(towerIndex).getY() / fieldSize, model.getBoardSize());
+                                    model.getPlayers()[playerIndex].setMoney(model.getPlayers()[playerIndex].getMoney() + towersNearby.get(towerIndex).getMaxHp() * 3);
+                                    int towerToDemolishIndex = model.getPlayers()[playerIndex].getTowerIndex(towersNearby.get(towerIndex));
 
-                                    if (index != -1) { model.getPlayers()[q].getTowers().get(index).setExploded(true); }
-
-                                    model.getPlayers()[q].deleteUnit(units.get(i));
+                                    if (towerToDemolishIndex != -1) {
+                                        model.getPlayers()[playerIndex].getTowers().get(towerToDemolishIndex).setExploded(true);
+                                    }
+                                    model.getPlayers()[playerIndex].deleteUnit(units.get(unitIndex));
                                     break;
                                 }
                             }
                         }
                     }
                     board.repaint();
-                    startAnimation();
                 }
             }
 
-            Player currentPlayer = model.getPlayers()[q];
+            Player currentPlayer = model.getPlayers()[playerIndex];
             ArrayList<Unit> currentPlayerUnits = currentPlayer.getUnits();
-            Player enemyPlayer = model.getPlayers()[Math.abs(q - 1)];
-            
-            for (int i = 0; i < currentPlayerUnits.size();) {
-                Unit cpu = currentPlayerUnits.get(i);
-                //ArrayList<Node> way = cpu.getWay();
-                if (model.isItEnemyCastleCoordinate(q, cpu.getX() / (model.getSize() / 30), cpu.getY() / (model.getSize() / 30))) {
+            Player enemyPlayer = model.getPlayers()[Math.abs(playerIndex - 1)];
+
+            for (int unitIndex = 0; unitIndex < currentPlayerUnits.size();) {
+                Unit cpu = currentPlayerUnits.get(unitIndex);
+                if (model.isItEnemyCastleCoordinate(playerIndex, cpu.getX() / fieldSize, cpu.getY() / fieldSize)) {
                     if (enemyPlayer.getCastle().getHp() - cpu.getPower() > 0) {
                         enemyPlayer.getCastle().setHp(enemyPlayer.getCastle().getHp() - cpu.getPower());
                     } else {
                         enemyPlayer.getCastle().setHp(0);
                         isOver = true;
                     }
-                    model.getPlayers()[q].deleteUnit(cpu);
+                    model.getPlayers()[playerIndex].deleteUnit(cpu);
                     board.repaint();
-                    //remove units who reached Castle after dealing damage to it
+                    //egységek sebzik a kastélyt miután beértek, majd megsemmisülnek
                 } else {
-                    i++;
+                    unitIndex++;
                 }
             }
         }
@@ -532,131 +543,50 @@ public class GameWindow extends JPanel implements ActionListener {
         if (isOver) {
             simulationTime = false;
             board.repaint();
-            if(!testMode)
+            if (!testMode) {
                 gameOver();
+            }
         }
 
         return moreDistance;
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-
-    }
-
-    public void startAnimation() {
-        if (animationTimer == null) {
-            current = 0;
-            animationTimer = new Timer(250, e -> timerActionPerformed(e));
-            animationTimer.start();
-        } else if (!animationTimer.isRunning()) {
-            animationTimer.restart();
-        }
-    }
-
-    private void timerActionPerformed(ActionEvent e) {
-        // TODO repeated code goes here
-    }
-
-    public void towerPlaceAction(String sc) {
+    public void towerPlaceAction(String towerType) {
         if (!buttonAction.equals("")) {
             buttonAction = "";
             model.setSelectables(new ArrayList<>());
         } else {
-            selectedTower = sc;
+            selectedTower = towerType;
             buttonAction = "placeTower";
             model.setSelectables();
         }
     }
 
-    //helper
-    private void showWays() {
-        System.out.print("p1: ");
-        for (Unit u : model.getPlayers()[0].getUnits()) {
-            System.out.println(u.getWay());
-        }
-        System.out.print("p2: ");
-        for (Unit u : model.getPlayers()[1].getUnits()) {
-            System.out.println(u.getWay());
-        }
-    }
-
-    private void printDiffMatrices() {
-        ArrayList<Unit> units1 = model.getPlayers()[0].getUnits();
-        ArrayList<Unit> units2 = model.getPlayers()[1].getUnits();
-        for (Unit u : units1) {
-            int diffM[][] = model.getPlayers()[0].getDifficulty(model, u.getType(), 0);
-            for (int i = 0; i < 30; i++) {
-                for (int j = 0; j < 30; j++) {
-                    System.out.print(diffM[i][j] + " ");
-                }
-                System.out.println();
-            }
-            System.out.println();
-        }
-
-        for (Unit u : units2) {
-            int diffM[][] = model.getPlayers()[1].getDifficulty(model, u.getType(), 1);
-            for (int i = 0; i < 30; i++) {
-                for (int j = 0; j < 30; j++) {
-                    System.out.print(diffM[i][j] + " ");
-                }
-                System.out.println();
-            }
-            System.out.println();
-        }
-    }
-
-    private void printWayDiff() {
-        ArrayList<Unit> units1 = model.getPlayers()[0].getUnits();
-
-        ArrayList<Unit> units2 = model.getPlayers()[1].getUnits();
-        for (Unit u : units1) {
-            ArrayList<Node> way = u.getWay();
-            int diffM[][] = model.getPlayers()[0].getDifficulty(model, u.getType(), 0);
-            for (Node n : way) {
-                System.out.print(diffM[n.getX()][n.getY()] + ", ");
-            }
-            System.out.println();
-        }
-
-        for (Unit u : units2) {
-            ArrayList<Node> way = u.getWay();
-            int diffM[][] = model.getPlayers()[1].getDifficulty(model, u.getType(), 1);
-            for (Node n : way) {
-                System.out.print(diffM[n.getX()][n.getY()] + ", ");
-            }
-            System.out.println();
-        }
-    }
-
-    /**
-     * now it's the other player's round both players get 100 coins after every
-     * 2 rounds, the simulation starts
-     */
+    //játékosok körönként váltják egymást, minden szimuláció 2 körönként történik - ezután kap mindkét játékos 100-100 aranyat
     public void newRound() {
         model.setSelectables(new ArrayList<>());
         model.setRound(model.getRound() + 1);
 
         if (model.getRound() == 1 || model.getRound() == 2) {
-            ticks = (1000 / timerInterval) * 60;
+            timerTicks = (1000 / timerInterval) * 60;
         } else {
-            ticks = (1000 / timerInterval) * 30;
+            timerTicks = (1000 / timerInterval) * 30;
         }
 
         model.setActivePlayer((1 + model.getActivePlayer()) % 2);
+        repaint();
         playerDataUpdate();
         activePlayerPanelSetter();
 
         if (model.getRound() % 2 == 1) {
-            for (int i = 0; i < 5; i++) {
-                p1TowerButtons[i].setEnabled(false);
-                p1UnitButtons[i].setEnabled(false);
-                p2TowerButtons[i].setEnabled(false);
-                p2UnitButtons[i].setEnabled(false);
+            for (int buttonIndex = 0; buttonIndex < 5; buttonIndex++) {
+                player1TowerButtons[buttonIndex].setEnabled(false);
+                player1UnitButtons[buttonIndex].setEnabled(false);
+                player2TowerButtons[buttonIndex].setEnabled(false);
+                player2UnitButtons[buttonIndex].setEnabled(false);
             }
             newRoundButton.setEnabled(false);
-            simulationticks = 0;
+            simulationTicks = 0;
             simulationTime = true;
 
             model.getPlayers()[0].setMoney(model.getPlayers()[0].getMoney() + 100);
@@ -665,54 +595,56 @@ public class GameWindow extends JPanel implements ActionListener {
 
         }
 
-        ArrayList<Tower> p1Towers = model.getPlayers()[0].getTowers();
-        for (int i = p1Towers.size() - 1; i >= 0; i--) {
-            if (p1Towers.get(i).getDemolishedIn() != -1) {
-                p1Towers.get(i).setDemolishedIn(1);//demolishedIn - 1
-                if (p1Towers.get(i).getDemolishedIn() == 0) {
-                    model.getTerrain().remove(p1Towers.get(i));
-                    model.getPosition()[(p1Towers.get(i).getX() / 30)][(p1Towers.get(i).getY() / 30)] = 'F';
-                    p1Towers.remove(i);
+        ArrayList<Tower> player1Towers = model.getPlayers()[0].getTowers();
+        for (int towerIndex = player1Towers.size() - 1; towerIndex >= 0; towerIndex--) {
+            if (player1Towers.get(towerIndex).getDemolishedIn() != -1) {
+                player1Towers.get(towerIndex).setDemolishedIn(1);//demolishedIn - 1
+                if (player1Towers.get(towerIndex).getDemolishedIn() == 0) {
+                    model.getTerrain().remove(player1Towers.get(towerIndex));
+                    model.setPosition(player1Towers.get(towerIndex).getX() / 30,player1Towers.get(towerIndex).getY() / 30, 'F');
+                    player1Towers.remove(towerIndex);
                 }
             }
         }
 
-        model.getPlayers()[0].setTowers(p1Towers);
-        ArrayList<Tower> p2Towers = model.getPlayers()[1].getTowers();
-        for (int i = p2Towers.size() - 1; i >= 0; i--) {
-            if (p2Towers.get(i).getDemolishedIn() != -1) {
-                p2Towers.get(i).setDemolishedIn(1);//demolishedIn - 1
-                if (p2Towers.get(i).getDemolishedIn() == 0) {
-                    model.getTerrain().remove(p2Towers.get(i));
-                    model.getPosition()[(p2Towers.get(i).getX() / 30)][(p2Towers.get(i).getY() / 30)] = 'F';
-                    p2Towers.remove(i);
+        model.getPlayers()[0].setTowers(player1Towers);
+        ArrayList<Tower> player2Towers = model.getPlayers()[1].getTowers();
+        for (int towerIndex = player2Towers.size() - 1; towerIndex >= 0; towerIndex--) {
+            if (player2Towers.get(towerIndex).getDemolishedIn() != -1) {
+                player2Towers.get(towerIndex).setDemolishedIn(1);//demolishedIn - 1
+                if (player2Towers.get(towerIndex).getDemolishedIn() == 0) {
+                    model.getTerrain().remove(player2Towers.get(towerIndex));
+                     model.setPosition(player2Towers.get(towerIndex).getX() / 30,player2Towers.get(towerIndex).getY() / 30, 'F');
+                    player2Towers.remove(towerIndex);
                 }
             }
         }
-        model.getPlayers()[1].setTowers(p2Towers);
+        model.getPlayers()[1].setTowers(player2Towers);
     }
 
-    public void gameOver() {
-        JFrame f = new JFrame();
+    public void gameOver() //játék végén felugró üzenet
+    {
+        JFrame newFrame = new JFrame();
         if (model.getPlayers()[0].getCastle().getHp() == 0 && model.getPlayers()[1].getCastle().getHp() == 0) {
-            JOptionPane.showMessageDialog(f, "The game ended in a draw.");
+            JOptionPane.showMessageDialog(newFrame, "The game ended in a draw.");
         } else {
             if (model.getPlayers()[0].getCastle().getHp() == 0) {
-                JOptionPane.showMessageDialog(f, model.getPlayers()[0].getName() + " won, congratulations!", "Game Over", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(newFrame, model.getPlayers()[0].getName() + " won, congratulations!", "Game Over", JOptionPane.INFORMATION_MESSAGE);
             } else {
-                JOptionPane.showMessageDialog(f, model.getPlayers()[1].getName() + " won, congratulations!", "Game Over", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(newFrame, model.getPlayers()[1].getName() + " won, congratulations!", "Game Over", JOptionPane.INFORMATION_MESSAGE);
             }
         }
         System.exit(0);
     }
 
-    public void saveGame() {
+    public void saveGame() //játék mentése txt fájlba
+    {
         String filename;
         filename = JOptionPane.showInputDialog("Filename:");
         if (filename == null || filename.length() == 0) {
             return;
         }
-        model.saveData(filename, ticks);
+        model.saveData(filename, timerTicks);
     }
 
     /**
@@ -722,15 +654,16 @@ public class GameWindow extends JPanel implements ActionListener {
     protected void paintComponent(Graphics grph) {
         super.paintComponent(grph);
         Graphics2D grphcs2 = (Graphics2D) grph;
-        
+        grph.drawImage(new ImageIcon("src/res/StartScreen Background.png").getImage(), 0, 0, 1920, 1080, null);
+
         Color sandBrown = new Color(210, 180, 140);
         Color lightGray = new Color(214, 196, 194);
-        Color cinnabar = new Color(227,66,52);      //red: ON round
-        Color pastelRed = new Color(255,105,97);    //red: NOT ON round
-        Color royalBlue = new Color(65,105,225);    //blue: ON round
-        Color blueGray = new Color(102,153,204);    //blue: NOT ON round
+        Color cinnabar = new Color(227, 66, 52);      //red: ON round
+        Color pastelRed = new Color(255, 105, 97);    //red: NOT ON round
+        Color royalBlue = new Color(65, 105, 225);    //blue: ON round
+        Color blueGray = new Color(102, 153, 204);    //blue: NOT ON round
         Color darkHoneyBrown = new Color(184, 151, 128);
-        
+
         //1st layer UI (bottom)
         grph.setColor(Color.DARK_GRAY);
         grphcs2.fillRoundRect(27, 113, 437, 891, 25, 25);   //left
@@ -738,9 +671,9 @@ public class GameWindow extends JPanel implements ActionListener {
         grphcs2.fillRoundRect(480, 10, 959, 1062, 22, 22);  //center
         grphcs2.fillRoundRect(27, 23, 437, 70, 25, 25);     //save
         grphcs2.fillRoundRect(1456, 23, 437, 70, 25, 25);   //exit
-        
+
         //2nd layer UI (middle - coloring)
-        if(model.getActivePlayer() == 0){
+        if (model.getActivePlayer() == 0) {
             grph.setColor(royalBlue);
             grphcs2.fillRoundRect(35, 121, 421, 875, 25, 25);   //left
             grph.setColor(pastelRed);
@@ -754,8 +687,8 @@ public class GameWindow extends JPanel implements ActionListener {
         grph.setColor(sandBrown);
         grphcs2.fillRoundRect(34, 30, 423, 56, 22, 22);     //save
         grphcs2.fillRoundRect(1463, 30, 423, 56, 22, 22);   //exit
-        grphcs2.fillRoundRect(489, 18, 942, 985 , 22, 22);  //center
-        
+        grphcs2.fillRoundRect(489, 18, 942, 985, 22, 22);  //center
+
         //3rd layer UI (top)
         grph.setColor(Color.DARK_GRAY);
         grphcs2.fillRoundRect(41, 126, 408, 865, 22, 22);   //left
@@ -772,87 +705,87 @@ public class GameWindow extends JPanel implements ActionListener {
         Color veryLightGray = new Color(220, 220, 220);
         Color transp = new Color(1f, 0f, 0f, .5f);
 
-        JPanel p1Panel          = new JPanel(); //whole panel
-        JPanel p1Stats          = new JPanel(); //legfelső (name/cas hp/money)
-        JPanel p1TwrLabelRow    = new JPanel(); //tower text
-        JPanel p1TwrOptRow      = new JPanel(); //tower button options
-        JPanel p1TwrManLabelRow = new JPanel(); //tower management text
-        JPanel p1TwrManOptRow   = new JPanel(); //tower management button options
-        JPanel p1UnitLabelRow   = new JPanel(); //unit text
-        JPanel p1UnitOptRow     = new JPanel(); //unit button options
+        JPanel player1Panel = new JPanel(); //whole panel
+        JPanel player1Stats = new JPanel(); //legfelső (name/cas hp/money)
+        JPanel player1TwrLabelRow = new JPanel(); //tower text
+        JPanel player1TowerOptionRow = new JPanel(); //tower button options
+        JPanel player1TwrManLabelRow = new JPanel(); //tower management text
+        JPanel player1TowerManagementOptionRow = new JPanel(); //tower management button options
+        JPanel player1UnitLabelRow = new JPanel(); //unit text
+        JPanel player1UnitOptRow = new JPanel(); //unit button options
 
-        p1Data = new JLabel();
-        JLabel p1Twr        = new JLabel("Towers");
-        JLabel p1FortStat   = new JLabel("200 coins");
-        JLabel p1RapStat    = new JLabel("250 coins");
-        JLabel p1SnipStat   = new JLabel("300 coins");
-        JLabel p1TwrMan     = new JLabel("Tower Management");
-        JLabel p1UnitLab    = new JLabel("Units");
-        JLabel p1GenStat    = new JLabel("20 coins");
-        JLabel p1DivStat    = new JLabel("30 coins");
-        JLabel p1ClimStat   = new JLabel("30 coins");
-        JLabel p1FigStat    = new JLabel("30 coins");
-        JLabel p1DesStat    = new JLabel("30 coins");
+        player1Data = new JLabel();
+        JLabel player1Twr = new JLabel("Towers");
+        JLabel player1FortStat = new JLabel("200 coins");
+        JLabel player1RapStat = new JLabel("250 coins");
+        JLabel player1SnipStat = new JLabel("300 coins");
+        JLabel player1TwrMan = new JLabel("Tower Management");
+        JLabel player1UnitLab = new JLabel("Units");
+        JLabel player1GenStat = new JLabel("20 coins");
+        JLabel player1DivStat = new JLabel("20 coins");
+        JLabel player1ClimStat = new JLabel("20 coins");
+        JLabel player1FigStat = new JLabel("40 coins");
+        JLabel player1DesStat = new JLabel("40 coins");
 
-        JPanel p2Panel          = new JPanel();
-        JPanel p2Stats          = new JPanel();
-        JPanel p2TwrLabelRow    = new JPanel();
-        JPanel p2TwrOptRow      = new JPanel();
-        JPanel p2TwrManLabelRow = new JPanel();
-        JPanel p2TwrManOptRow   = new JPanel();
-        JPanel p2UnitLabelRow   = new JPanel();
-        JPanel p2UnitOptRow     = new JPanel();
+        JPanel player2Panel = new JPanel();
+        JPanel player2Stats = new JPanel();
+        JPanel player2TwrLabelRow = new JPanel();
+        JPanel player2TowerOptionRow = new JPanel();
+        JPanel player2TwrManLabelRow = new JPanel();
+        JPanel player2TowerManagementOptionRow = new JPanel();
+        JPanel player2UnitLabelRow = new JPanel();
+        JPanel player2UnitOptRow = new JPanel();
 
-        p2Data = new JLabel();
-        JLabel p2Twr        = new JLabel("Towers");
-        JLabel p2FortStat   = new JLabel("200 coins");
-        JLabel p2RapStat    = new JLabel("250 coins");
-        JLabel p2SnipStat   = new JLabel("300 coins");
-        JLabel p2TwrMan     = new JLabel("Tower Management");
-        JLabel p2UnitLab    = new JLabel("Units");
-        JLabel p2GenStat    = new JLabel("20 coins");
-        JLabel p2DivStat    = new JLabel("30 coins");
-        JLabel p2ClimStat   = new JLabel("30 coins");
-        JLabel p2FigStat    = new JLabel("30 coins");
-        JLabel p2DesStat    = new JLabel("30 coins");
+        player2Data = new JLabel();
+        JLabel player2Twr = new JLabel("Towers");
+        JLabel player2FortStat = new JLabel("200 coins");
+        JLabel player2RapStat = new JLabel("250 coins");
+        JLabel player2SnipStat = new JLabel("300 coins");
+        JLabel player2TwrMan = new JLabel("Tower Management");
+        JLabel player2UnitLab = new JLabel("Units");
+        JLabel player2GenStat = new JLabel("20 coins");
+        JLabel player2DivStat = new JLabel("20 coins");
+        JLabel player2ClimStat = new JLabel("20 coins");
+        JLabel player2FigStat = new JLabel("40 coins");
+        JLabel player2DesStat = new JLabel("40 coins");
 
         playerDataUpdate();
 
-        p1TowerButtons[0] = new JButton("Fortified");
-        p1TowerButtons[1] = new JButton("Rapid");
-        p1TowerButtons[2] = new JButton("Sniper");
-        p1TowerButtons[3] = new JButton("Upgrade");
-        p1TowerButtons[4] = new JButton("Demolish");
-        p1UnitButtons[0] = new JButton("General");
-        p1UnitButtons[1] = new JButton("Fighter");
-        p1UnitButtons[2] = new JButton("Climber");
-        p1UnitButtons[3] = new JButton("Diver");
-        p1UnitButtons[4] = new JButton("Destroyer");
+        player1TowerButtons[0] = new JButton("Fortified");
+        player1TowerButtons[1] = new JButton("Rapid");
+        player1TowerButtons[2] = new JButton("Sniper");
+        player1TowerButtons[3] = new JButton("Upgrade");
+        player1TowerButtons[4] = new JButton("Demolish");
+        player1UnitButtons[0] = new JButton("General");
+        player1UnitButtons[1] = new JButton("Fighter");
+        player1UnitButtons[2] = new JButton("Climber");
+        player1UnitButtons[3] = new JButton("Diver");
+        player1UnitButtons[4] = new JButton("Destroyer");
 
-        p2TowerButtons[0] = new JButton("Fortified");
-        p2TowerButtons[1] = new JButton("Rapid");
-        p2TowerButtons[2] = new JButton("Sniper");
-        p2TowerButtons[3] = new JButton("Upgrade");
-        p2TowerButtons[4] = new JButton("Demolish");
-        p2UnitButtons[0] = new JButton("General");
-        p2UnitButtons[1] = new JButton("Fighter");
-        p2UnitButtons[2] = new JButton("Climber");
-        p2UnitButtons[3] = new JButton("Diver");
-        p2UnitButtons[4] = new JButton("Destroyer");
+        player2TowerButtons[0] = new JButton("Fortified");
+        player2TowerButtons[1] = new JButton("Rapid");
+        player2TowerButtons[2] = new JButton("Sniper");
+        player2TowerButtons[3] = new JButton("Upgrade");
+        player2TowerButtons[4] = new JButton("Demolish");
+        player2UnitButtons[0] = new JButton("General");
+        player2UnitButtons[1] = new JButton("Fighter");
+        player2UnitButtons[2] = new JButton("Climber");
+        player2UnitButtons[3] = new JButton("Diver");
+        player2UnitButtons[4] = new JButton("Destroyer");
 
         this.setBackground(algaeGreen);
 
-        //p1 panels
-        p1Panel.setLayout(new GridBagLayout());
-        p1TwrOptRow.setLayout(new GridBagLayout());
-        p1TwrManOptRow.setLayout(new GridBagLayout());
-        p1UnitOptRow.setLayout(new GridBagLayout());
+        //player1 panels
+        player1Panel.setLayout(new GridBagLayout());
+        player1TowerOptionRow.setLayout(new GridBagLayout());
+        player1TowerManagementOptionRow.setLayout(new GridBagLayout());
+        player1UnitOptRow.setLayout(new GridBagLayout());
 
-        //p2 panels
-        p2Panel.setLayout(new GridBagLayout());
-        p2TwrOptRow.setLayout(new GridBagLayout());
-        p2TwrManOptRow.setLayout(new GridBagLayout());
-        p2UnitOptRow.setLayout(new GridBagLayout());
+        //player2 panels
+        player2Panel.setLayout(new GridBagLayout());
+        player2TowerOptionRow.setLayout(new GridBagLayout());
+        player2TowerManagementOptionRow.setLayout(new GridBagLayout());
+        player2UnitOptRow.setLayout(new GridBagLayout());
 
         //Elhelyezés
         GridBagConstraints gbc = new GridBagConstraints();
@@ -875,8 +808,7 @@ public class GameWindow extends JPanel implements ActionListener {
         gbc.gridx = 1;
         gbc.gridy = 1;
         this.add(board, gbc);
-        
-        
+
         /**
          * Save game BUTTON
          */
@@ -921,476 +853,464 @@ public class GameWindow extends JPanel implements ActionListener {
         gbc.gridx = 1;
         gbc.gridy = 0;
         this.add(timeAndRoundLabel, gbc);
-        
+
         /**
-         * Player 1 UI - p1Panel MAIN
+         * Player 1 UI - player1Panel MAIN
          */
-        p1Panel.setPreferredSize(new Dimension(400, 858));
-        p1Panel.setBackground(Color.DARK_GRAY);
+        player1Panel.setPreferredSize(new Dimension(400, 858));
+        player1Panel.setBackground(Color.DARK_GRAY);
 
         //STATOK: név + pénz + kastély hp
-        p1Stats.add(p1Data);
-        p1Stats.setBackground(veryLightGray);
+        player1Stats.add(player1Data);
+        player1Stats.setBackground(veryLightGray);
 
-        p1Data.setPreferredSize(new Dimension(380, 72));
-        p1Data.setFont(new Font("Calibri", Font.PLAIN, 35));
-        p1Data.setBorder(new EmptyBorder(0, 5, 8, 0));
-        
+        player1Data.setPreferredSize(new Dimension(380, 72));
+        player1Data.setFont(new Font("Calibri", Font.PLAIN, 35));
+        player1Data.setBorder(new EmptyBorder(0, 5, 8, 0));
+
         gbl.insets = new Insets(-210, 0, 75, 0);   //-210, 0, 100, 0
         gbl.gridx = 0;
         gbl.gridy = 0;
-        p1Panel.add(p1Stats, gbl);
+        player1Panel.add(player1Stats, gbl);
 
-        
         //Tower LABEL
-        p1TwrLabelRow.add(p1Twr);
-        p1TwrLabelRow.setBorder(new EmptyBorder(8, -245, 0, 0));
-        p1TwrLabelRow.setBackground(veryLightGray);
-        p1TwrLabelRow.setPreferredSize(new Dimension(390, 60));
+        player1TwrLabelRow.add(player1Twr);
+        player1TwrLabelRow.setBorder(new EmptyBorder(8, -245, 0, 0));
+        player1TwrLabelRow.setBackground(veryLightGray);
+        player1TwrLabelRow.setPreferredSize(new Dimension(390, 60));
 
-        p1Twr.setFont(new Font("Calibri", Font.PLAIN, 40));
+        player1Twr.setFont(new Font("Calibri", Font.PLAIN, 40));
 
         gbl.insets = new Insets(-100, 0, 0, 0);
         gbl.gridx = 0;
         gbl.gridy = 1;
-        p1Panel.add(p1TwrLabelRow, gbl);
-        
-        
+        player1Panel.add(player1TwrLabelRow, gbl);
+
         //Tower BUTTONS
-        p1TowerButtons[0].setPreferredSize(new Dimension(180, 40)); //260, 40
-        p1TowerButtons[0].setFont(new Font("Calibri", Font.PLAIN, 25));
-        p1TowerButtons[0].setMargin(new Insets(8, 0, 0, 0));
-        p1TowerButtons[0].setFocusPainted(false);
+        player1TowerButtons[0].setPreferredSize(new Dimension(180, 40)); //260, 40
+        player1TowerButtons[0].setFont(new Font("Calibri", Font.PLAIN, 25));
+        player1TowerButtons[0].setMargin(new Insets(8, 0, 0, 0));
+        player1TowerButtons[0].setFocusPainted(false);
         gbtl.insets = new Insets(2, -170, 3, 0);    //2, -220, 3, 0
         gbtl.gridx = 0;
         gbtl.gridy = 0;
-        p1TwrOptRow.add(p1TowerButtons[0], gbtl);
-        
-        p1FortStat.setFont(new Font("Calibri", Font.PLAIN, 30));
+        player1TowerOptionRow.add(player1TowerButtons[0], gbtl);
+
+        player1FortStat.setFont(new Font("Calibri", Font.PLAIN, 30));
         gbtl.insets = new Insets(8, 12, 0, -180);
         gbtl.gridx = 1;
         gbtl.gridy = 0;
-        p1TwrOptRow.add(p1FortStat, gbtl);
+        player1TowerOptionRow.add(player1FortStat, gbtl);
 
-        p1TowerButtons[1].setPreferredSize(new Dimension(180, 40));
-        p1TowerButtons[1].setFont(new Font("Calibri", Font.PLAIN, 25));
-        p1TowerButtons[1].setMargin(new Insets(8, 0, 0, 0));
-        p1TowerButtons[1].setFocusPainted(false);
+        player1TowerButtons[1].setPreferredSize(new Dimension(180, 40));
+        player1TowerButtons[1].setFont(new Font("Calibri", Font.PLAIN, 25));
+        player1TowerButtons[1].setMargin(new Insets(8, 0, 0, 0));
+        player1TowerButtons[1].setFocusPainted(false);
         gbtl.insets = new Insets(2, -170, 3, 0);
         gbtl.gridx = 0;
         gbtl.gridy = 1;
-        p1TwrOptRow.add(p1TowerButtons[1], gbtl);
-        
-        p1RapStat.setFont(new Font("Calibri", Font.PLAIN, 30));
+        player1TowerOptionRow.add(player1TowerButtons[1], gbtl);
+
+        player1RapStat.setFont(new Font("Calibri", Font.PLAIN, 30));
         gbtl.insets = new Insets(8, 12, 0, -180);
         gbtl.gridx = 1;
         gbtl.gridy = 1;
-        p1TwrOptRow.add(p1RapStat, gbtl);
+        player1TowerOptionRow.add(player1RapStat, gbtl);
 
-        p1TowerButtons[2].setPreferredSize(new Dimension(180, 40));
-        p1TowerButtons[2].setFont(new Font("Calibri", Font.PLAIN, 25));
-        p1TowerButtons[2].setMargin(new Insets(8, 0, 0, 0));
-        p1TowerButtons[2].setFocusPainted(false);
+        player1TowerButtons[2].setPreferredSize(new Dimension(180, 40));
+        player1TowerButtons[2].setFont(new Font("Calibri", Font.PLAIN, 25));
+        player1TowerButtons[2].setMargin(new Insets(8, 0, 0, 0));
+        player1TowerButtons[2].setFocusPainted(false);
         gbtl.insets = new Insets(2, -170, 3, 0);
         gbtl.gridx = 0;
         gbtl.gridy = 2;
-        p1TwrOptRow.add(p1TowerButtons[2], gbtl);
-        
-        p1SnipStat.setFont(new Font("Calibri", Font.PLAIN, 30));
+        player1TowerOptionRow.add(player1TowerButtons[2], gbtl);
+
+        player1SnipStat.setFont(new Font("Calibri", Font.PLAIN, 30));
         gbtl.insets = new Insets(8, 12, 0, -180);
         gbtl.gridx = 1;
         gbtl.gridy = 2;
-        p1TwrOptRow.add(p1SnipStat, gbtl);
+        player1TowerOptionRow.add(player1SnipStat, gbtl);
 
-        p1TwrOptRow.setBackground(Color.LIGHT_GRAY);
-        p1TwrOptRow.setPreferredSize(new Dimension(390, 160));
+        player1TowerOptionRow.setBackground(Color.LIGHT_GRAY);
+        player1TowerOptionRow.setPreferredSize(new Dimension(390, 160));
 
         gbl.insets = new Insets(-20, 0, 20, 0);
         gbl.gridx = 0;
         gbl.gridy = 2;
-        p1Panel.add(p1TwrOptRow, gbl);
+        player1Panel.add(player1TowerOptionRow, gbl);
 
-        
         //Tower management LABEL
-        p1TwrManLabelRow.add(p1TwrMan);
-        p1TwrManLabelRow.setBorder(new EmptyBorder(8, 0, 0, 30));
-        p1TwrManLabelRow.setBackground(veryLightGray);
-        p1TwrManLabelRow.setPreferredSize(new Dimension(390, 60));
+        player1TwrManLabelRow.add(player1TwrMan);
+        player1TwrManLabelRow.setBorder(new EmptyBorder(8, 0, 0, 30));
+        player1TwrManLabelRow.setBackground(veryLightGray);
+        player1TwrManLabelRow.setPreferredSize(new Dimension(390, 60));
 
-        p1TwrMan.setFont(new Font("Calibri", Font.PLAIN, 40));
+        player1TwrMan.setFont(new Font("Calibri", Font.PLAIN, 40));
 
         gbl.insets = new Insets(0, 0, 0, 0);
         gbl.gridx = 0;
         gbl.gridy = 3;
-        p1Panel.add(p1TwrManLabelRow, gbl);
-        
+        player1Panel.add(player1TwrManLabelRow, gbl);
 
         //Tower management BUTTONS
-        p1TowerButtons[3].setPreferredSize(new Dimension(260, 40));
-        p1TowerButtons[3].setFont(new Font("Calibri", Font.PLAIN, 25));
-        p1TowerButtons[3].setMargin(new Insets(8, 0, 0, 0));
-        p1TowerButtons[3].setFocusPainted(false);
+        player1TowerButtons[3].setPreferredSize(new Dimension(260, 40));
+        player1TowerButtons[3].setFont(new Font("Calibri", Font.PLAIN, 25));
+        player1TowerButtons[3].setMargin(new Insets(8, 0, 0, 0));
+        player1TowerButtons[3].setFocusPainted(false);
         gbml.insets = new Insets(4, 0, 3, 0);
         gbml.gridx = 0;
         gbml.gridy = 0;
-        p1TwrManOptRow.add(p1TowerButtons[3], gbml);
+        player1TowerManagementOptionRow.add(player1TowerButtons[3], gbml);
 
-        p1TowerButtons[4].setPreferredSize(new Dimension(260, 40));
-        p1TowerButtons[4].setFont(new Font("Calibri", Font.PLAIN, 25));
-        p1TowerButtons[4].setMargin(new Insets(8, 0, 0, 0));
-        p1TowerButtons[4].setFocusPainted(false);
+        player1TowerButtons[4].setPreferredSize(new Dimension(260, 40));
+        player1TowerButtons[4].setFont(new Font("Calibri", Font.PLAIN, 25));
+        player1TowerButtons[4].setMargin(new Insets(8, 0, 0, 0));
+        player1TowerButtons[4].setFocusPainted(false);
         gbml.insets = new Insets(3, 0, 4, 0);
         gbml.gridx = 0;
         gbml.gridy = 1;
-        p1TwrManOptRow.add(p1TowerButtons[4], gbml);
+        player1TowerManagementOptionRow.add(player1TowerButtons[4], gbml);
 
-        p1TwrManOptRow.setBackground(Color.LIGHT_GRAY);
-        p1TwrManOptRow.setPreferredSize(new Dimension(390, 110));
+        player1TowerManagementOptionRow.setBackground(Color.LIGHT_GRAY);
+        player1TowerManagementOptionRow.setPreferredSize(new Dimension(390, 110));
 
         gbl.insets = new Insets(0, 0, 20, 0);
         gbl.gridx = 0;
         gbl.gridy = 4;
-        p1Panel.add(p1TwrManOptRow, gbl);
+        player1Panel.add(player1TowerManagementOptionRow, gbl);
 
-        
         //Units LABEL
-        p1UnitLabelRow.add(p1UnitLab);
-        p1UnitLabelRow.setBorder(new EmptyBorder(8, -280, 0, 0));
-        p1UnitLabelRow.setBackground(veryLightGray);
-        p1UnitLabelRow.setPreferredSize(new Dimension(390, 60));
+        player1UnitLabelRow.add(player1UnitLab);
+        player1UnitLabelRow.setBorder(new EmptyBorder(8, -280, 0, 0));
+        player1UnitLabelRow.setBackground(veryLightGray);
+        player1UnitLabelRow.setPreferredSize(new Dimension(390, 60));
 
-        p1UnitLab.setFont(new Font("Calibri", Font.PLAIN, 40));
+        player1UnitLab.setFont(new Font("Calibri", Font.PLAIN, 40));
 
         gbl.insets = new Insets(0, 0, 0, 0);    //másik: -100, 0, 0, 0
         gbl.gridx = 0;
         gbl.gridy = 5;  //5
-        p1Panel.add(p1UnitLabelRow, gbl);
-        
+        player1Panel.add(player1UnitLabelRow, gbl);
 
         //Units BUTTONS
-        p1UnitButtons[0].setPreferredSize(new Dimension(180, 40));
-        p1UnitButtons[0].setFont(new Font("Calibri", Font.PLAIN, 25));
-        p1UnitButtons[0].setMargin(new Insets(8, 0, 0, 0));
-        p1UnitButtons[0].setFocusPainted(false);
+        player1UnitButtons[0].setPreferredSize(new Dimension(180, 40));
+        player1UnitButtons[0].setFont(new Font("Calibri", Font.PLAIN, 25));
+        player1UnitButtons[0].setMargin(new Insets(8, 0, 0, 0));
+        player1UnitButtons[0].setFocusPainted(false);
         gbul.insets = new Insets(2, -170, 3, 0);   //3, -20, 3, 0
         gbul.gridx = 0;
         gbul.gridy = 0;
-        p1UnitOptRow.add(p1UnitButtons[0], gbul);
-        
-        p1GenStat.setFont(new Font("Calibri", Font.PLAIN, 30));
+        player1UnitOptRow.add(player1UnitButtons[0], gbul);
+
+        player1GenStat.setFont(new Font("Calibri", Font.PLAIN, 30));
         gbul.insets = new Insets(8, 12, 0, -180);
         gbul.gridx = 1;
         gbul.gridy = 0;
-        p1UnitOptRow.add(p1GenStat, gbul);        
+        player1UnitOptRow.add(player1GenStat, gbul);
 
-        p1UnitButtons[1].setPreferredSize(new Dimension(180, 40));
-        p1UnitButtons[1].setFont(new Font("Calibri", Font.PLAIN, 25));
-        p1UnitButtons[1].setMargin(new Insets(8, 0, 0, 0));
-        p1UnitButtons[1].setFocusPainted(false);
+        player1UnitButtons[1].setPreferredSize(new Dimension(180, 40));
+        player1UnitButtons[1].setFont(new Font("Calibri", Font.PLAIN, 25));
+        player1UnitButtons[1].setMargin(new Insets(8, 0, 0, 0));
+        player1UnitButtons[1].setFocusPainted(false);
         gbul.insets = new Insets(2, -170, 3, 0);
         gbul.gridx = 0;
         gbul.gridy = 1;
-        p1UnitOptRow.add(p1UnitButtons[1], gbul);
-        
-        p1FigStat.setFont(new Font("Calibri", Font.PLAIN, 30));
+        player1UnitOptRow.add(player1UnitButtons[1], gbul);
+
+        player1FigStat.setFont(new Font("Calibri", Font.PLAIN, 30));
         gbul.insets = new Insets(8, 12, 0, -180);
         gbul.gridx = 1;
         gbul.gridy = 1;
-        p1UnitOptRow.add(p1FigStat, gbul);
+        player1UnitOptRow.add(player1FigStat, gbul);
 
-        p1UnitButtons[2].setPreferredSize(new Dimension(180, 40));
-        p1UnitButtons[2].setFont(new Font("Calibri", Font.PLAIN, 25));
-        p1UnitButtons[2].setMargin(new Insets(8, 0, 0, 0));
-        p1UnitButtons[2].setFocusPainted(false);
+        player1UnitButtons[2].setPreferredSize(new Dimension(180, 40));
+        player1UnitButtons[2].setFont(new Font("Calibri", Font.PLAIN, 25));
+        player1UnitButtons[2].setMargin(new Insets(8, 0, 0, 0));
+        player1UnitButtons[2].setFocusPainted(false);
         gbul.insets = new Insets(2, -170, 3, 0);
         gbul.gridx = 0;
         gbul.gridy = 2;
-        p1UnitOptRow.add(p1UnitButtons[2], gbul);
-        
-        p1ClimStat.setFont(new Font("Calibri", Font.PLAIN, 30));
+        player1UnitOptRow.add(player1UnitButtons[2], gbul);
+
+        player1ClimStat.setFont(new Font("Calibri", Font.PLAIN, 30));
         gbul.insets = new Insets(8, 12, 0, -180);
         gbul.gridx = 1;
         gbul.gridy = 2;
-        p1UnitOptRow.add(p1ClimStat, gbul);
+        player1UnitOptRow.add(player1ClimStat, gbul);
 
-        p1UnitButtons[3].setPreferredSize(new Dimension(180, 40));
-        p1UnitButtons[3].setFont(new Font("Calibri", Font.PLAIN, 25));
-        p1UnitButtons[3].setMargin(new Insets(8, 0, 0, 0));
-        p1UnitButtons[3].setFocusPainted(false);
+        player1UnitButtons[3].setPreferredSize(new Dimension(180, 40));
+        player1UnitButtons[3].setFont(new Font("Calibri", Font.PLAIN, 25));
+        player1UnitButtons[3].setMargin(new Insets(8, 0, 0, 0));
+        player1UnitButtons[3].setFocusPainted(false);
         gbul.insets = new Insets(2, -170, 3, 0);
         gbul.gridx = 0;
         gbul.gridy = 3;
-        p1UnitOptRow.add(p1UnitButtons[3], gbul);
-        
-        p1DivStat.setFont(new Font("Calibri", Font.PLAIN, 30));
+        player1UnitOptRow.add(player1UnitButtons[3], gbul);
+
+        player1DivStat.setFont(new Font("Calibri", Font.PLAIN, 30));
         gbul.insets = new Insets(8, 12, 0, -180);
         gbul.gridx = 1;
         gbul.gridy = 3;
-        p1UnitOptRow.add(p1DivStat, gbul);
+        player1UnitOptRow.add(player1DivStat, gbul);
 
-        p1UnitButtons[4].setPreferredSize(new Dimension(180, 40));
-        p1UnitButtons[4].setFont(new Font("Calibri", Font.PLAIN, 25));
-        p1UnitButtons[4].setMargin(new Insets(8, 0, 0, 0));
-        p1UnitButtons[4].setFocusPainted(false);
+        player1UnitButtons[4].setPreferredSize(new Dimension(180, 40));
+        player1UnitButtons[4].setFont(new Font("Calibri", Font.PLAIN, 25));
+        player1UnitButtons[4].setMargin(new Insets(8, 0, 0, 0));
+        player1UnitButtons[4].setFocusPainted(false);
         gbul.insets = new Insets(2, -170, 3, 0);
         gbul.gridx = 0;
         gbul.gridy = 4;
-        p1UnitOptRow.add(p1UnitButtons[4], gbul);
-        
-        p1DesStat.setFont(new Font("Calibri", Font.PLAIN, 30));
+        player1UnitOptRow.add(player1UnitButtons[4], gbul);
+
+        player1DesStat.setFont(new Font("Calibri", Font.PLAIN, 30));
         gbul.insets = new Insets(8, 12, 0, -180);
         gbul.gridx = 1;
         gbul.gridy = 4;
-        p1UnitOptRow.add(p1DesStat, gbul);
+        player1UnitOptRow.add(player1DesStat, gbul);
 
-        p1UnitOptRow.setBackground(Color.LIGHT_GRAY);
-        p1UnitOptRow.setPreferredSize(new Dimension(390, 250));
+        player1UnitOptRow.setBackground(Color.LIGHT_GRAY);
+        player1UnitOptRow.setPreferredSize(new Dimension(390, 250));
 
         gbl.insets = new Insets(0, 0, -185, 0); //0, 0, -210, 0
         gbl.gridx = 0;
         gbl.gridy = 6;  //6
-        p1Panel.add(p1UnitOptRow, gbl);
+        player1Panel.add(player1UnitOptRow, gbl);
 
-        //p1Panel elhelyezkedése
+        //player1Panel elhelyezkedése
         gbc.insets = new Insets(0, 0, -53, 5);    //0, 0, -40, 5
         gbc.gridx = 0;
         gbc.gridy = 1;
-        this.add(p1Panel, gbc);
+        this.add(player1Panel, gbc);
 
         /**
          * Player 2 UI
          */
-        p2Panel.setPreferredSize(new Dimension(400, 858)); //420, 390
-        p2Panel.setBackground(Color.DARK_GRAY);
+        player2Panel.setPreferredSize(new Dimension(400, 858)); //420, 390
+        player2Panel.setBackground(Color.DARK_GRAY);
 
         //STATOK: név + pénz + kastély hp
-        p2Stats.add(p2Data);
-        p2Stats.setBackground(veryLightGray);
+        player2Stats.add(player2Data);
+        player2Stats.setBackground(veryLightGray);
 
-        p2Data.setPreferredSize(new Dimension(380, 72));
-        p2Data.setFont(new Font("Calibri", Font.PLAIN, 35));
-        p2Data.setBorder(new EmptyBorder(0, 5, 8, 0));
+        player2Data.setPreferredSize(new Dimension(380, 72));
+        player2Data.setFont(new Font("Calibri", Font.PLAIN, 35));
+        player2Data.setBorder(new EmptyBorder(0, 5, 8, 0));
 
         gbr.insets = new Insets(-210, 0, 75, 0);
         gbr.gridx = 0;
         gbr.gridy = 0;
-        p2Panel.add(p2Stats, gbr);
+        player2Panel.add(player2Stats, gbr);
 
-        
         //Tower LABEL
-        p2TwrLabelRow.add(p2Twr);
-        p2TwrLabelRow.setBorder(new EmptyBorder(8, -245, 0, 0));    //8, -245, 0, 0
-        p2TwrLabelRow.setBackground(veryLightGray);
-        p2TwrLabelRow.setPreferredSize(new Dimension(390, 60));
+        player2TwrLabelRow.add(player2Twr);
+        player2TwrLabelRow.setBorder(new EmptyBorder(8, -245, 0, 0));    //8, -245, 0, 0
+        player2TwrLabelRow.setBackground(veryLightGray);
+        player2TwrLabelRow.setPreferredSize(new Dimension(390, 60));
 
-        p2Twr.setFont(new Font("Calibri", Font.PLAIN, 40));
+        player2Twr.setFont(new Font("Calibri", Font.PLAIN, 40));
 
         gbr.insets = new Insets(-100, 0, 0, 0);
         gbr.gridx = 0;
         gbr.gridy = 1;
-        p2Panel.add(p2TwrLabelRow, gbr);
+        player2Panel.add(player2TwrLabelRow, gbr);
 
-        
         //Tower BUTTONS
-        p2TowerButtons[0].setPreferredSize(new Dimension(180, 40));
-        p2TowerButtons[0].setFont(new Font("Calibri", Font.PLAIN, 25));
-        p2TowerButtons[0].setMargin(new Insets(8, 0, 0, 0));
-        p2TowerButtons[0].setFocusPainted(false);
+        player2TowerButtons[0].setPreferredSize(new Dimension(180, 40));
+        player2TowerButtons[0].setFont(new Font("Calibri", Font.PLAIN, 25));
+        player2TowerButtons[0].setMargin(new Insets(8, 0, 0, 0));
+        player2TowerButtons[0].setFocusPainted(false);
         gbtr.insets = new Insets(2, -170, 3, 0);
         gbtr.gridx = 0;
         gbtr.gridy = 0;
-        p2TwrOptRow.add(p2TowerButtons[0], gbtr);
-        
-        p2FortStat.setFont(new Font("Calibri", Font.PLAIN, 30));
+        player2TowerOptionRow.add(player2TowerButtons[0], gbtr);
+
+        player2FortStat.setFont(new Font("Calibri", Font.PLAIN, 30));
         gbtr.insets = new Insets(8, 12, 0, -180);
         gbtr.gridx = 1;
         gbtr.gridy = 0;
-        p2TwrOptRow.add(p2FortStat, gbtr);
+        player2TowerOptionRow.add(player2FortStat, gbtr);
 
-        p2TowerButtons[1].setPreferredSize(new Dimension(180, 40));
-        p2TowerButtons[1].setFont(new Font("Calibri", Font.PLAIN, 25));
-        p2TowerButtons[1].setMargin(new Insets(8, 0, 0, 0));
-        p2TowerButtons[1].setFocusPainted(false);
+        player2TowerButtons[1].setPreferredSize(new Dimension(180, 40));
+        player2TowerButtons[1].setFont(new Font("Calibri", Font.PLAIN, 25));
+        player2TowerButtons[1].setMargin(new Insets(8, 0, 0, 0));
+        player2TowerButtons[1].setFocusPainted(false);
         gbtr.insets = new Insets(2, -170, 3, 0);
         gbtr.gridx = 0;
         gbtr.gridy = 1;
-        p2TwrOptRow.add(p2TowerButtons[1], gbtr);
-        
-        p2RapStat.setFont(new Font("Calibri", Font.PLAIN, 30));
+        player2TowerOptionRow.add(player2TowerButtons[1], gbtr);
+
+        player2RapStat.setFont(new Font("Calibri", Font.PLAIN, 30));
         gbtr.insets = new Insets(8, 12, 0, -180);
         gbtr.gridx = 1;
         gbtr.gridy = 1;
-        p2TwrOptRow.add(p2RapStat, gbtr);
+        player2TowerOptionRow.add(player2RapStat, gbtr);
 
-        p2TowerButtons[2].setPreferredSize(new Dimension(180, 40));
-        p2TowerButtons[2].setFont(new Font("Calibri", Font.PLAIN, 25));
-        p2TowerButtons[2].setMargin(new Insets(8, 0, 0, 0));
-        p2TowerButtons[2].setFocusPainted(false);
+        player2TowerButtons[2].setPreferredSize(new Dimension(180, 40));
+        player2TowerButtons[2].setFont(new Font("Calibri", Font.PLAIN, 25));
+        player2TowerButtons[2].setMargin(new Insets(8, 0, 0, 0));
+        player2TowerButtons[2].setFocusPainted(false);
         gbtr.insets = new Insets(2, -170, 3, 0);
         gbtr.gridx = 0;
         gbtr.gridy = 2;
-        p2TwrOptRow.add(p2TowerButtons[2], gbtr);
-        
-        p2SnipStat.setFont(new Font("Calibri", Font.PLAIN, 30));
+        player2TowerOptionRow.add(player2TowerButtons[2], gbtr);
+
+        player2SnipStat.setFont(new Font("Calibri", Font.PLAIN, 30));
         gbtr.insets = new Insets(8, 12, 0, -180);
         gbtr.gridx = 1;
         gbtr.gridy = 2;
-        p2TwrOptRow.add(p2SnipStat, gbtr);
+        player2TowerOptionRow.add(player2SnipStat, gbtr);
 
-        p2TwrOptRow.setBackground(Color.LIGHT_GRAY);
-        p2TwrOptRow.setPreferredSize(new Dimension(390, 160));
+        player2TowerOptionRow.setBackground(Color.LIGHT_GRAY);
+        player2TowerOptionRow.setPreferredSize(new Dimension(390, 160));
 
         gbr.insets = new Insets(-20, 0, 20, 0);
         gbr.gridx = 0;
         gbr.gridy = 2;
-        p2Panel.add(p2TwrOptRow, gbr);
+        player2Panel.add(player2TowerOptionRow, gbr);
 
-        
         //Tower management LABEL
-        p2TwrManLabelRow.add(p2TwrMan);
-        p2TwrManLabelRow.setBorder(new EmptyBorder(8, 0, 0, 30));
-        p2TwrManLabelRow.setBackground(veryLightGray);
-        p2TwrManLabelRow.setPreferredSize(new Dimension(390, 60));
+        player2TwrManLabelRow.add(player2TwrMan);
+        player2TwrManLabelRow.setBorder(new EmptyBorder(8, 0, 0, 30));
+        player2TwrManLabelRow.setBackground(veryLightGray);
+        player2TwrManLabelRow.setPreferredSize(new Dimension(390, 60));
 
-        p2TwrMan.setFont(new Font("Calibri", Font.PLAIN, 40));
+        player2TwrMan.setFont(new Font("Calibri", Font.PLAIN, 40));
 
         gbr.insets = new Insets(0, 0, 0, 0);
         gbr.gridx = 0;
         gbr.gridy = 3;
-        p2Panel.add(p2TwrManLabelRow, gbr);
+        player2Panel.add(player2TwrManLabelRow, gbr);
 
-        
         //Tower management BUTTONS
-        p2TowerButtons[3].setPreferredSize(new Dimension(260, 40));
-        p2TowerButtons[3].setFont(new Font("Calibri", Font.PLAIN, 25));
-        p2TowerButtons[3].setMargin(new Insets(8, 0, 0, 0));
-        p2TowerButtons[3].setFocusPainted(false);
+        player2TowerButtons[3].setPreferredSize(new Dimension(260, 40));
+        player2TowerButtons[3].setFont(new Font("Calibri", Font.PLAIN, 25));
+        player2TowerButtons[3].setMargin(new Insets(8, 0, 0, 0));
+        player2TowerButtons[3].setFocusPainted(false);
         gbmr.insets = new Insets(4, 0, 3, 0);
         gbmr.gridx = 0;
         gbmr.gridy = 0;
-        p2TwrManOptRow.add(p2TowerButtons[3], gbmr);
+        player2TowerManagementOptionRow.add(player2TowerButtons[3], gbmr);
 
-        p2TowerButtons[4].setPreferredSize(new Dimension(260, 40));
-        p2TowerButtons[4].setFont(new Font("Calibri", Font.PLAIN, 25));
-        p2TowerButtons[4].setMargin(new Insets(8, 0, 0, 0));
-        p2TowerButtons[4].setFocusPainted(false);
+        player2TowerButtons[4].setPreferredSize(new Dimension(260, 40));
+        player2TowerButtons[4].setFont(new Font("Calibri", Font.PLAIN, 25));
+        player2TowerButtons[4].setMargin(new Insets(8, 0, 0, 0));
+        player2TowerButtons[4].setFocusPainted(false);
         gbmr.insets = new Insets(3, 0, 4, 0);
         gbmr.gridx = 0;
         gbmr.gridy = 1;
-        p2TwrManOptRow.add(p2TowerButtons[4], gbmr);
+        player2TowerManagementOptionRow.add(player2TowerButtons[4], gbmr);
 
-        p2TwrManOptRow.setBackground(Color.LIGHT_GRAY);
-        p2TwrManOptRow.setPreferredSize(new Dimension(390, 110));
+        player2TowerManagementOptionRow.setBackground(Color.LIGHT_GRAY);
+        player2TowerManagementOptionRow.setPreferredSize(new Dimension(390, 110));
 
         gbr.insets = new Insets(0, 0, 20, 0);
         gbr.gridx = 0;
         gbr.gridy = 4;
-        p2Panel.add(p2TwrManOptRow, gbr);
+        player2Panel.add(player2TowerManagementOptionRow, gbr);
 
-        
         //Units LABEL
-        p2UnitLabelRow.add(p2UnitLab);
-        p2UnitLabelRow.setBorder(new EmptyBorder(8, -280, 0, 0));
-        p2UnitLabelRow.setBackground(veryLightGray);
-        p2UnitLabelRow.setPreferredSize(new Dimension(390, 60));
+        player2UnitLabelRow.add(player2UnitLab);
+        player2UnitLabelRow.setBorder(new EmptyBorder(8, -280, 0, 0));
+        player2UnitLabelRow.setBackground(veryLightGray);
+        player2UnitLabelRow.setPreferredSize(new Dimension(390, 60));
 
-        p2UnitLab.setFont(new Font("Calibri", Font.PLAIN, 40));
+        player2UnitLab.setFont(new Font("Calibri", Font.PLAIN, 40));
 
         gbr.insets = new Insets(0, 0, 0, 0);
         gbr.gridx = 0;
         gbr.gridy = 5;
-        p2Panel.add(p2UnitLabelRow, gbr);
-        
+        player2Panel.add(player2UnitLabelRow, gbr);
 
         //Units BUTTONS
-        p2UnitButtons[0].setPreferredSize(new Dimension(180, 40));
-        p2UnitButtons[0].setFont(new Font("Calibri", Font.PLAIN, 25));
-        p2UnitButtons[0].setMargin(new Insets(8, 0, 0, 0));
-        p2UnitButtons[0].setFocusPainted(false);
+        player2UnitButtons[0].setPreferredSize(new Dimension(180, 40));
+        player2UnitButtons[0].setFont(new Font("Calibri", Font.PLAIN, 25));
+        player2UnitButtons[0].setMargin(new Insets(8, 0, 0, 0));
+        player2UnitButtons[0].setFocusPainted(false);
         gbur.insets = new Insets(2, -170, 3, 0);
         gbur.gridx = 0;
         gbur.gridy = 0;
-        p2UnitOptRow.add(p2UnitButtons[0], gbur);
-        
-        p2GenStat.setFont(new Font("Calibri", Font.PLAIN, 30));
+        player2UnitOptRow.add(player2UnitButtons[0], gbur);
+
+        player2GenStat.setFont(new Font("Calibri", Font.PLAIN, 30));
         gbur.insets = new Insets(8, 12, 0, -180);
         gbur.gridx = 1;
         gbur.gridy = 0;
-        p2UnitOptRow.add(p2GenStat, gbur);
+        player2UnitOptRow.add(player2GenStat, gbur);
 
-        p2UnitButtons[1].setPreferredSize(new Dimension(180, 40));
-        p2UnitButtons[1].setFont(new Font("Calibri", Font.PLAIN, 25));
-        p2UnitButtons[1].setMargin(new Insets(8, 0, 0, 0));
-        p2UnitButtons[1].setFocusPainted(false);
+        player2UnitButtons[1].setPreferredSize(new Dimension(180, 40));
+        player2UnitButtons[1].setFont(new Font("Calibri", Font.PLAIN, 25));
+        player2UnitButtons[1].setMargin(new Insets(8, 0, 0, 0));
+        player2UnitButtons[1].setFocusPainted(false);
         gbur.insets = new Insets(2, -170, 3, 0);
         gbur.gridx = 0;
         gbur.gridy = 1;
-        p2UnitOptRow.add(p2UnitButtons[1], gbur);
-        
-        p2FigStat.setFont(new Font("Calibri", Font.PLAIN, 30));
+        player2UnitOptRow.add(player2UnitButtons[1], gbur);
+
+        player2FigStat.setFont(new Font("Calibri", Font.PLAIN, 30));
         gbur.insets = new Insets(8, 12, 0, -180);
         gbur.gridx = 1;
         gbur.gridy = 1;
-        p2UnitOptRow.add(p2FigStat, gbur);
+        player2UnitOptRow.add(player2FigStat, gbur);
 
-        p2UnitButtons[2].setPreferredSize(new Dimension(180, 40));
-        p2UnitButtons[2].setFont(new Font("Calibri", Font.PLAIN, 25));
-        p2UnitButtons[2].setMargin(new Insets(8, 0, 0, 0));
-        p2UnitButtons[2].setFocusPainted(false);
+        player2UnitButtons[2].setPreferredSize(new Dimension(180, 40));
+        player2UnitButtons[2].setFont(new Font("Calibri", Font.PLAIN, 25));
+        player2UnitButtons[2].setMargin(new Insets(8, 0, 0, 0));
+        player2UnitButtons[2].setFocusPainted(false);
         gbur.insets = new Insets(2, -170, 3, 0);
         gbur.gridx = 0;
         gbur.gridy = 2;
-        p2UnitOptRow.add(p2UnitButtons[2], gbur);
-        
-        p2ClimStat.setFont(new Font("Calibri", Font.PLAIN, 30));
+        player2UnitOptRow.add(player2UnitButtons[2], gbur);
+
+        player2ClimStat.setFont(new Font("Calibri", Font.PLAIN, 30));
         gbur.insets = new Insets(8, 12, 0, -180);
         gbur.gridx = 1;
         gbur.gridy = 2;
-        p2UnitOptRow.add(p2ClimStat, gbur);
+        player2UnitOptRow.add(player2ClimStat, gbur);
 
-        p2UnitButtons[3].setPreferredSize(new Dimension(180, 40));
-        p2UnitButtons[3].setFont(new Font("Calibri", Font.PLAIN, 25));
-        p2UnitButtons[3].setMargin(new Insets(8, 0, 0, 0));
-        p2UnitButtons[3].setFocusPainted(false);
+        player2UnitButtons[3].setPreferredSize(new Dimension(180, 40));
+        player2UnitButtons[3].setFont(new Font("Calibri", Font.PLAIN, 25));
+        player2UnitButtons[3].setMargin(new Insets(8, 0, 0, 0));
+        player2UnitButtons[3].setFocusPainted(false);
         gbur.insets = new Insets(2, -170, 3, 0);
         gbur.gridx = 0;
         gbur.gridy = 3;
-        p2UnitOptRow.add(p2UnitButtons[3], gbur);
-        
-        p2DivStat.setFont(new Font("Calibri", Font.PLAIN, 30));
+        player2UnitOptRow.add(player2UnitButtons[3], gbur);
+
+        player2DivStat.setFont(new Font("Calibri", Font.PLAIN, 30));
         gbur.insets = new Insets(8, 12, 0, -180);
         gbur.gridx = 1;
         gbur.gridy = 3;
-        p2UnitOptRow.add(p2DivStat, gbur);
+        player2UnitOptRow.add(player2DivStat, gbur);
 
-        p2UnitButtons[4].setPreferredSize(new Dimension(180, 40));
-        p2UnitButtons[4].setFont(new Font("Calibri", Font.PLAIN, 25));
-        p2UnitButtons[4].setMargin(new Insets(8, 0, 0, 0));
-        p2UnitButtons[4].setFocusPainted(false);
+        player2UnitButtons[4].setPreferredSize(new Dimension(180, 40));
+        player2UnitButtons[4].setFont(new Font("Calibri", Font.PLAIN, 25));
+        player2UnitButtons[4].setMargin(new Insets(8, 0, 0, 0));
+        player2UnitButtons[4].setFocusPainted(false);
         gbur.insets = new Insets(2, -170, 3, 0);
         gbur.gridx = 0;
         gbur.gridy = 4;
-        p2UnitOptRow.add(p2UnitButtons[4], gbur);
-        
-        p2DesStat.setFont(new Font("Calibri", Font.PLAIN, 30));
+        player2UnitOptRow.add(player2UnitButtons[4], gbur);
+
+        player2DesStat.setFont(new Font("Calibri", Font.PLAIN, 30));
         gbur.insets = new Insets(8, 12, 0, -180);
         gbur.gridx = 1;
         gbur.gridy = 4;
-        p2UnitOptRow.add(p2DesStat, gbur);
+        player2UnitOptRow.add(player2DesStat, gbur);
 
-        p2UnitOptRow.setBackground(Color.LIGHT_GRAY);
-        p2UnitOptRow.setPreferredSize(new Dimension(390, 250));
+        player2UnitOptRow.setBackground(Color.LIGHT_GRAY);
+        player2UnitOptRow.setPreferredSize(new Dimension(390, 250));
 
         gbr.insets = new Insets(0, 0, -185, 0);
         gbr.gridx = 0;
         gbr.gridy = 6;  //6
-        p2Panel.add(p2UnitOptRow, gbr);
+        player2Panel.add(player2UnitOptRow, gbr);
 
-        //p2Panel elhelyezkedése
+        //player2Panel elhelyezkedése
         gbc.insets = new Insets(0, 5, -53, 0);  //0, 5, -40, 0
         gbc.gridx = 2;
         gbc.gridy = 1;
-        this.add(p2Panel, gbc);
+        this.add(player2Panel, gbc);
     }
 
     /**
@@ -1398,15 +1318,31 @@ public class GameWindow extends JPanel implements ActionListener {
      */
     public final void activePlayerPanelSetter() {
         if (board.getModel().getActivePlayer() == 0) {
-            for (var button : p2TowerButtons)   { button.setEnabled(false); }
-            for (var button : p2UnitButtons)    { button.setEnabled(false); }
-            for (var button : p1TowerButtons)   { button.setEnabled(true); }
-            for (var button : p1UnitButtons)    { button.setEnabled(true); }
+            for (var button : player2TowerButtons) {
+                button.setEnabled(false);
+            }
+            for (var button : player2UnitButtons) {
+                button.setEnabled(false);
+            }
+            for (var button : player1TowerButtons) {
+                button.setEnabled(true);
+            }
+            for (var button : player1UnitButtons) {
+                button.setEnabled(true);
+            }
         } else {
-            for (var button : p1TowerButtons)   { button.setEnabled(false); }
-            for (var button : p1UnitButtons)    { button.setEnabled(false); }
-            for (var button : p2TowerButtons)   { button.setEnabled(true); }
-            for (var button : p2UnitButtons)    { button.setEnabled(true); }
+            for (var button : player1TowerButtons) {
+                button.setEnabled(false);
+            }
+            for (var button : player1UnitButtons) {
+                button.setEnabled(false);
+            }
+            for (var button : player2TowerButtons) {
+                button.setEnabled(true);
+            }
+            for (var button : player2UnitButtons) {
+                button.setEnabled(true);
+            }
         }
     }
 
@@ -1414,40 +1350,79 @@ public class GameWindow extends JPanel implements ActionListener {
      * Frissíti a játékos UI-on megjelenő adatait
      */
     public void playerDataUpdate() {
-        Player p1 = board.getModel().getPlayers()[0];
-        Player p2 = board.getModel().getPlayers()[1];
-        p1Data.setText(
-            "<html>"
-            + p1.getName()
-            + "<br>Money - " + p1.getMoney()
-            + "</html>"
+        Player player1 = board.getModel().getPlayers()[0];
+        Player player2 = board.getModel().getPlayers()[1];
+        player1Data.setText(
+                "<html>"
+                + player1.getName()
+                + "<br>Money // " + player1.getMoney()
+                + "</html>"
         );
 
-        p2Data.setText(
-            "<html>"
-            + p2.getName()
-            + "<br>Money - " + p2.getMoney()
-            + "</html>"
+        player2Data.setText(
+                "<html>"
+                + player2.getName()
+                + "<br>Money // " + player2.getMoney()
+                + "</html>"
         );
     }
 
     /**
      * Getterek, setterek
      */
-    public Board getBoard()                 { return board; }
-    public void setBoard(Board bd)          { board = bd; }
-    public int getTicks()                   { return ticks; }
-    public void setTicks(int ticks)         { this.ticks = ticks; }
-    public void setModel(Model model)       { this.model = model; }
-    public JLabel getTimeAndRoundLabel()    { return timeAndRoundLabel; }
-    public JButton[] getP1TowerButtons()    { return p1TowerButtons; }
-    public JButton[] getP1UnitButtons()     { return p1UnitButtons; }
-    public JButton[] getP2TowerButtons()    { return p2TowerButtons; }
-    public JButton[] getP2UnitButtons()     { return p2UnitButtons; }
-    public ArrayList<Integer> getPlayer1distances() { return player1distances; }
-    public ArrayList<Integer> getPlayer2distances() { return player2distances; }
-    public void setRNDPROTECTION(int RNDPROTECTION) { this.RNDPROTECTION = RNDPROTECTION; }
-    public void setTestMode(boolean b){
+    public Board getBoard() {
+        return board;
+    }
+
+    public void setBoard(Board bd) {
+        board = bd;
+    }
+
+    public int getTicks() {
+        return timerTicks;
+    }
+
+    public void setTicks(int timerTicks) {
+        this.timerTicks = timerTicks;
+    }
+
+    public void setModel(Model model) {
+        this.model = model;
+    }
+
+    public JLabel getTimeAndRoundLabel() {
+        return timeAndRoundLabel;
+    }
+
+    public JButton[] getP1TowerButtons() {
+        return player1TowerButtons;
+    }
+
+    public JButton[] getP1UnitButtons() {
+        return player1UnitButtons;
+    }
+
+    public JButton[] getP2TowerButtons() {
+        return player2TowerButtons;
+    }
+
+    public JButton[] getP2UnitButtons() {
+        return player2UnitButtons;
+    }
+
+    public ArrayList<Integer> getPlayer1distances() {
+        return player1Distances;
+    }
+
+    public ArrayList<Integer> getPlayer2distances() {
+        return player2Distances;
+    }
+
+    public void setRNDPROTECTION(int RNDPROTECTION) {
+        this.RNDPROTECTION = RNDPROTECTION;
+    }
+
+    public void setTestMode(boolean b) {
         testMode = b;
     }
 }

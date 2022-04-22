@@ -37,8 +37,8 @@ public class Game {
         container.add(ss, "1");
 
         /**
-         * megnézi, hogy helyesek-e a felhasználók által beírt nevek 
-         * a textboxok nem maradhatnak üresen
+         * megnézi, hogy helyesek-e a felhasználók által beírt nevek a textboxok
+         * nem maradhatnak üresen
          */
         ss.getStartButton().addActionListener((ActionEvent ae) -> {
             if (!ss.isCorrect()) {
@@ -52,7 +52,7 @@ public class Game {
         /**
          * mentett játék betöltésére használt gomb
          */
-        ss.getLoadButton().addActionListener(ae ->{
+        ss.getLoadButton().addActionListener(ae -> {
 
             JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
             FileNameExtensionFilter filter = new FileNameExtensionFilter(".txt", "txt", "text");
@@ -64,14 +64,14 @@ public class Game {
             }
 
             gw = new GameWindow();
-            try{
-                ss.loadGame(gw,fileName);
-            }catch(IOException e){
+            try {
+                ss.loadGame(gw, fileName);
+            } catch (IOException e) {
                 JOptionPane.showMessageDialog(null, "No saved games found!", "Warning", JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
-            gw.constructor(width,height);
-            container.add(gw,"2");
+            gw.constructor(width, height);
+            container.add(gw, "2");
             cardLayout.show(container, "2");
             gw.playerDataUpdate();
         });

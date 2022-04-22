@@ -11,11 +11,12 @@ public abstract class Tower extends Sprite {
     protected String type;
     protected int power;
     protected int range;
-    protected double attack_speed;
+    protected double attackFrequency;
     protected int hp;
     protected int price;
     protected int upgradePrice;
     protected int demolishedIn;
+    protected int moneySpentOn;
     protected int level;
     protected int maxHp;
     protected Color color;
@@ -49,11 +50,17 @@ public abstract class Tower extends Sprite {
         level = 1;
         if (scolor == "red") {
             this.color = Color.red;
-            this.img = new ImageIcon("src/res/Towerred.png").getImage();
         } else {
             this.color = Color.blue;
-            this.img = new ImageIcon("src/res/Towerblue.png").getImage();
         }
+    }
+
+    public int getMoneySpentOn() {
+        return moneySpentOn;
+    }
+
+    public void setMoneySpentOn(int moneySpentOn) {
+        this.moneySpentOn = moneySpentOn;
     }
 
     public String getType() {
@@ -80,13 +87,15 @@ public abstract class Tower extends Sprite {
         this.range = range;
     }
 
-    public double getAttack_speed() {
-        return attack_speed;
+    public double getAttackFrequency() {
+        return attackFrequency;
     }
 
-    public void setAttack_speed(double attack_speed) {
-        this.attack_speed = attack_speed;
+    public void setAttackFrequency(double attackFrequency) {
+        this.attackFrequency = attackFrequency;
     }
+
+    
 
     public int getHp() {
         return hp;
@@ -101,12 +110,10 @@ public abstract class Tower extends Sprite {
     }
     
     public void setColor(String colorString){
-        if (colorString == "red") {
+        if (colorString.equals("red") ) {
             this.color = Color.red;
-            this.img = new ImageIcon("src/res/Towerred.png").getImage();
         } else {
             this.color = Color.blue;
-            this.img = new ImageIcon("src/res/Towerblue.png").getImage();
         }
     }
 

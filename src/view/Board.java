@@ -44,8 +44,6 @@ public class Board extends JPanel {
     private boolean isCastleDestroyed(int spriteX, int spriteY) {
         for (int i = 0; i < 2; i++) {
             Castle currentPlayerCastle = model.getPlayers()[i].getCastle();
-            //System.out.println(currentPlayerCastle.getX() +" "+spriteX +" "+currentPlayerCastle.getY() +" "+spriteY
-                    //+" "+ currentPlayerCastle.getHp() );
             if (currentPlayerCastle.getX() == spriteX && currentPlayerCastle.getY() == spriteY
                     && currentPlayerCastle.getHp() == 0) {
                 return true;
