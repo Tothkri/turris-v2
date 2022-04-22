@@ -328,9 +328,9 @@ public class GameWindow extends JPanel {
                                 if (enemyUnitsNearby.get(randomEnemyUnit).getHp() > towers.get(towerIndex).getPower()) {
                                     enemyUnitsNearby.get(randomEnemyUnit).setHp(enemyUnitsNearby.get(randomEnemyUnit).getHp() - towers.get(towerIndex).getPower());
                                 } else {
-                                    model.getPlayers()[(playerIndex + 1) % 2].deleteUnit(enemyUnitsNearby.get(randomEnemyUnit));
                                     model.getPlayers()[playerIndex].setMoney(model.getPlayers()[playerIndex].getMoney() + enemyUnitsNearby.get(randomEnemyUnit).getMaxHp() * 2);
-                                     playerDataUpdate();
+                                    model.getPlayers()[(playerIndex + 1) % 2].deleteUnit(enemyUnitsNearby.get(randomEnemyUnit));
+                                    playerDataUpdate();
                                 }
                             }
                         }
@@ -369,14 +369,14 @@ public class GameWindow extends JPanel {
                         ArrayList<Node> bestWayNode = new ArrayList<>();
 
                         for (int castleCoordinateIndex = 0; castleCoordinateIndex < 4; castleCoordinateIndex++) {
-                            Player actualPlayer=model.getPlayers()[playerIndex];
-                            ArrayList<String> bestWayString = actualPlayer.findBestWay(u.getX() / fieldSize, u.getY() / fieldSize, 
+                            Player actualPlayer = model.getPlayers()[playerIndex];
+                            ArrayList<String> bestWayString = actualPlayer.findBestWay(u.getX() / fieldSize, u.getY() / fieldSize,
                                     model.getCastleCoordinates()[castleCoordinateIndex + defendingPlayer][0],
                                     model.getCastleCoordinates()[castleCoordinateIndex + defendingPlayer][1], actualPlayer.getDifficulty(model, u.getType(), playerIndex));
-                            int actualWayDifficulty=model.wayDifficulty(playerIndex, actualPlayer.convertWay(bestWayString), u.getType());
+                            int actualWayDifficulty = model.wayDifficulty(playerIndex, actualPlayer.convertWay(bestWayString), u.getType());
                             if (minWayDifficulty > actualWayDifficulty) {
-                                minWayDifficulty =  actualWayDifficulty;
-                                bestWayNode=actualPlayer.convertWay(bestWayString);
+                                minWayDifficulty = actualWayDifficulty;
+                                bestWayNode = actualPlayer.convertWay(bestWayString);
                             }
                         }
                         if (!bestWayNode.isEmpty()) {
@@ -424,7 +424,7 @@ public class GameWindow extends JPanel {
                         }
                     }
 
-                    if (units.get(unitIndex).getWay()!=null&&!units.get(unitIndex).getWay().isEmpty()) {
+                    if (units.get(unitIndex).getWay() != null && !units.get(unitIndex).getWay().isEmpty()) {
                         ArrayList<Node> unitWay = units.get(unitIndex).getWay();
                         Node next = unitWay.get(0);
                         units.get(unitIndex).setX(next.getX() * fieldSize);
@@ -456,6 +456,11 @@ public class GameWindow extends JPanel {
                                 units.get(unitIndex).setHp(units.get(unitIndex).getHp() - enemyUnitsNearby.get(randomEnemyUnit).getPower());
                             } else if ("Fighter".equals(enemyUnitsNearby.get(randomEnemyUnit).getType())) {
                                 model.getPlayers()[playerIndex].deleteUnit(units.get(unitIndex));
+                                if (unitIndex > 0) {
+                                    unitIndex--;
+                                } else {
+                                    break;
+                                }
                                 model.getPlayers()[Math.abs(playerIndex - 1)].setMoney(model.getPlayers()[Math.abs(playerIndex - 1)].getMoney() + units.get(unitIndex).getMaxHp() * 2);
                             }
                         } else {
@@ -464,9 +469,19 @@ public class GameWindow extends JPanel {
                                 units.get(unitIndex).setHp(units.get(unitIndex).getHp() - enemyUnitsNearby.get(randomEnemyUnit).getPower());
                             } else if ("Fighter".equals(enemyUnitsNearby.get(randomEnemyUnit).getType())) {
                                 model.getPlayers()[playerIndex].deleteUnit(units.get(unitIndex));
+                                if (unitIndex > 0) {
+                                    unitIndex--;
+                                } else {
+                                    break;
+                                }
                                 model.getPlayers()[Math.abs(playerIndex - 1)].setMoney(model.getPlayers()[Math.abs(playerIndex - 1)].getMoney() + units.get(unitIndex).getMaxHp() * 2);
                             }
                             model.getPlayers()[(playerIndex + 1) % 2].deleteUnit(enemyUnitsNearby.get(randomEnemyUnit));
+                            if (unitIndex > 0) {
+                                unitIndex--;
+                            } else {
+                                break;
+                            }
                         }
                     }
 
@@ -493,6 +508,9 @@ public class GameWindow extends JPanel {
                                         model.getPlayers()[Math.abs(playerIndex - 1)].getTowers().get(towerToDemolishIndex).setExploded(true);
                                     }
                                     model.getPlayers()[playerIndex].deleteUnit(units.get(unitIndex));
+                                    if (unitIndex > 0) {
+                                        unitIndex--;
+                                    }
                                     break;
                                 } else if (towersNearby.get(towerIndex).getHp() > 0) //torony megsemmisül
                                 {
@@ -509,6 +527,9 @@ public class GameWindow extends JPanel {
                                         model.getPlayers()[playerIndex].getTowers().get(towerToDemolishIndex).setExploded(true);
                                     }
                                     model.getPlayers()[playerIndex].deleteUnit(units.get(unitIndex));
+                                    if (unitIndex > 0) {
+                                        unitIndex--;
+                                    }
                                     break;
                                 }
                             }
@@ -601,7 +622,7 @@ public class GameWindow extends JPanel {
                 player1Towers.get(towerIndex).setDemolishedIn(1);//demolishedIn - 1
                 if (player1Towers.get(towerIndex).getDemolishedIn() == 0) {
                     model.getTerrain().remove(player1Towers.get(towerIndex));
-                    model.setPosition(player1Towers.get(towerIndex).getX() / 30,player1Towers.get(towerIndex).getY() / 30, 'F');
+                    model.setPosition(player1Towers.get(towerIndex).getX() / 30, player1Towers.get(towerIndex).getY() / 30, 'F');
                     player1Towers.remove(towerIndex);
                 }
             }
@@ -614,7 +635,7 @@ public class GameWindow extends JPanel {
                 player2Towers.get(towerIndex).setDemolishedIn(1);//demolishedIn - 1
                 if (player2Towers.get(towerIndex).getDemolishedIn() == 0) {
                     model.getTerrain().remove(player2Towers.get(towerIndex));
-                     model.setPosition(player2Towers.get(towerIndex).getX() / 30,player2Towers.get(towerIndex).getY() / 30, 'F');
+                    model.setPosition(player2Towers.get(towerIndex).getX() / 30, player2Towers.get(towerIndex).getY() / 30, 'F');
                     player2Towers.remove(towerIndex);
                 }
             }
