@@ -2,7 +2,11 @@ Scrummaster rotáció:
 1. hét (03.02 - 03.09): Szálkai Olivér Dávid
 2. hét (03.09 - 03.16): Tóth Kristóf (YPENKF)
 3. hét (03.16 - 03.23): Tóth Kristóf (SONXZF)
-4. hét (03.23 - 03.30): Tóth Kristóf (SONXZF) 
+4. hét (03.23 - 03.30): Tóth Kristóf (SONXZF)
+5. hét (03.30 - 04.06): Szálkai Olivér Dávid
+6. hét -
+7. hét (04.13 - 04.20): Tóth Kristóf (YPENKF)
+
 
 Ki mit csinált:
 1. hét (03.02 - 03.09)
@@ -54,9 +58,13 @@ Ki mit csinált:
 
 7. hét (04.13 - 04.20)
 
-    Tóth Kristóf (SONXZF): 
+    Tóth Kristóf (SONXZF): Kisebb bug fixek, tesztesetek megírása
 
-    Tóth Kristóf (YPENKF): 
+    Tóth Kristóf (YPENKF): tesztesetek implementálása + CI
     
     Szálkai Olivér Dávid (ONLQ05): 
+
+
+
+
 
