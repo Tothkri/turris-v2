@@ -5,18 +5,7 @@ import java.util.ArrayList;
 
 public class Diver extends Unit {
 
-    //constructor for loaded units
-    public Diver(String scolor, int hp, int x, int y, int height, int width, Image img)  {
-        super(scolor, x, y, height, width, img);
-        this.distance = 4;
-        this.power = 4;
-        this.hp = hp;
-        this.price = 20;
-        this.type = "Diver";
-        this.maxHp=10;
-    }
-
-    //constructor for creating new unit
+    //újonnan létrehozott
     public Diver(String scolor, int x, int y, int height, int width, Image img, ArrayList<Node> way) {
         super(scolor, x, y, height, width, img);
         this.distance = 4;
@@ -24,7 +13,19 @@ public class Diver extends Unit {
         this.hp = 10;
         this.price = 20;
         this.type = "Diver";
-        this.maxHp=10;
-        this.way=way;
+        this.maxHp = 10;
+        this.way = way;
     }
+
+    //fájlból betöltött
+    public Diver(String scolor, int hp, int x, int y, int height, int width, Image img) {
+        super(scolor, x, y, height, width, img);
+        this.distance = 4;
+        this.power = 4;
+        this.hp = hp;
+        this.price = 20;
+        this.type = "Diver";
+        this.maxHp = 10;
+    }
+
 }
