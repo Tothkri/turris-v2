@@ -35,6 +35,7 @@ FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 p:
 w
 800
+300
 T Fortified blue 2 1 1.0 80 1 868 93 31 31 -1
 T Rapid blue 2 1 0.5 45 1 837 93 31 31 -1
 T Sniper blue 2 1 1.5 25 1 806 93 31 31 -1
@@ -42,4 +43,5 @@ T Sniper blue 2 1 1.5 25 1 806 93 31 31 -1
 p:
 d
 1080
+300
 
