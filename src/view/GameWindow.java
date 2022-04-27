@@ -39,7 +39,7 @@ public class GameWindow extends JPanel {
 
     private Timer timer;
     private Board board;
-    private JButton exitButton;
+    private JButton backToMenuButton;
     private JButton newRoundButton;
     private JButton saveButton;
     private JButton[] player1TowerButtons;
@@ -88,8 +88,7 @@ public class GameWindow extends JPanel {
         player2Distances = new ArrayList<>();
         timeAndRoundLabel = new JLabel();
         this.setPreferredSize(new Dimension(gameWindowWidth, gameWindowHeight));
-        exitButton = new JButton("Exit game");
-        exitButton.addActionListener((event) -> System.exit(0));
+        backToMenuButton = new JButton("Back to menu");
         newRoundButton = new JButton("Finish round");
         newRoundButton.addActionListener((event) -> {
             newRound();
@@ -404,10 +403,9 @@ public class GameWindow extends JPanel {
         timer.start();
         activePlayerPanelSetter();
     }
-
+    
     public boolean simulation() {
         //először az egységek mozognak
-
         boolean moreDistance = false;
         boolean isOver = false;
         for (int playerIndex = 0; playerIndex < 2; playerIndex++) {
@@ -484,7 +482,27 @@ public class GameWindow extends JPanel {
                             }
                         }
                     }
-
+                    else if(!enemyUnitsNearby.isEmpty()){
+                        for(int enemyUnitIndex = 0; enemyUnitIndex < enemyUnitsNearby.size();enemyUnitIndex++){
+                            Unit enemyUnit = enemyUnitsNearby.get(enemyUnitIndex);
+                            if(enemyUnit.getType().equals("Fighter")){
+                                units.get(unitIndex).setBlood(true);
+                                if(units.get(unitIndex).getHp() < enemyUnit.getPower()){
+                                    model.getPlayers()[playerIndex].deleteUnit(units.get(unitIndex));
+                                    model.getPlayers()[Math.abs(playerIndex - 1)].setMoney(model.getPlayers()[Math.abs(playerIndex - 1)].getMoney() + units.get(unitIndex).getMaxHp() * 2);
+                                    if (unitIndex > 0) {
+                                    unitIndex--;
+                                    } else {
+                                        break;
+                                    }
+                                    model.getPlayers()[Math.abs(playerIndex - 1)].setMoney(model.getPlayers()[Math.abs(playerIndex - 1)].getMoney() + units.get(unitIndex).getMaxHp() * 2);
+                                }else{
+                                    units.get(unitIndex).setHp(units.get(unitIndex).getHp() - enemyUnit.getPower());
+                                }
+                                
+                            }
+                        }
+                    }
                     ArrayList<Tower> towersNearby = model.towersNearby(playerIndex, units.get(unitIndex));
 
                     //Destroyer támadja a mellette lévő tornyot
@@ -560,7 +578,6 @@ public class GameWindow extends JPanel {
                 }
             }
         }
-
         if (isOver) {
             simulationTime = false;
             board.repaint();
@@ -844,14 +861,14 @@ public class GameWindow extends JPanel {
         /**
          * Exit game BUTTON
          */
-        exitButton.setPreferredSize(new Dimension(260, 40));
-        exitButton.setFont(new Font("Calibri", Font.PLAIN, 25));
-        exitButton.setMargin(new Insets(8, 0, 0, 0));
-        exitButton.setFocusPainted(false);
+        backToMenuButton.setPreferredSize(new Dimension(260, 40));
+        backToMenuButton.setFont(new Font("Calibri", Font.PLAIN, 25));
+        backToMenuButton.setMargin(new Insets(8, 0, 0, 0));
+        backToMenuButton.setFocusPainted(false);
         gbc.insets = new Insets(0, 0, -22, 0);
         gbc.gridx = 2;
         gbc.gridy = 0;
-        this.add(exitButton, gbc);
+        this.add(backToMenuButton, gbc);
 
         /**
          * Finish round BUTTON
@@ -1444,5 +1461,8 @@ public class GameWindow extends JPanel {
 
     public void setTestMode(boolean b) {
         testMode = b;
+    }
+    public JButton getBackToMenuButton(){
+        return backToMenuButton;
     }
 }

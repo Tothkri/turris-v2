@@ -47,6 +47,13 @@ public class Game {
             gw = new GameWindow(width, height, ss.getP1Name().getText(), ss.getP2Name().getText(), ss.getSelectedRadioButton());
             container.add(gw, "2");
             cardLayout.show(container, "2");
+            gw.getBackToMenuButton().addActionListener(action ->{
+                ss.getP1Name().setText("");
+                ss.getP2Name().setText("");
+                container.add(ss, "1");
+                gw.saveGame();
+                cardLayout.show(container,"1");
+            });
         });
 
         /**
@@ -74,6 +81,13 @@ public class Game {
             container.add(gw, "2");
             cardLayout.show(container, "2");
             gw.playerDataUpdate();
+            gw.getBackToMenuButton().addActionListener(action ->{
+                ss.getP1Name().setText("");
+                ss.getP2Name().setText("");
+                container.add(ss, "1");
+                gw.saveGame();
+                cardLayout.show(container,"1");
+            });
         });
 
         frame.setResizable(false);
