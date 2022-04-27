@@ -6,7 +6,7 @@ Scrummaster rotáció:
 5. hét (03.30 - 04.06): Szálkai Olivér Dávid
 6. hét -
 7. hét (04.13 - 04.20): Tóth Kristóf (YPENKF)
-
+7. hét (04.20 - 04.27): Tóth Kristóf (SONXZF)
 
 Ki mit csinált:
 1. hét (03.02 - 03.09)
