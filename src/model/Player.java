@@ -144,7 +144,7 @@ public class Player {
         int boardPositionX = matrixPositionX * (size / 30);
         int boardPositionY = matrixPositionY * (size / 30);
         for (Tower t : playerTowers) {
-            if (t.getX() == boardPositionX && t.getY() == boardPositionY) {
+            if (t.getX() == boardPositionX && t.getY() == boardPositionY&&t.demolishedIn==-1) {
                 playerMoney += t.getMoneySpentOn() / 2; //játékos visszakapja az összes toronyba költött pénz felét
                 t.demolish();
             }
