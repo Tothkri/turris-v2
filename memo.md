@@ -64,6 +64,24 @@ Ki mit csinált:
     
     Szálkai Olivér Dávid (ONLQ05): 
 
+8. hét (04.20 - 04.27)
+
+    Tóth Kristóf (SONXZF): bug fix, külön sprite képek logikájának implementálása, clean code
+
+    Tóth Kristóf (YPENKF): visszatérés a menübe gomb + fighter bug
+    
+    Szálkai Olivér Dávid (ONLQ05): végleges sprite képek
+
+to-do list:
+-fighter bug
+-egyéb bug keresés
+-több unit küldése gomb
+-végleges képek
+-vissza a menübe gomb
+-default mentés
+
+dokumentáció (diagramok frissítése, osztályleírások, user guide): wiki oldalra
+
 
 
 
