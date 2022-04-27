@@ -679,11 +679,10 @@ public class GameWindow extends JPanel {
 
         Color sandBrown = new Color(210, 180, 140);
         Color lightGray = new Color(214, 196, 194);
-        Color cinnabar = new Color(227, 66, 52);      //red: ON round
-        Color pastelRed = new Color(255, 105, 97);    //red: NOT ON round
-        Color royalBlue = new Color(65, 105, 225);    //blue: ON round
-        Color blueGray = new Color(102, 153, 204);    //blue: NOT ON round
-        Color darkHoneyBrown = new Color(184, 151, 128);
+        Color brightCinnabar = new Color(247, 73, 54);  //red: ON round
+        Color dullPastelRed = new Color(255, 172, 166); //red: NOT ON round
+        Color brightRoyalBlue = new Color(71, 112, 249);//blue: ON round
+        Color dullBlueGray = new Color(154, 180, 206);  //blue: NOT ON round
 
         //1st layer UI (bottom)
         grph.setColor(Color.DARK_GRAY);
@@ -695,14 +694,14 @@ public class GameWindow extends JPanel {
 
         //2nd layer UI (middle - coloring)
         if (model.getActivePlayer() == 0) {
-            grph.setColor(royalBlue);
+            grph.setColor(brightRoyalBlue);
             grphcs2.fillRoundRect(35, 121, 421, 875, 25, 25);   //left
-            grph.setColor(pastelRed);
+            grph.setColor(dullPastelRed);
             grphcs2.fillRoundRect(1465, 121, 421, 875, 25, 25); //right
         } else {
-            grph.setColor(blueGray);
+            grph.setColor(dullBlueGray);
             grphcs2.fillRoundRect(35, 121, 421, 875, 25, 25);   //left
-            grph.setColor(cinnabar);
+            grph.setColor(brightCinnabar);
             grphcs2.fillRoundRect(1465, 121, 421, 875, 25, 25); //right
         }
         grph.setColor(sandBrown);
