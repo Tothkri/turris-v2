@@ -10,6 +10,16 @@ public class Castle extends Sprite {
     private int hp;
     private String color;
 
+    /**
+     * új játékhoz konstruktor
+     * @param scolor
+     * @param x
+     * @param y
+     * @param height
+     * @param width
+     * @param img
+     * @param hp
+     */
     public Castle(String scolor, int x, int y, int height, int width, Image img, int hp) {
         super(x, y, height, width, img);
         this.hp = hp;
@@ -20,34 +30,28 @@ public class Castle extends Sprite {
             this.img = new ImageIcon("src/res/Castleblue.png").getImage();
         }
     }
-
-    public String getColor() {
-        return color;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
-    }
-
+    
+    /**
+     * fájlból betöltéshez konstruktor
+     */
     public Castle() {
         super();
-        hp = 500;
+        hp = 300;
     }
-
-    public int getHp() {
-        return hp;
-    }
-
-    public void setHp(int hp) {
-        this.hp = hp;
-    }
-
-    private double hpLine() {
+    
+    /**
+     * hp csík hossza
+     */
+    private double hpLineLength() {
         double d = (double) hp / 300;
         return d * width;
 
     }
 
+    /**
+     * kastély kirajzolás
+     * @param g2
+     */
     @Override
     public void draw(Graphics2D g2) {
         Color colorFromString;
@@ -59,13 +63,26 @@ public class Castle extends Sprite {
         if (hp != 0) {
             g2.drawImage(img, x, y, height, width, null);
             g2.setColor(colorFromString);
-            g2.drawLine(x , y + height - 2, x + (int) hpLine() , y + height - 2);
-            g2.drawLine(x , y + height - 3, x + (int) hpLine() , y + height - 3);
-            g2.drawLine(x, y + height - 4, x + (int) hpLine() , y + height - 4);
-            g2.drawLine(x , y + height - 5, x + (int) hpLine() , y + height - 5);
-            g2.drawLine(x , y + height - 6, x + (int) hpLine() , y + height - 6);
+            int length=(int)hpLineLength();
+            for(int i=2;i<6;i++){
+                g2.drawLine(x , y + height - i, x + (int) length , y + height - i);
+            }
+            
         }
 
+    }
+    
+    /**
+     * hp getterek, setterek
+     * @return
+     */
+   
+    public int getHp() {
+        return hp;
+    }
+
+    public void setHp(int hp) {
+        this.hp = hp;
     }
 
 }

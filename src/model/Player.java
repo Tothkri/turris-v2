@@ -21,14 +21,6 @@ public class Player {
     private final int[] columnIndexes = {0, -1, 1, 0};
     private int[][] difficultyMatrix;
 
-    public Castle getCastle() {
-        return playerCastle;
-    }
-
-    public void setCastle(Castle playerCastle) {
-        this.playerCastle = playerCastle;
-    }
-
     public Player(int playerMoney, String playerName) {
         this.playerMoney = playerMoney;
         this.playerName = playerName;
@@ -37,6 +29,13 @@ public class Player {
         this.difficultyMatrix = new int[30][30];
     }
 
+    /**
+     * torony lerakása adott koordinátán (adott típussal)
+     * @param matrixPositionX
+     * @param matrixPositionY
+     * @param UnitType
+     * @param model
+     */
     public void build(int matrixPositionX, int matrixPositionY, String UnitType, Model model) {
 
         int fieldSize = model.getBoardSize() / 30;
@@ -117,6 +116,12 @@ public class Player {
 
     }
 
+    /**
+     * torony fejlesztése adott koordinátán
+     * @param matrixPositionX
+     * @param matrixPositionY
+     * @param size
+     */
     public void upgrade(int matrixPositionX, int matrixPositionY, int size) {
         int boardPositionX = matrixPositionX * (size / 30);
         int boardPositionY = matrixPositionY * (size / 30);
@@ -140,22 +145,39 @@ public class Player {
         }
     }
 
+    /**
+     * torony lerombolása adott koordinátán
+     * @param matrixPositionX
+     * @param matrixPositionY
+     * @param size
+     */
     public void demolish(int matrixPositionX, int matrixPositionY, int size) {
         int boardPositionX = matrixPositionX * (size / 30);
         int boardPositionY = matrixPositionY * (size / 30);
         for (Tower t : playerTowers) {
-            if (t.getX() == boardPositionX && t.getY() == boardPositionY&&t.demolishedIn==-1) {
+            if (t.getX() == boardPositionX && t.getY() == boardPositionY && t.demolishedIn == -1) {
                 playerMoney += t.getMoneySpentOn() / 2; //játékos visszakapja az összes toronyba költött pénz felét
                 t.demolish();
             }
         }
     }
 
-    private boolean isValid(int x, int y) //annak eldöntése, hogy a játéktéren van-e egy mező
+     /**
+     * annak eldöntése, hogy a játéktéren van-e egy mező
+     */
+    private boolean isValid(int x, int y) 
     {
         return (x >= 0 && x < 30) && (y >= 0 && y < 30);
     }
 
+    /**
+     * egységek küldése
+     * @param type
+     * @param playerColor
+     * @param amount
+     * @param model
+     * @return
+     */
     public Model sendUnits(String type, String playerColor, int amount, Model model) {
         int fieldSize = model.getBoardSize() / 30;
         if ((type.equals("General") || type.equals("Diver") || type.equals("Climber")) && amount * 20 > playerMoney) {
@@ -213,10 +235,17 @@ public class Player {
 
     }
 
-    public ArrayList<String> findBestWay(int fromX, int fromY, int toX, int toY, int difficultyMatrix[][]) /* 
-            kezdő és cél mezők között legjobb út kiszámítása
-            ez a legjobb út fordulópontjait adja vissza
-     */ {
+    /**
+     * kezdő és cél mezők között legjobb út kiszámítása
+     * ez a legjobb út fordulópontjait adja vissza
+     * @param fromX
+     * @param fromY
+     * @param toX
+     * @param toY
+     * @param difficultyMatrix
+     * @return
+     */
+    public ArrayList<String> findBestWay(int fromX, int fromY, int toX, int toY, int difficultyMatrix[][])  {
 
         ArrayList<String> bestWayString = new ArrayList<>();
         int currentX = fromX;
@@ -263,6 +292,12 @@ public class Player {
         return bestWayString;
     }
 
+    /**
+     * a megadott torony toronylista indexének visszaadása
+     * lerombolásnál használatos
+     * @param t
+     * @return
+     */
     public int getTowerIndex(Tower t) {
         int index = 0;
         for (Tower x : playerTowers) {
@@ -274,7 +309,12 @@ public class Player {
         return -1; //nincs ilyen torony a listában
     }
 
-    public ArrayList<Node> convertWay(ArrayList<String> bestWayString) //String legjobb utat Node típusban adjuk vissza
+    /**
+     * String típusú legjobb utat Node típusban adjuk vissza
+     * @param bestWayString
+     * @return
+     */
+    public ArrayList<Node> convertWay(ArrayList<String> bestWayString) 
     {
 
         ArrayList<Node> bestWayNode = new ArrayList<Node>();
@@ -327,7 +367,11 @@ public class Player {
         return bestWayNode;
     }
 
-    private void findNodeWay(Node currentNode, ArrayList<String> bestWayNode) //segédfüggvény, rekurzívan hozzáadjuk a mezők szülőjét (előző mező) az úthoz
+    /**
+     * segédfüggvény, rekurzívan hozzáadjuk a mezők szülőjét (előző mező) az úthoz
+     * 
+     */
+    private void findNodeWay(Node currentNode, ArrayList<String> bestWayNode) 
     {
         if (currentNode != null) //ha nincs szülő, akkor visszakaptuk a kezdő mezőt
         {
@@ -336,10 +380,21 @@ public class Player {
         }
     }
 
+    /**
+     * egység törlése
+     * @param unitToDelete
+     */
     public void deleteUnit(Unit unitToDelete) {
         playerUnits.remove(unitToDelete);
     }
 
+    /**
+     * nehézségi mátrix visszaadása adott játékos adott típusú egységére
+     * @param model
+     * @param UnitType
+     * @param activePlayer
+     * @return
+     */
     public int[][] getDifficulty(Model model, String UnitType, int activePlayer) {
         for (int i = 0; i < 30; i++) {
             for (int j = 0; j < 30; j++) {
@@ -372,6 +427,39 @@ public class Player {
         return difficultyMatrix;
     }
 
+    /**
+     * még nem lerombolt tornyok listájának visszaadása
+     * @return
+     */
+    public ArrayList<Tower> getNotDemolishedTowers() {
+        ArrayList<Tower> notDemolished = new ArrayList<Tower>();
+        for (Tower t : playerTowers) {
+            if (t.demolishedIn == -1) {
+                notDemolished.add(t);
+            }
+
+        }
+        return notDemolished;
+    }
+
+    /**
+     * új torony hozzáadása
+     *
+     * @param newTower
+     */
+    public void addTower(Tower newTower) {
+        playerTowers.add(newTower);
+    }
+
+    /**
+     * getterek, setterek
+     *
+     * @return
+     */
+    public Castle getCastle() {
+        return playerCastle;
+    }
+
     public int getMoney() {
         return playerMoney;
     }
@@ -388,23 +476,12 @@ public class Player {
         this.playerName = playerName;
     }
 
-    public ArrayList<Tower> getNotDemolishedTowers() {
-        ArrayList<Tower> notDemolished = new ArrayList<Tower>();
-        for (Tower t : playerTowers) {
-            if (t.demolishedIn == -1) {
-                notDemolished.add(t);
-            }
-
-        }
-        return notDemolished;
+    public void setCastle(Castle playerCastle) {
+        this.playerCastle = playerCastle;
     }
 
     public ArrayList<Tower> getTowers() {
         return playerTowers;
-    }
-
-    public void addTower(Tower newTower) {
-        playerTowers.add(newTower);
     }
 
     public ArrayList<Unit> getUnits() {

@@ -66,12 +66,19 @@ public class GameWindow extends JPanel {
         super();
     }
 
+    /**
+     *
+     * @param gameWindowWidth
+     * @param gameWindowHeight
+     * @param player1Name
+     * @param player2Name
+     * @param selectedMap
+     */
     public GameWindow(int gameWindowWidth, int gameWindowHeight, String player1Name, String player2Name, int selectedMap) {
         super();
         board = new Board(selectedMap, player1Name, player2Name, gameWindowWidth, gameWindowHeight);
         this.model = board.getModel();
         model.setRound(1);
-
         //50% eséllyel kezdenek a játékosok
         Random whichPlayerStarts = new Random();
         model.setActivePlayer(whichPlayerStarts.nextInt(2));
@@ -79,6 +86,11 @@ public class GameWindow extends JPanel {
         constructor(gameWindowWidth, gameWindowHeight);
     }
 
+    /**
+     *
+     * @param gameWindowWidth
+     * @param gameWindowHeight
+     */
     public void constructor(int gameWindowWidth, int gameWindowHeight) {
         buttonAction = "";
         RNDPROTECTION = 0;
@@ -95,34 +107,31 @@ public class GameWindow extends JPanel {
         });
 
         //kurzor utáni info megjelenítéshez
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-                }
-
-                JTextPane text = new JTextPane() {
-                    @Override
-                    public String getToolTipText() {
-                        return ((JComponent) getParent()).getToolTipText();
-                    }
-
-                    @Override
-                    public String getToolTipText(MouseEvent event) {
-                        return ((JComponent) getParent()).getToolTipText(event);
-                    }
-                };
-
-                try {
-                    text.getStyledDocument().insertString(0, ".", null);
-                } catch (BadLocationException e) {
-                    e.printStackTrace();
-                }
-
-                ToolTipManager.sharedInstance().registerComponent(text);
+        EventQueue.invokeLater(() -> {
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
             }
+            
+            JTextPane text = new JTextPane() {
+                @Override
+                public String getToolTipText() {
+                    return ((JComponent) getParent()).getToolTipText();
+                }
+                
+                @Override
+                public String getToolTipText(MouseEvent event) {
+                    return ((JComponent) getParent()).getToolTipText(event);
+                }
+            };
+            
+            try {
+                text.getStyledDocument().insertString(0, ".", null);
+            } catch (BadLocationException e) {
+                e.printStackTrace();
+            }
+            
+            ToolTipManager.sharedInstance().registerComponent(text);
         });
 
         saveButton = new JButton("Save game");
@@ -130,6 +139,9 @@ public class GameWindow extends JPanel {
 
         this.setLayout(new GridBagLayout());
 
+        /**
+         * PLAYER1 gombok
+         */
         player1TowerButtons = new JButton[5];
         player1UnitButtons = new JButton[5];
         player2TowerButtons = new JButton[5];
@@ -137,7 +149,6 @@ public class GameWindow extends JPanel {
 
         setPanels();
 
-        //PLAYER BUTTONS
         /**
          * PLAYER1 Tower típusok
          */
@@ -298,8 +309,6 @@ public class GameWindow extends JPanel {
             PointerInfo hover = MouseInfo.getPointerInfo();
             Point hoveredPoint = hover.getLocation();
 
-            int fieldSize = model.getBoardSize() / 30;
-
             int boardPositionX = (int) hoveredPoint.getX() - 500;
             int matrixPositionX = boardPositionX / fieldSize;
             int boardPositionY = (int) hoveredPoint.getY() - 75;
@@ -404,8 +413,11 @@ public class GameWindow extends JPanel {
         activePlayerPanelSetter();
     }
     
+    /**
+     * 1 szimulációs menet: egységek lépnek, harcos sebez, romboló rombol, tornyok sebeznek
+     * @return
+     */
     public boolean simulation() {
-        //először az egységek mozognak
         boolean moreDistance = false;
         boolean isOver = false;
         for (int playerIndex = 0; playerIndex < 2; playerIndex++) {
@@ -487,8 +499,8 @@ public class GameWindow extends JPanel {
                             if(enemyUnit.getType().equals("Fighter")){
                                 units.get(unitIndex).setBlood(true);
                                 if(units.get(unitIndex).getHp() < enemyUnit.getPower()){
-                                    model.getPlayers()[playerIndex].deleteUnit(units.get(unitIndex));
                                     model.getPlayers()[Math.abs(playerIndex - 1)].setMoney(model.getPlayers()[Math.abs(playerIndex - 1)].getMoney() + units.get(unitIndex).getMaxHp() * 2);
+                                    model.getPlayers()[playerIndex].deleteUnit(units.get(unitIndex));
                                     if (unitIndex > 0) {
                                     unitIndex--;
                                     } else {
@@ -588,6 +600,10 @@ public class GameWindow extends JPanel {
         return moreDistance;
     }
 
+    /**
+     * torony építés során elérhető helyek megjelenítése, ha van elég pénz a toronyra
+     * @param towerType
+     */
     public void towerPlaceAction(String towerType) {
         if (!buttonAction.equals("")) {
             buttonAction = "";
@@ -601,7 +617,9 @@ public class GameWindow extends JPanel {
         }
     }
 
-    //játékosok körönként váltják egymást, minden szimuláció 2 körönként történik - ezután kap mindkét játékos 100-100 aranyat
+    /**
+     *játékosok körönként váltják egymást, minden szimuláció 2 körönként történik - ezután kap mindkét játékos 100-100 aranyat
+     */
     public void newRound() {
         model.setSelectables(new ArrayList<>());
         model.setRound(model.getRound() + 1);
@@ -661,7 +679,10 @@ public class GameWindow extends JPanel {
         model.getPlayers()[1].setTowers(player2Towers);
     }
 
-    public void gameOver() //játék végén felugró üzenet
+    /**
+     *játék végén felugró üzenet
+     */
+    public void gameOver() 
     {
         JFrame newFrame = new JFrame();
         if (model.getPlayers()[0].getCastle().getHp() == 0 && model.getPlayers()[1].getCastle().getHp() == 0) {
@@ -676,10 +697,13 @@ public class GameWindow extends JPanel {
         System.exit(0);
     }
 
-    public void saveGame() //játék mentése txt fájlba
+    /**
+     *játék mentése txt fájlba
+     */
+    public void saveGame() 
     {
         String filename;
-        filename = JOptionPane.showInputDialog("Filename:");
+        filename = JOptionPane.showInputDialog(null, "Filename: ", "Save to file (click cancel to not save)", JOptionPane.QUESTION_MESSAGE);
         if (filename == null || filename.length() == 0) {
             return;
         }
@@ -687,7 +711,8 @@ public class GameWindow extends JPanel {
     }
 
     /**
-     * Outlines
+     * grafikus rész
+     * @param grph
      */
     @Override
     protected void paintComponent(Graphics grph) {
@@ -1407,13 +1432,14 @@ public class GameWindow extends JPanel {
 
     /**
      * Getterek, setterek
+     * @return 
      */
     public Board getBoard() {
         return board;
     }
 
-    public void setBoard(Board bd) {
-        board = bd;
+    public void setBoard(Board newBoard) {
+        board = newBoard;
     }
 
     public int getTicks() {
@@ -1460,8 +1486,8 @@ public class GameWindow extends JPanel {
         this.RNDPROTECTION = RNDPROTECTION;
     }
 
-    public void setTestMode(boolean b) {
-        testMode = b;
+    public void setTestMode(boolean isTestMode) {
+        testMode = isTestMode;
     }
     public JButton getBackToMenuButton(){
         return backToMenuButton;

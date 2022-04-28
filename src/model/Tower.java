@@ -23,29 +23,19 @@ public abstract class Tower extends Sprite {
     protected Node shootCords;
     protected boolean exploded;
 
-    public boolean isExploded() {
-        return exploded;
-    }
-
-    public void setExploded(boolean exploded) {
-        this.exploded = exploded;
-    }
-
-    public void setShootCords(int x, int y){
-        shootCords.setX(x);
-        shootCords.setY(y);
-    }
-
-    public Node getShootCords(){
-        return shootCords;
-    }
-
-
+    /**
+     *
+     * @param scolor
+     * @param x
+     * @param y
+     * @param height
+     * @param width
+     * @param img
+     */
     public Tower(String scolor, int x, int y, int height, int width, Image img) {
         super(x, y, height, width, img);
         exploded = false;
-        shootCords = new Node();
-        setShootCords(-1,-1);
+        shootCords = new Node(-1,-1);
         this.demolishedIn = -1;
         level = 1;
         if (scolor == "red") {
@@ -53,6 +43,45 @@ public abstract class Tower extends Sprite {
         } else {
             this.color = Color.blue;
         }
+    }
+    
+    /**
+     * torony fejlesztése
+     */
+    public abstract void upgrade();
+
+    /**
+     * torony lerombolása
+     */
+    public void demolish() {
+        demolishedIn = 4;//2 whole round
+        img = new ImageIcon("src/res/Destroyed.png").getImage();
+    }
+    
+     /**
+     * hp csík hossza
+     */
+     private double hpLineWidth() {
+        double d = (double) hp / maxHp;
+            return d * width;
+
+    }
+    
+      /**
+     * torony kirajzolása
+     * @param g2
+     */
+    @Override
+    public void draw(Graphics2D g2) {
+        if(demolishedIn != -1) img = new ImageIcon("src/res/Destroyed.png").getImage();
+        g2.drawImage(img, x, y, height, width, null);
+        if (demolishedIn <=0) {
+            g2.setColor(color);
+            g2.drawLine(x + 2, y + height - 2, x + (int) hpLineWidth() - 2, y + height - 2);
+            g2.drawLine(x + 2, y + height - 3, x + (int) hpLineWidth() - 2, y + height - 3);
+            g2.drawLine(x + 2, y + height - 4, x + (int) hpLineWidth() - 2, y + height - 4);
+        }
+
     }
 
     public int getMoneySpentOn() {
@@ -95,7 +124,22 @@ public abstract class Tower extends Sprite {
         this.attackFrequency = attackFrequency;
     }
 
-    
+    public boolean isExploded() {
+        return exploded;
+    }
+
+    public void setExploded(boolean exploded) {
+        this.exploded = exploded;
+    }
+
+    public void setShootCords(int x, int y){
+        shootCords.setX(x);
+        shootCords.setY(y);
+    }
+
+    public Node getShootCords(){
+        return shootCords;
+    }
 
     public int getHp() {
         return hp;
@@ -141,38 +185,12 @@ public abstract class Tower extends Sprite {
         level = lvl;
     }
 
-    public abstract void upgrade();
-
-    public void demolish() {
-        demolishedIn = 4;//2 whole round
-        img = new ImageIcon("src/res/Destroyed.png").getImage();
-    }
-
     public int getDemolishedIn() {
         return demolishedIn;
     }
 
     public void setDemolishedIn(int x) {
         demolishedIn -= x;
-    }
-
-    private double hpLine() {
-        double d = (double) hp / maxHp;
-            return d * width;
-
-    }
-
-    @Override
-    public void draw(Graphics2D g2) {
-        if(demolishedIn != -1) img = new ImageIcon("src/res/Destroyed.png").getImage();
-        g2.drawImage(img, x, y, height, width, null);
-        if (demolishedIn <=0) {
-            g2.setColor(color);
-            g2.drawLine(x + 2, y + height - 2, x + (int) hpLine() - 2, y + height - 2);
-            g2.drawLine(x + 2, y + height - 3, x + (int) hpLine() - 2, y + height - 3);
-            g2.drawLine(x + 2, y + height - 4, x + (int) hpLine() - 2, y + height - 4);
-        }
-
     }
 
 }
