@@ -5,7 +5,16 @@ import java.util.ArrayList;
 
 public class General extends Unit {
 
-    //újonnan létrehozott
+    /**
+     * újonnan létrehozott
+     * @param scolor
+     * @param x
+     * @param y
+     * @param height
+     * @param width
+     * @param img
+     * @param way
+     */
     public General(String scolor, int x, int y, int height, int width, Image img, ArrayList<Node> way) {
         super(scolor, x, y, height, width, img);
         this.distance = 5;
@@ -17,7 +26,16 @@ public class General extends Unit {
         this.way = way;
     }
 
-    //fájlból betöltött
+    /**
+     * fájlból betöltött
+     * @param scolor
+     * @param hp
+     * @param x
+     * @param y
+     * @param height
+     * @param width
+     * @param img
+     */
     public General(String scolor, int hp, int x, int y, int height, int width, Image img) {
         super(scolor, x, y, height, width, img);
         this.distance = 5;

@@ -4,7 +4,15 @@ import java.awt.Image;
 
 public class Sniper extends Tower {
 
-    //újonnan létrehozott
+    /**
+     * újonnan létrehozott
+     * @param scolor
+     * @param x
+     * @param y
+     * @param height
+     * @param width
+     * @param img
+     */
     public Sniper(String scolor, int x, int y, int height, int width, Image img) {
         super(scolor, x, y, height, width, img);
         this.attackFrequency = 1.5;
@@ -20,7 +28,21 @@ public class Sniper extends Tower {
         this.moneySpentOn = price;
     }
 
-    //fájból betöltött
+    /**
+     * fájból betöltött
+     * @param type
+     * @param sColor
+     * @param power
+     * @param range
+     * @param attackFrequency
+     * @param hp
+     * @param level
+     * @param x
+     * @param y
+     * @param height
+     * @param width
+     * @param img
+     */
     public Sniper(String type, String sColor, int power, int range, double attackFrequency, int hp, int level, int x, int y, int height, int width, Image img) {
         super(sColor, x, y, height, width, img);
         this.type = type;
@@ -43,6 +65,9 @@ public class Sniper extends Tower {
         }
     }
 
+    /**
+     * fejlesztés
+     */
     @Override
     public void upgrade() {
         attackFrequency -= 0.25;

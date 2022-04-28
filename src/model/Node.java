@@ -6,22 +6,33 @@ public class Node {
     private int y;
     Node parent;
 
-    Node(int x, int y, Node parent) {
+    /**
+     * szülővel (előző mező) rendelkező elem
+     * @param x
+     * @param y
+     * @param parent
+     */
+    public Node(int x, int y, Node parent) {
         this.x = x;
         this.y = y;
         this.parent = parent;
     }
 
-    Node(int x, int y) {
+    /**
+     * szülő nélkül rendelkező elem
+     * @param x
+     * @param y
+     */
+    public Node(int x, int y) {
         this.x = x;
         this.y = y;
         this.parent = null;
     }
 
-    public Node() {
-
-    }
-
+    /**
+     * getterek, setterek
+     * @return
+     */
     public int getX() {
         return x;
     }
