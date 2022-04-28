@@ -361,13 +361,13 @@ public class Model {
         }
     }
 
-    public String getInfo(int boardPositionX, int boardPositionY) {
+    public String getInfo(int matrixPositionX, int matrixPositionY) {
         String information = "";
         boolean foundElement = false;
 
         for (int i = 0; i < players[activePlayer].getNotDemolishedTowers().size() && !foundElement; i++) {
             Tower t = players[activePlayer].getNotDemolishedTowers().get(i);
-            if (t.x / (boardSize / 30) == boardPositionX && t.y / (boardSize / 30) == boardPositionY) {
+            if (t.x / (boardSize / 30) == matrixPositionX && t.y / (boardSize / 30) == matrixPositionY) {
                 information = "<html><font face=\"sansserif\" color=\"black\">Tower type: " + t.type + "<br>level: " + t.level + "<br>hp: " + t.hp + ""
                         + "<br>attack speed: " + t.attackFrequency + "<br>power: " + t.power + "<br>range: " + t.range + "</font></html>";
                 foundElement = true;
@@ -376,14 +376,19 @@ public class Model {
         }
 
         ArrayList<Unit> units = new ArrayList<>();
-        for (Unit actualUnit : players[0].getUnits()) {
-            if (actualUnit.getX() / (boardSize / 30) == boardPositionX && actualUnit.getY() / (boardSize / 30) == boardPositionY) {
+        for (Unit actualUnit : players[activePlayer].getUnits()) {
+            if (actualUnit.getX() / (boardSize / 30) == matrixPositionX && actualUnit.getY() / (boardSize / 30) == matrixPositionY) {
                 units.add(actualUnit);
             }
+            System.out.println(actualUnit.getX() / (boardSize / 30)+" x "+ matrixPositionX );
+            System.out.println(actualUnit.getY() / (boardSize / 30)+" y "+ matrixPositionY );
         }
+
+
+
         
         if (units.size() == 1) {
-            units.get(0).setX(boardPositionX * (boardSize / 30));
+            units.get(0).setX(matrixPositionX * (boardSize / 30)); //ha volt több unit és egyen kívül mind meghalt
             information += "<html><font face=\"sansserif\" color=\"black\">Unit type: " + units.get(0).type + "<br>hp: " + units.get(0).hp + ""
                     + "<br>distance: " + units.get(0).distance + "<br>power: " + units.get(0).power + "</font></html>";
             return information;
@@ -393,7 +398,7 @@ public class Model {
                 showUnits = units.size();
             }
             for (int i = 0; i < showUnits; i++) {
-                units.get(i).setX(boardPositionX * (boardSize / 30) + i);
+                units.get(i).setX(matrixPositionX * (boardSize / 30) + i);
             }
             ArrayList<String> unitTypes = new ArrayList<>();
             String typesString = "";
@@ -418,10 +423,10 @@ public class Model {
 
         for (int i = 0; i < 4; i++) {
 
-            if (boardPositionX == castleCoordinates[i][0] && boardPositionY == castleCoordinates[i][1]) {
+            if (matrixPositionX == castleCoordinates[i][0] && matrixPositionY == castleCoordinates[i][1]) {
                 information = "<html><font face=\"sansserif\" color=\"black\">" + players[0].getName() + "'s castle<br>hp: "
                         + players[0].getCastle().getHp() + "</font></html>";
-            } else if (boardPositionX == castleCoordinates[i + 4][0] && boardPositionY == castleCoordinates[i + 4][1]) {
+            } else if (matrixPositionX == castleCoordinates[i + 4][0] && matrixPositionY == castleCoordinates[i + 4][1]) {
                 information = "<html><font face=\"sansserif\" color=\"black\">" + players[1].getName() + "'s castle<br>hp: "
                         + players[1].getCastle().getHp() + "</font></html>";
             }

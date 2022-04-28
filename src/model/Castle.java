@@ -59,11 +59,11 @@ public class Castle extends Sprite {
         if (hp != 0) {
             g2.drawImage(img, x, y, height, width, null);
             g2.setColor(colorFromString);
-            g2.drawLine(x + 2, y + height - 2, x + (int) hpLine() - 2, y + height - 2);
-            g2.drawLine(x + 2, y + height - 3, x + (int) hpLine() - 2, y + height - 3);
-            g2.drawLine(x + 2, y + height - 4, x + (int) hpLine() - 2, y + height - 4);
-            g2.drawLine(x + 2, y + height - 5, x + (int) hpLine() - 2, y + height - 5);
-            g2.drawLine(x + 2, y + height - 6, x + (int) hpLine() - 2, y + height - 6);
+            g2.drawLine(x , y + height - 2, x + (int) hpLine() , y + height - 2);
+            g2.drawLine(x , y + height - 3, x + (int) hpLine() , y + height - 3);
+            g2.drawLine(x, y + height - 4, x + (int) hpLine() , y + height - 4);
+            g2.drawLine(x , y + height - 5, x + (int) hpLine() , y + height - 5);
+            g2.drawLine(x , y + height - 6, x + (int) hpLine() , y + height - 6);
         }
 
     }

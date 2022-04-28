@@ -21,23 +21,13 @@ public abstract class Unit extends Sprite {
         return maxHp;
     }
 
-    public void setMaxHp(int maxHp) {
-        this.maxHp = maxHp;
-    }
-
-    protected void move(int x, int y) {
+    public void move(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
-    public boolean collides(Sprite s) {
-        return false;
-    }
-
     private double hpLineWidth() {
-        double lineWidth = (double) hp / maxHp;
-        return lineWidth * width;
-
+        return ((double)hp / (double)maxHp)*25;
     }
 
     public boolean isBlood() {
@@ -70,10 +60,6 @@ public abstract class Unit extends Sprite {
 
     public int getDistance() {
         return distance;
-    }
-
-    public void setDistance(int distance) {
-        this.distance = distance;
     }
 
     public int getPower() {
@@ -113,9 +99,9 @@ public abstract class Unit extends Sprite {
 
         g2.drawImage(img, x, y, height, width, null);
         g2.setColor(color);
-        g2.drawLine(x + 4, y + height - 2, x + (int) hpLineWidth()- 4, y + height - 2);
-        g2.drawLine(x + 4, y + height - 3, x + (int) hpLineWidth()- 4, y + height - 3);
-        g2.drawLine(x + 4, y + height - 4, x + (int) hpLineWidth()- 4, y + height - 4);
+        g2.drawLine(x +3, y + height - 2, x +3+ (int)hpLineWidth(), y + height - 2);
+        g2.drawLine(x+3 , y + height - 3, x +3+(int)hpLineWidth(), y + height - 3);
+        g2.drawLine(x +3, y + height - 4, x +3+ (int)hpLineWidth(), y + height - 4);
 
     }
 

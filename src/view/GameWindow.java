@@ -425,8 +425,7 @@ public class GameWindow extends JPanel {
                     if (units.get(unitIndex).getWay() != null && !units.get(unitIndex).getWay().isEmpty()) {
                         ArrayList<Node> unitWay = units.get(unitIndex).getWay();
                         Node next = unitWay.get(0);
-                        units.get(unitIndex).setX(next.getX() * fieldSize);
-                        units.get(unitIndex).setY(next.getY() * fieldSize);
+                        units.get(unitIndex).move(next.getX() * fieldSize,next.getY() * fieldSize);
                         board.repaint();
                         unitWay.remove(0);
                         units.get(unitIndex).setWay(unitWay);
