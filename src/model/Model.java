@@ -291,12 +291,26 @@ public class Model {
     public void setSelectables() {
         for (int i = 0; i < 30; i++) {
             for (int j = (activePlayer + 1) * 15 - 1; j >= activePlayer * 15; j--) {
-                if (terrainElementPositions[i][j] == 'F' && placable(i, j, players[activePlayer].getDifficulty(this, "General", activePlayer))) //generalra számoljuk, mivel így a tavat és hegyet is akadálynak veszi, hogy ne tudjunk rájuk rakni tornyot
+                if (terrainElementPositions[i][j] == 'F' && placable(i, j, players[activePlayer].getDifficulty(this, "General", activePlayer))) 
+        //generalra számoljuk, mivel így a tavat és hegyet is akadálynak veszi, hogy ne tudjunk rájuk rakni tornyot
                 {
                     selectables.add(new Selectable(i * (boardSize / 30), j * (boardSize / 30),
                             (boardSize / 30), (boardSize / 30)));
                 }
             }
+        }
+    }
+    
+    public int towerBuildMoney(String towerType){
+        if(towerType.equals("Fortified")){
+            return 200;
+        }
+        else if(towerType.equals("Rapid")){
+            return 250;
+        }
+        else //towerType.equals("Sniper")
+        {
+            return 300;
         }
     }
 
@@ -361,13 +375,13 @@ public class Model {
             }
         }
 
-        ArrayList<Unit> units = new ArrayList<Unit>();
-        for (Unit actualUnit : players[activePlayer].getUnits()) {
+        ArrayList<Unit> units = new ArrayList<>();
+        for (Unit actualUnit : players[0].getUnits()) {
             if (actualUnit.getX() / (boardSize / 30) == boardPositionX && actualUnit.getY() / (boardSize / 30) == boardPositionY) {
                 units.add(actualUnit);
             }
         }
-
+        
         if (units.size() == 1) {
             units.get(0).setX(boardPositionX * (boardSize / 30));
             information += "<html><font face=\"sansserif\" color=\"black\">Unit type: " + units.get(0).type + "<br>hp: " + units.get(0).hp + ""
@@ -381,7 +395,7 @@ public class Model {
             for (int i = 0; i < showUnits; i++) {
                 units.get(i).setX(boardPositionX * (boardSize / 30) + i);
             }
-            ArrayList<String> unitTypes = new ArrayList<String>();
+            ArrayList<String> unitTypes = new ArrayList<>();
             String typesString = "";
             int sumPower = 0;
             int sumHp = 0;
@@ -397,7 +411,8 @@ public class Model {
             for (int i = 1; i < unitTypes.size(); i++) {
                 typesString += ", " + unitTypes.get(i);
             }
-            information += "<html><font face=\"sansserif\" color=\"black\">" + units.size() + " units<br>Types: " + typesString + "<br>Sum power: " + sumPower + "<br>Sum hp: " + sumHp + "</font></html>";
+            information += "<html><font face=\"sansserif\" color=\"black\">" + units.size() + " units<br>Types: " + typesString + "<br>Sum power: " + 
+                    sumPower + "<br>Sum hp: " + sumHp + "</font></html>";
             return information;
         }
 
@@ -406,7 +421,7 @@ public class Model {
             if (boardPositionX == castleCoordinates[i][0] && boardPositionY == castleCoordinates[i][1]) {
                 information = "<html><font face=\"sansserif\" color=\"black\">" + players[0].getName() + "'s castle<br>hp: "
                         + players[0].getCastle().getHp() + "</font></html>";
-            } else if (boardPositionX == castleCoordinates[i + 4][0] && boardPositionX == castleCoordinates[i + 4][1]) {
+            } else if (boardPositionX == castleCoordinates[i + 4][0] && boardPositionY == castleCoordinates[i + 4][1]) {
                 information = "<html><font face=\"sansserif\" color=\"black\">" + players[1].getName() + "'s castle<br>hp: "
                         + players[1].getCastle().getHp() + "</font></html>";
             }

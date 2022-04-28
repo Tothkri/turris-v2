@@ -596,7 +596,9 @@ public class GameWindow extends JPanel {
         } else {
             selectedTower = towerType;
             buttonAction = "placeTower";
-            model.setSelectables();
+            if(model.getPlayers()[model.getActivePlayer()].getMoney()>=model.towerBuildMoney(towerType)){
+                model.setSelectables();
+            }
         }
     }
 
