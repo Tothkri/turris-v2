@@ -72,19 +72,23 @@ Ki mit csinált:
     
     Szálkai Olivér Dávid (ONLQ05): végleges sprite képek, StartScreen GUI
 
+9. hét (04.27 - 05.04.)
+
+    Tóth Kristóf (SONXZF): bug fix, javadoc
+
+    Tóth Kristóf (YPENKF): 
+    
+    Szálkai Olivér Dávid (ONLQ05): 
+
 to-do list:
 
--fighter bug
-
--egyéb bug keresés
+-bug keresés
 
 -több unit küldése gomb
 
 -végleges képek
 
--vissza a menübe gomb
-
--default mentés
+-bug: unit hover text (plain2F.txt)
 
 dokumentáció (diagramok frissítése, osztályleírások, user guide): wiki oldalra
 

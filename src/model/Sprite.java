@@ -11,6 +11,14 @@ public abstract class Sprite {
     protected int width;
     protected Image img;
 
+    /**
+     * újonnan létrehozáshoz
+     * @param x
+     * @param y
+     * @param height
+     * @param width
+     * @param img
+     */
     public Sprite(int x, int y, int height, int width, Image img) {
         this.x = x;
         this.y = y;
@@ -19,9 +27,24 @@ public abstract class Sprite {
         this.img = img;
     }
 
+    /**
+     * fájlból betöltéshez konstruktor
+     */ 
     public Sprite() {
     }
+    
+    /**
+     * elem kirajzolása
+     * @param g2
+     */
+    public void draw(Graphics2D g2) {
+        g2.drawImage(img, x, y, height, width, null);
+    }
 
+    /**
+     * getterek, setterek
+     * @return
+     */
     public int getX() {
         return x;
     }
@@ -62,7 +85,5 @@ public abstract class Sprite {
         this.img = img;
     }
 
-    public void draw(Graphics2D g2) {
-        g2.drawImage(img, x, y, height, width, null);
-    }
+    
 }

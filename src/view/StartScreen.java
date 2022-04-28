@@ -75,7 +75,8 @@ public class StartScreen extends JPanel {
      * Játék betöltése
      *
      * @param gw
-     * @return
+     * @param fileName
+     * @throws java.io.IOException
      */
     public void loadGame(GameWindow gw, String fileName) throws IOException {
         int size = height - 150;
@@ -257,6 +258,11 @@ public class StartScreen extends JPanel {
         gw.setTicks(ticks);
     }
 
+    /**
+     * tornyok betöltése
+     * @param arr
+     * @return
+     */
     public Tower setTower(String[] arr) {
         String png = arr[1] + arr[7] + arr[2];
         if (!arr[12].equals("-1")) {
@@ -288,6 +294,11 @@ public class StartScreen extends JPanel {
         return t;
     }
 
+    /**
+     * egységek betöltése
+     * @param arr
+     * @return
+     */
     public Unit setUnit(String[] arr) {
         Unit u;
         int size = height - 150;
@@ -316,6 +327,12 @@ public class StartScreen extends JPanel {
         return u;
     }
 
+    /**
+     * pálya típus képének beállítása
+     * @param mf
+     * @param ms
+     * @param mt
+     */
     public void getMapPickVal(Boolean mf, Boolean ms, Boolean mt) {
         if (mf) {
             mapVal = "src/res/mnl_map.png";
@@ -330,7 +347,8 @@ public class StartScreen extends JPanel {
     }
 
     /**
-     * Outlines
+     * grafikus rész
+     * @param grph
      */
     @Override
     protected void paintComponent(Graphics grph) {
@@ -663,12 +681,11 @@ public class StartScreen extends JPanel {
             this.add(stexButtonRow, gridBConts);
             
         } catch(IOException | FontFormatException e) {
-            //System.out.println("Exception thrown :" + e);
         }
     }
 
     /**
-     * Checks if the names are correct or not
+     * nevek helyesek-e
      *
      * @param
      * @return correct or not
@@ -700,6 +717,7 @@ public class StartScreen extends JPanel {
 
     /**
      * Rádiógombok beállítása
+     * @return 
      */
     public int getSelectedRadioButton() {
         if (map1.isSelected()) {
@@ -712,6 +730,7 @@ public class StartScreen extends JPanel {
 
     /**
      * Getterek, setterek
+     * @return 
      */
     public JButton getStartButton() {
         return startButton;

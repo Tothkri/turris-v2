@@ -13,9 +13,41 @@ public class MainTest {
     private Model m;
     private Player p1;
     private Player p2;
-    private int fieldSize=31;
+    private final int fieldSize = 31;
 
     public MainTest() {
+    }
+
+    public void simulate(int count) {
+        for (int i = 0; i < count; i++) {
+            gw.simulation();
+        }
+    }
+    
+    public void towerSimulate(int count,int simulationticks){
+        for (int c = 0; c < count; c++) {
+        gw.simulation();
+        for (int i = 0; i < 2; i++) {
+            ArrayList<Tower> towers = gw.getBoard().getModel().getPlayers()[i].getNotDemolishedTowers();
+            for (int j = 0; j < towers.size(); j++) {
+                double tickPerAttack = towers.get(j).getAttackFrequency() / 0.25;
+                if (simulationticks % tickPerAttack == 0) {
+                    ArrayList<Unit> enemyUnitsNearby = gw.getBoard().getModel().enemyUnitsNearby(i, towers.get(j));
+                    if (enemyUnitsNearby.size() > 0) {
+                        int rand = (int) (Math.random() * enemyUnitsNearby.size());
+                        towers.get(j).setShootCords(enemyUnitsNearby.get(rand).getX(), enemyUnitsNearby.get(rand).getY());
+                        if (enemyUnitsNearby.get(rand).getHp() > towers.get(j).getPower()) {
+                            enemyUnitsNearby.get(rand).setHp(enemyUnitsNearby.get(rand).getHp() - towers.get(j).getPower());
+                        } else {
+                            gw.getBoard().getModel().getPlayers()[(i + 1) % 2].deleteUnit(enemyUnitsNearby.get(rand));
+                            gw.getBoard().getModel().getPlayers()[i].setMoney(gw.getBoard().getModel().getPlayers()[i].getMoney() + enemyUnitsNearby.get(rand).getMaxHp() * 2);
+                        }
+                    }
+                }
+            }
+        }
+        simulationticks++;
+        }
     }
 
     public void Initialize(String fileName) {
@@ -32,9 +64,8 @@ public class MainTest {
     }
 
     /**
-     * Both players start with the correct amount of money Both castles start
-     * with the correct amount of health Not current player can't use his
-     * buttons
+     * Játék kezdete: fájlból betöltve a játékosok megfelelő pénzmennyiséggel,
+     * kastély hp-val rendelkeznek aktív játékos gombjai jellenk meg csak
      */
     @Test
     public void testStart() {
@@ -61,8 +92,7 @@ public class MainTest {
     }
 
     /**
-     * Checks if the units, towers, castles,other stats are correct after
-     * loading
+     * Egységek, tornyok, kastélyok, egyéb adatok helyesek-e betöltés után
      */
     @Test
     public void testLoad() {
@@ -91,7 +121,7 @@ public class MainTest {
     }
 
     /**
-     * Test the amount of mountains and lakes generated on different maps
+     * hegyek és tavak mennyiségének tesztelése különböző típusú pályákon
      */
     @Test
     public void testSelectedMap() {
@@ -110,10 +140,9 @@ public class MainTest {
     }
 
     /**
-     * Checks if tower is correctly built Checks if the money is deducted Checks
-     * if it appears at the position Checks if player has the tower Won't build
-     * if there's no place for it, or has no money for it Won't build if the
-     * tower would block the castle from units Checks if selects are correct
+     * torony építése helyesen működik pénz megfelelően vonódik le ha nincs
+     * hely, nem lehet építeni kijelölésrk helyesek ha nincs pénz nem lehet
+     * építeni torony nem zárhat el utat a két kastély között
      */
     @Test
     public void testTowerBuild() {
@@ -155,7 +184,7 @@ public class MainTest {
     }
 
     /**
-     * Check if player can or cannot upgrade
+     * torony fejlesztések lehetségesek-e, pénz jól vonódik le
      */
     @Test
     public void upgradeTower() {
@@ -224,8 +253,8 @@ public class MainTest {
     }
 
     /**
-     * Checks is destroyed tower gives money back Cannot destroy a destroyed
-     * tower Cannot destroy a non-tower
+     * lerombolt torony jól ad vissza pénz lerombolt torony nem funkcionál nem
+     * torony elem nem rombolható le
      */
     @Test
     public void testDemolishTower() {
@@ -237,7 +266,7 @@ public class MainTest {
 
         m.getPlayers()[0].demolish(27, 3, size);
         assertTrue(m.getPlayers()[0].getMoney() == 1025);
-         m.setPosition(27,3,'D');
+        m.setPosition(27, 3, 'D');
 
         m.getPlayers()[0].setMoney(2000);
         m.getPlayers()[0].upgrade(26, 3, size);
@@ -252,7 +281,7 @@ public class MainTest {
     }
 
     /**
-     * Checks, if unit damages the castle
+     * egységek sebzik a kastélyt
      */
     @Test
     public void testUnitsDamgeToCastle() {
@@ -277,7 +306,7 @@ public class MainTest {
                     ArrayList<String> wayString = m.getPlayers()[q].findBestWay(u.getX() / fieldSize,
                             u.getY() / fieldSize, m.getCastleCoordinates()[i + defender][0],
                             m.getCastleCoordinates()[i + defender][1], m.getPlayers()[q].getDifficulty(m, u.getType(), q));
-                    int currentDiffculty=m.wayDifficulty(q, m.getPlayers()[q].convertWay(wayString), u.getType());
+                    int currentDiffculty = m.wayDifficulty(q, m.getPlayers()[q].convertWay(wayString), u.getType());
                     if (minWayDiff > currentDiffculty) {
                         bestWayNode = m.getPlayers()[q].convertWay(wayString);
                         minWayDiff = currentDiffculty;
@@ -292,12 +321,8 @@ public class MainTest {
             }
         }
 
-        gw.simulation();
-        gw.simulation();
-        gw.simulation();
-        gw.simulation();
-        gw.simulation();
-        gw.simulation();
+        simulate(6);
+        
         gw.getPlayer1distances().clear();
         gw.getPlayer2distances().clear();
 
@@ -312,12 +337,7 @@ public class MainTest {
                     }
                 }
             }
-            gw.simulation();
-            gw.simulation();
-            gw.simulation();
-            gw.simulation();
-            gw.simulation();
-            gw.simulation();
+             simulate(6);
             gw.getPlayer1distances().clear();
             gw.getPlayer2distances().clear();
         }
@@ -328,6 +348,9 @@ public class MainTest {
         assertTrue(m.getPlayers()[0].getMoney() == 800);
     }
 
+    /**
+     * egységek megfelelően teszik meg a távolságot
+     */
     @Test
     public void testUnitDistance() {
         Initialize("plain.txt");
@@ -350,7 +373,7 @@ public class MainTest {
                     ArrayList<String> wayString = m.getPlayers()[q].findBestWay(u.getX() / fieldSize,
                             u.getY() / fieldSize, m.getCastleCoordinates()[i + defender][0],
                             m.getCastleCoordinates()[i + defender][1], m.getPlayers()[q].getDifficulty(m, u.getType(), q));
-                    int currentDiffculty=m.wayDifficulty(q, m.getPlayers()[q].convertWay(wayString), u.getType());
+                    int currentDiffculty = m.wayDifficulty(q, m.getPlayers()[q].convertWay(wayString), u.getType());
                     if (minWayDiff > currentDiffculty) {
                         bestWayNode = m.getPlayers()[q].convertWay(wayString);
                         minWayDiff = currentDiffculty;
@@ -365,11 +388,7 @@ public class MainTest {
             }
         }
         gw.setModel(m);
-        gw.simulation();
-        gw.simulation();
-        gw.simulation();
-        gw.simulation();
-        gw.simulation();
+         simulate(5);
         int x = gw.getBoard().getModel().getPlayers()[0].getUnits().get(0).getX();
         int y = gw.getBoard().getModel().getPlayers()[0].getUnits().get(0).getY();
         gw.simulation();
@@ -378,7 +397,7 @@ public class MainTest {
     }
 
     /**
-     * Checks two fighter unit damage
+     * két harcos sebzi egymást
      */
     @Test
     public void testFighterUnit() {
@@ -400,7 +419,7 @@ public class MainTest {
                     ArrayList<String> wayString = m.getPlayers()[q].findBestWay(u.getX() / fieldSize,
                             u.getY() / fieldSize, m.getCastleCoordinates()[i + defender][0],
                             m.getCastleCoordinates()[i + defender][1], m.getPlayers()[q].getDifficulty(m, u.getType(), q));
-                    int currentDiffculty=m.wayDifficulty(q, m.getPlayers()[q].convertWay(wayString), u.getType());
+                    int currentDiffculty = m.wayDifficulty(q, m.getPlayers()[q].convertWay(wayString), u.getType());
                     if (minWayDiff > currentDiffculty) {
                         bestWayNode = m.getPlayers()[q].convertWay(wayString);
                         minWayDiff = currentDiffculty;
@@ -422,6 +441,9 @@ public class MainTest {
         assertTrue(m.getPlayers()[1].getUnits().get(0).getHp() == m.getPlayers()[1].getUnits().get(0).getMaxHp() - m.getPlayers()[1].getUnits().get(0).getPower());
     }
 
+    /**
+     * romboló egység funkcionalitásának tesztelése
+     */
     @Test
     public void testDestroyerUnit() {
         Initialize("plain1T1D.txt");
@@ -441,7 +463,7 @@ public class MainTest {
                     ArrayList<String> wayString = m.getPlayers()[q].findBestWay(u.getX() / fieldSize,
                             u.getY() / fieldSize, m.getCastleCoordinates()[i + defender][0],
                             m.getCastleCoordinates()[i + defender][1], m.getPlayers()[q].getDifficulty(m, u.getType(), q));
-                    int currentDiffculty=m.wayDifficulty(q, m.getPlayers()[q].convertWay(wayString), u.getType());
+                    int currentDiffculty = m.wayDifficulty(q, m.getPlayers()[q].convertWay(wayString), u.getType());
                     if (minWayDiff > currentDiffculty) {
                         bestWayNode = m.getPlayers()[q].convertWay(wayString);
                         minWayDiff = currentDiffculty;
@@ -459,9 +481,7 @@ public class MainTest {
         gw.setModel(m);
 
         assertTrue(m.getPlayers()[1].getTowers().get(0).getHp() == m.getPlayers()[1].getTowers().get(0).getMaxHp());
-        gw.simulation();
-        gw.simulation();
-        gw.simulation();
+         simulate(3);
         m = gw.getBoard().getModel();
 
         assertTrue(m.getPlayers()[1].getTowers().get(0).getHp() == m.getPlayers()[1].getTowers().get(0).getMaxHp() - 50);
@@ -469,7 +489,7 @@ public class MainTest {
     }
 
     /**
-     * Destroyer cannot destroy demolished tower
+     * romboló egység lerombolt tornyot nem rombol tovább
      */
     @Test
     public void testDestroyerDemolishedTower() {
@@ -490,7 +510,7 @@ public class MainTest {
                     ArrayList<String> wayString = m.getPlayers()[q].findBestWay(u.getX() / fieldSize,
                             u.getY() / fieldSize, m.getCastleCoordinates()[i + defender][0],
                             m.getCastleCoordinates()[i + defender][1], m.getPlayers()[q].getDifficulty(m, u.getType(), q));
-                    int currentDiffculty=m.wayDifficulty(q, m.getPlayers()[q].convertWay(wayString), u.getType());
+                    int currentDiffculty = m.wayDifficulty(q, m.getPlayers()[q].convertWay(wayString), u.getType());
                     if (minWayDiff > currentDiffculty) {
                         bestWayNode = m.getPlayers()[q].convertWay(wayString);
                         minWayDiff = currentDiffculty;
@@ -505,15 +525,13 @@ public class MainTest {
         }
         gw.setRNDPROTECTION(1);
         gw.setModel(m);
-        gw.simulation();
-        gw.simulation();
-        gw.simulation();
+         simulate(3);
         m = gw.getBoard().getModel();
         assertTrue(!m.getPlayers()[0].getUnits().isEmpty());
     }
 
     /**
-     * Checks in an extreme map, if climber and diver can move
+     * extrém pályán búvát, hegymászó egységek funkcionalitásának tesztelése
      */
     @Test
     public void testClimberDiver() {
@@ -534,7 +552,7 @@ public class MainTest {
                     ArrayList<String> wayString = m.getPlayers()[q].findBestWay(u.getX() / fieldSize,
                             u.getY() / fieldSize, m.getCastleCoordinates()[i + defender][0],
                             m.getCastleCoordinates()[i + defender][1], m.getPlayers()[q].getDifficulty(m, u.getType(), q));
-                    int currentDiffculty=m.wayDifficulty(q, m.getPlayers()[q].convertWay(wayString), u.getType());
+                    int currentDiffculty = m.wayDifficulty(q, m.getPlayers()[q].convertWay(wayString), u.getType());
                     if (minWayDiff > currentDiffculty) {
                         bestWayNode = m.getPlayers()[q].convertWay(wayString);
                         minWayDiff = currentDiffculty;
@@ -562,7 +580,7 @@ public class MainTest {
     }
 
     /**
-     * Checks castles health and the winner
+     * kastély hp és győztes tesztelése
      */
     @Test
     public void testWinner() {
@@ -583,7 +601,7 @@ public class MainTest {
                     ArrayList<String> wayString = m.getPlayers()[q].findBestWay(u.getX() / fieldSize,
                             u.getY() / fieldSize, m.getCastleCoordinates()[i + defender][0],
                             m.getCastleCoordinates()[i + defender][1], m.getPlayers()[q].getDifficulty(m, u.getType(), q));
-                    int currentDiffculty=m.wayDifficulty(q, m.getPlayers()[q].convertWay(wayString), u.getType());
+                    int currentDiffculty = m.wayDifficulty(q, m.getPlayers()[q].convertWay(wayString), u.getType());
                     if (minWayDiff > currentDiffculty) {
                         bestWayNode = m.getPlayers()[q].convertWay(wayString);
                         minWayDiff = currentDiffculty;
@@ -601,13 +619,13 @@ public class MainTest {
 
         gw.getBoard().getModel().getPlayers()[1].getCastle().setHp(1);
         gw.setTestMode(true);
-        gw.simulation();
-        gw.simulation();
-        gw.simulation();
-        gw.simulation();
+         simulate(4);
         assertTrue(gw.getBoard().getModel().getPlayers()[1].getCastle().getHp() == 0);
     }
 
+    /**
+     * döntetlen végkimenetel
+     */
     @Test
     public void testDraw() {
         Initialize("plain2U.txt");
@@ -627,7 +645,7 @@ public class MainTest {
                     ArrayList<String> wayString = m.getPlayers()[q].findBestWay(u.getX() / fieldSize,
                             u.getY() / fieldSize, m.getCastleCoordinates()[i + defender][0],
                             m.getCastleCoordinates()[i + defender][1], m.getPlayers()[q].getDifficulty(m, u.getType(), q));
-                    int currentDiffculty=m.wayDifficulty(q, m.getPlayers()[q].convertWay(wayString), u.getType());
+                    int currentDiffculty = m.wayDifficulty(q, m.getPlayers()[q].convertWay(wayString), u.getType());
                     if (minWayDiff > currentDiffculty) {
                         bestWayNode = m.getPlayers()[q].convertWay(wayString);
                         minWayDiff = currentDiffculty;
@@ -646,17 +664,13 @@ public class MainTest {
         gw.getBoard().getModel().getPlayers()[1].getCastle().setHp(1);
         gw.getBoard().getModel().getPlayers()[0].getCastle().setHp(1);
         gw.setTestMode(true);
-        gw.simulation();
-        gw.simulation();
-        gw.simulation();
-        gw.simulation();
+         simulate(4);
         assertTrue(gw.getBoard().getModel().getPlayers()[1].getCastle().getHp() == 0);
         assertTrue(gw.getBoard().getModel().getPlayers()[0].getCastle().getHp() == 0);
     }
 
     /**
-     * Checks if tower is shooting correctly Checks if destroyed tower shoots or
-     * not
+     * tornyok lövésének tesztelése, lerombolt torony nem lő
      */
     @Test
     public void testTowerShooting() {
@@ -677,7 +691,7 @@ public class MainTest {
                     ArrayList<String> wayString = m.getPlayers()[q].findBestWay(u.getX() / fieldSize,
                             u.getY() / fieldSize, m.getCastleCoordinates()[i + defender][0],
                             m.getCastleCoordinates()[i + defender][1], m.getPlayers()[q].getDifficulty(m, u.getType(), q));
-                    int currentDiffculty=m.wayDifficulty(q, m.getPlayers()[q].convertWay(wayString), u.getType());
+                    int currentDiffculty = m.wayDifficulty(q, m.getPlayers()[q].convertWay(wayString), u.getType());
                     if (minWayDiff > currentDiffculty) {
                         bestWayNode = m.getPlayers()[q].convertWay(wayString);
                         minWayDiff = currentDiffculty;
@@ -695,111 +709,7 @@ public class MainTest {
         int simulationticks = 0;
         assertTrue(m.getPlayers()[0].getUnits().get(0).getHp() == m.getPlayers()[0].getUnits().get(0).getMaxHp());
 
-        gw.simulation();
-        for (int i = 0; i < 2; i++) {
-            ArrayList<Tower> towers = gw.getBoard().getModel().getPlayers()[i].getNotDemolishedTowers();
-            for (int j = 0; j < towers.size(); j++) {
-                double tickPerAttack = towers.get(j).getAttackFrequency() / 0.25;
-                if (simulationticks % tickPerAttack == 0) {
-                    ArrayList<Unit> enemyUnitsNearby = gw.getBoard().getModel().enemyUnitsNearby(i, towers.get(j));
-                    if (enemyUnitsNearby.size() > 0) {
-                        int rand = (int) (Math.random() * enemyUnitsNearby.size());
-                        towers.get(j).setShootCords(enemyUnitsNearby.get(rand).getX(), enemyUnitsNearby.get(rand).getY());
-                        if (enemyUnitsNearby.get(rand).getHp() > towers.get(j).getPower()) {
-                            enemyUnitsNearby.get(rand).setHp(enemyUnitsNearby.get(rand).getHp() - towers.get(j).getPower());
-                        } else {
-                            gw.getBoard().getModel().getPlayers()[(i + 1) % 2].deleteUnit(enemyUnitsNearby.get(rand));
-                            gw.getBoard().getModel().getPlayers()[i].setMoney(gw.getBoard().getModel().getPlayers()[i].getMoney() + enemyUnitsNearby.get(rand).getMaxHp() * 2);
-                        }
-                    }
-                }
-            }
-        }
-        simulationticks++;
-        gw.simulation();
-        for (int i = 0; i < 2; i++) {
-            ArrayList<Tower> towers = gw.getBoard().getModel().getPlayers()[i].getNotDemolishedTowers();
-            for (int j = 0; j < towers.size(); j++) {
-                double tickPerAttack = towers.get(j).getAttackFrequency() / 0.25;
-                if (simulationticks % tickPerAttack == 0) {
-                    ArrayList<Unit> enemyUnitsNearby = gw.getBoard().getModel().enemyUnitsNearby(i, towers.get(j));
-                    if (enemyUnitsNearby.size() > 0) {
-                        int rand = (int) (Math.random() * enemyUnitsNearby.size());
-                        towers.get(j).setShootCords(enemyUnitsNearby.get(rand).getX(), enemyUnitsNearby.get(rand).getY());
-                        if (enemyUnitsNearby.get(rand).getHp() > towers.get(j).getPower()) {
-                            enemyUnitsNearby.get(rand).setHp(enemyUnitsNearby.get(rand).getHp() - towers.get(j).getPower());
-                        } else {
-                            gw.getBoard().getModel().getPlayers()[(i + 1) % 2].deleteUnit(enemyUnitsNearby.get(rand));
-                            gw.getBoard().getModel().getPlayers()[i].setMoney(gw.getBoard().getModel().getPlayers()[i].getMoney() + enemyUnitsNearby.get(rand).getMaxHp() * 2);
-                        }
-                    }
-                }
-            }
-        }
-        simulationticks++;
-        gw.simulation();
-        for (int i = 0; i < 2; i++) {
-            ArrayList<Tower> towers = gw.getBoard().getModel().getPlayers()[i].getNotDemolishedTowers();
-            for (int j = 0; j < towers.size(); j++) {
-                double tickPerAttack = towers.get(j).getAttackFrequency() / 0.25;
-                if (simulationticks % tickPerAttack == 0) {
-                    ArrayList<Unit> enemyUnitsNearby = gw.getBoard().getModel().enemyUnitsNearby(i, towers.get(j));
-                    if (enemyUnitsNearby.size() > 0) {
-                        int rand = (int) (Math.random() * enemyUnitsNearby.size());
-                        towers.get(j).setShootCords(enemyUnitsNearby.get(rand).getX(), enemyUnitsNearby.get(rand).getY());
-                        if (enemyUnitsNearby.get(rand).getHp() > towers.get(j).getPower()) {
-                            enemyUnitsNearby.get(rand).setHp(enemyUnitsNearby.get(rand).getHp() - towers.get(j).getPower());
-                        } else {
-                            gw.getBoard().getModel().getPlayers()[(i + 1) % 2].deleteUnit(enemyUnitsNearby.get(rand));
-                            gw.getBoard().getModel().getPlayers()[i].setMoney(gw.getBoard().getModel().getPlayers()[i].getMoney() + enemyUnitsNearby.get(rand).getMaxHp() * 2);
-                        }
-                    }
-                }
-            }
-        }
-        simulationticks++;
-        gw.simulation();
-        for (int i = 0; i < 2; i++) {
-            ArrayList<Tower> towers = gw.getBoard().getModel().getPlayers()[i].getNotDemolishedTowers();
-            for (int j = 0; j < towers.size(); j++) {
-                double tickPerAttack = towers.get(j).getAttackFrequency() / 0.25;
-                if (simulationticks % tickPerAttack == 0) {
-                    ArrayList<Unit> enemyUnitsNearby = gw.getBoard().getModel().enemyUnitsNearby(i, towers.get(j));
-                    if (enemyUnitsNearby.size() > 0) {
-                        int rand = (int) (Math.random() * enemyUnitsNearby.size());
-                        towers.get(j).setShootCords(enemyUnitsNearby.get(rand).getX(), enemyUnitsNearby.get(rand).getY());
-                        if (enemyUnitsNearby.get(rand).getHp() > towers.get(j).getPower()) {
-                            enemyUnitsNearby.get(rand).setHp(enemyUnitsNearby.get(rand).getHp() - towers.get(j).getPower());
-                        } else {
-                            gw.getBoard().getModel().getPlayers()[(i + 1) % 2].deleteUnit(enemyUnitsNearby.get(rand));
-                            gw.getBoard().getModel().getPlayers()[i].setMoney(gw.getBoard().getModel().getPlayers()[i].getMoney() + enemyUnitsNearby.get(rand).getMaxHp() * 2);
-                        }
-                    }
-                }
-            }
-        }
-        simulationticks++;
-        gw.simulation();
-        for (int i = 0; i < 2; i++) {
-            ArrayList<Tower> towers = gw.getBoard().getModel().getPlayers()[i].getNotDemolishedTowers();
-            for (int j = 0; j < towers.size(); j++) {
-                double tickPerAttack = towers.get(j).getAttackFrequency() / 0.25;
-                if (simulationticks % tickPerAttack == 0) {
-                    ArrayList<Unit> enemyUnitsNearby = gw.getBoard().getModel().enemyUnitsNearby(i, towers.get(j));
-                    if (enemyUnitsNearby.size() > 0) {
-                        int rand = (int) (Math.random() * enemyUnitsNearby.size());
-                        towers.get(j).setShootCords(enemyUnitsNearby.get(rand).getX(), enemyUnitsNearby.get(rand).getY());
-                        if (enemyUnitsNearby.get(rand).getHp() > towers.get(j).getPower()) {
-                            enemyUnitsNearby.get(rand).setHp(enemyUnitsNearby.get(rand).getHp() - towers.get(j).getPower());
-                        } else {
-                            gw.getBoard().getModel().getPlayers()[(i + 1) % 2].deleteUnit(enemyUnitsNearby.get(rand));
-                            gw.getBoard().getModel().getPlayers()[i].setMoney(gw.getBoard().getModel().getPlayers()[i].getMoney() + enemyUnitsNearby.get(rand).getMaxHp() * 2);
-                        }
-                    }
-                }
-            }
-        }
-        simulationticks++;
+        towerSimulate(5,simulationticks);
         m = gw.getBoard().getModel();
         assertTrue(m.getPlayers()[0].getUnits().get(0).getHp() == m.getPlayers()[0].getUnits().get(0).getMaxHp() - m.getPlayers()[1].getTowers().get(0).getPower());
 
@@ -818,132 +728,7 @@ public class MainTest {
                     }
                 }
             }
-            gw.simulation();
-            for (int i = 0; i < 2; i++) {
-                ArrayList<Tower> towers = gw.getBoard().getModel().getPlayers()[i].getNotDemolishedTowers();
-                for (int j = 0; j < towers.size(); j++) {
-                    double tickPerAttack = towers.get(j).getAttackFrequency() / 0.25;
-                    if (simulationticks % tickPerAttack == 0) {
-                        ArrayList<Unit> enemyUnitsNearby = gw.getBoard().getModel().enemyUnitsNearby(i, towers.get(j));
-                        if (enemyUnitsNearby.size() > 0) {
-                            int rand = (int) (Math.random() * enemyUnitsNearby.size());
-                            towers.get(j).setShootCords(enemyUnitsNearby.get(rand).getX(), enemyUnitsNearby.get(rand).getY());
-                            if (enemyUnitsNearby.get(rand).getHp() > towers.get(j).getPower()) {
-                                enemyUnitsNearby.get(rand).setHp(enemyUnitsNearby.get(rand).getHp() - towers.get(j).getPower());
-                            } else {
-                                gw.getBoard().getModel().getPlayers()[(i + 1) % 2].deleteUnit(enemyUnitsNearby.get(rand));
-                                gw.getBoard().getModel().getPlayers()[i].setMoney(gw.getBoard().getModel().getPlayers()[i].getMoney() + enemyUnitsNearby.get(rand).getMaxHp() * 2);
-                            }
-                        }
-                    }
-                }
-            }
-            simulationticks++;
-            gw.simulation();
-            for (int i = 0; i < 2; i++) {
-                ArrayList<Tower> towers = gw.getBoard().getModel().getPlayers()[i].getNotDemolishedTowers();
-                for (int j = 0; j < towers.size(); j++) {
-                    double tickPerAttack = towers.get(j).getAttackFrequency() / 0.25;
-                    if (simulationticks % tickPerAttack == 0) {
-                        ArrayList<Unit> enemyUnitsNearby = gw.getBoard().getModel().enemyUnitsNearby(i, towers.get(j));
-                        if (enemyUnitsNearby.size() > 0) {
-                            int rand = (int) (Math.random() * enemyUnitsNearby.size());
-                            towers.get(j).setShootCords(enemyUnitsNearby.get(rand).getX(), enemyUnitsNearby.get(rand).getY());
-                            if (enemyUnitsNearby.get(rand).getHp() > towers.get(j).getPower()) {
-                                enemyUnitsNearby.get(rand).setHp(enemyUnitsNearby.get(rand).getHp() - towers.get(j).getPower());
-                            } else {
-                                gw.getBoard().getModel().getPlayers()[(i + 1) % 2].deleteUnit(enemyUnitsNearby.get(rand));
-                                gw.getBoard().getModel().getPlayers()[i].setMoney(gw.getBoard().getModel().getPlayers()[i].getMoney() + enemyUnitsNearby.get(rand).getMaxHp() * 2);
-                            }
-                        }
-                    }
-                }
-            }
-            simulationticks++;
-            gw.simulation();
-            for (int i = 0; i < 2; i++) {
-                ArrayList<Tower> towers = gw.getBoard().getModel().getPlayers()[i].getNotDemolishedTowers();
-                for (int j = 0; j < towers.size(); j++) {
-                    double tickPerAttack = towers.get(j).getAttackFrequency() / 0.25;
-                    if (simulationticks % tickPerAttack == 0) {
-                        ArrayList<Unit> enemyUnitsNearby = gw.getBoard().getModel().enemyUnitsNearby(i, towers.get(j));
-                        if (enemyUnitsNearby.size() > 0) {
-                            int rand = (int) (Math.random() * enemyUnitsNearby.size());
-                            towers.get(j).setShootCords(enemyUnitsNearby.get(rand).getX(), enemyUnitsNearby.get(rand).getY());
-                            if (enemyUnitsNearby.get(rand).getHp() > towers.get(j).getPower()) {
-                                enemyUnitsNearby.get(rand).setHp(enemyUnitsNearby.get(rand).getHp() - towers.get(j).getPower());
-                            } else {
-                                gw.getBoard().getModel().getPlayers()[(i + 1) % 2].deleteUnit(enemyUnitsNearby.get(rand));
-                                gw.getBoard().getModel().getPlayers()[i].setMoney(gw.getBoard().getModel().getPlayers()[i].getMoney() + enemyUnitsNearby.get(rand).getMaxHp() * 2);
-                            }
-                        }
-                    }
-                }
-            }
-            simulationticks++;
-            gw.simulation();
-            for (int i = 0; i < 2; i++) {
-                ArrayList<Tower> towers = gw.getBoard().getModel().getPlayers()[i].getNotDemolishedTowers();
-                for (int j = 0; j < towers.size(); j++) {
-                    double tickPerAttack = towers.get(j).getAttackFrequency() / 0.25;
-                    if (simulationticks % tickPerAttack == 0) {
-                        ArrayList<Unit> enemyUnitsNearby = gw.getBoard().getModel().enemyUnitsNearby(i, towers.get(j));
-                        if (enemyUnitsNearby.size() > 0) {
-                            int rand = (int) (Math.random() * enemyUnitsNearby.size());
-                            towers.get(j).setShootCords(enemyUnitsNearby.get(rand).getX(), enemyUnitsNearby.get(rand).getY());
-                            if (enemyUnitsNearby.get(rand).getHp() > towers.get(j).getPower()) {
-                                enemyUnitsNearby.get(rand).setHp(enemyUnitsNearby.get(rand).getHp() - towers.get(j).getPower());
-                            } else {
-                                gw.getBoard().getModel().getPlayers()[(i + 1) % 2].deleteUnit(enemyUnitsNearby.get(rand));
-                                gw.getBoard().getModel().getPlayers()[i].setMoney(gw.getBoard().getModel().getPlayers()[i].getMoney() + enemyUnitsNearby.get(rand).getMaxHp() * 2);
-                            }
-                        }
-                    }
-                }
-            }
-            simulationticks++;
-            gw.simulation();
-            for (int i = 0; i < 2; i++) {
-                ArrayList<Tower> towers = gw.getBoard().getModel().getPlayers()[i].getNotDemolishedTowers();
-                for (int j = 0; j < towers.size(); j++) {
-                    double tickPerAttack = towers.get(j).getAttackFrequency() / 0.25;
-                    if (simulationticks % tickPerAttack == 0) {
-                        ArrayList<Unit> enemyUnitsNearby = gw.getBoard().getModel().enemyUnitsNearby(i, towers.get(j));
-                        if (enemyUnitsNearby.size() > 0) {
-                            int rand = (int) (Math.random() * enemyUnitsNearby.size());
-                            towers.get(j).setShootCords(enemyUnitsNearby.get(rand).getX(), enemyUnitsNearby.get(rand).getY());
-                            if (enemyUnitsNearby.get(rand).getHp() > towers.get(j).getPower()) {
-                                enemyUnitsNearby.get(rand).setHp(enemyUnitsNearby.get(rand).getHp() - towers.get(j).getPower());
-                            } else {
-                                gw.getBoard().getModel().getPlayers()[(i + 1) % 2].deleteUnit(enemyUnitsNearby.get(rand));
-                                gw.getBoard().getModel().getPlayers()[i].setMoney(gw.getBoard().getModel().getPlayers()[i].getMoney() + enemyUnitsNearby.get(rand).getMaxHp() * 2);
-                            }
-                        }
-                    }
-                }
-            }
-            simulationticks++;
-            gw.simulation();
-            for (int i = 0; i < 2; i++) {
-                ArrayList<Tower> towers = gw.getBoard().getModel().getPlayers()[i].getNotDemolishedTowers();
-                for (int j = 0; j < towers.size(); j++) {
-                    double tickPerAttack = towers.get(j).getAttackFrequency() / 0.25;
-                    if (simulationticks % tickPerAttack == 0) {
-                        ArrayList<Unit> enemyUnitsNearby = gw.getBoard().getModel().enemyUnitsNearby(i, towers.get(j));
-                        if (enemyUnitsNearby.size() > 0) {
-                            int rand = (int) (Math.random() * enemyUnitsNearby.size());
-                            towers.get(j).setShootCords(enemyUnitsNearby.get(rand).getX(), enemyUnitsNearby.get(rand).getY());
-                            if (enemyUnitsNearby.get(rand).getHp() > towers.get(j).getPower()) {
-                                enemyUnitsNearby.get(rand).setHp(enemyUnitsNearby.get(rand).getHp() - towers.get(j).getPower());
-                            } else {
-                                gw.getBoard().getModel().getPlayers()[(i + 1) % 2].deleteUnit(enemyUnitsNearby.get(rand));
-                                gw.getBoard().getModel().getPlayers()[i].setMoney(gw.getBoard().getModel().getPlayers()[i].getMoney() + enemyUnitsNearby.get(rand).getMaxHp() * 2);
-                            }
-                        }
-                    }
-                }
-            }
-            simulationticks++;
+            towerSimulate(6,simulationticks);
             gw.getPlayer1distances().clear();
             gw.getPlayer2distances().clear();
         }

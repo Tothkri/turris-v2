@@ -4,7 +4,15 @@ import java.awt.Image;
 
 public class Fortified extends Tower {
 
-    //újonnan létrehozott
+    /**
+     *újonnan létrehozott
+     * @param scolor
+     * @param x
+     * @param y
+     * @param height
+     * @param width
+     * @param img
+     */
     public Fortified(String scolor, int x, int y, int height, int width, Image img) {
         super(scolor, x, y, height, width, img);
         this.attackFrequency = 1.0;
@@ -20,7 +28,21 @@ public class Fortified extends Tower {
         this.moneySpentOn = price;
     }
 
-    //fájból betöltött
+    /**
+     *fájból betöltött
+     * @param type
+     * @param scolor
+     * @param power
+     * @param range
+     * @param attackFrequency
+     * @param hp
+     * @param level
+     * @param x
+     * @param y
+     * @param height
+     * @param width
+     * @param img
+     */
     public Fortified(String type, String scolor, int power, int range, double attackFrequency, int hp, int level, int x, int y, int height, int width, Image img) {
         super(scolor, x, y, height, width, img);
         this.type = type;
@@ -42,6 +64,9 @@ public class Fortified extends Tower {
         }
     }
 
+    /**
+     * fejlesztés
+     */
     @Override
     public void upgrade() {
         if (level == 2) {

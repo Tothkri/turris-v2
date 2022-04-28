@@ -17,27 +17,32 @@ public abstract class Unit extends Sprite {
     protected int maxHp;
     protected boolean blood;
 
-    public int getMaxHp() {
-        return maxHp;
-    }
-
+    /**
+     * egység lép adott koordinátára
+     * @param x
+     * @param y
+     */
     public void move(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
+    /**
+     * hp csík hossza (25 pixeles maximum)
+     */
     private double hpLineWidth() {
         return ((double)hp / (double)maxHp)*25;
     }
 
-    public boolean isBlood() {
-        return blood;
-    }
-
-    public void setBlood(boolean blood) {
-        this.blood = blood;
-    }
-
+    /**
+     *
+     * @param scolor
+     * @param x
+     * @param y
+     * @param height
+     * @param width
+     * @param img
+     */
     public Unit(String scolor, int x, int y, int height, int width, Image img) {
         super(x, y, height, width, img);
         blood = false;
@@ -49,7 +54,30 @@ public abstract class Unit extends Sprite {
         this.img = img;
         this.way = null;
     }
+    
+    /**
+     * egység kirajzolása
+     * @param g2
+     */
+    @Override
+    public void draw(Graphics2D g2) {
 
+        g2.drawImage(img, x, y, height, width, null);
+        g2.setColor(color);
+        g2.drawLine(x +3, y + height - 2, x +3+ (int)hpLineWidth(), y + height - 2);
+        g2.drawLine(x+3 , y + height - 3, x +3+(int)hpLineWidth(), y + height - 3);
+        g2.drawLine(x +3, y + height - 4, x +3+ (int)hpLineWidth(), y + height - 4);
+
+    }
+
+    /**
+     * getterek, setterek
+     * @return
+     */
+    public int getMaxHp() {
+        return maxHp;
+    }
+    
     public String getType() {
         return type;
     }
@@ -82,6 +110,14 @@ public abstract class Unit extends Sprite {
         return price;
     }
 
+    public boolean isBlood() {
+        return blood;
+    }
+
+    public void setBlood(boolean blood) {
+        this.blood = blood;
+    }
+    
     public void setPrice(int price) {
         this.price = price;
     }
@@ -94,15 +130,6 @@ public abstract class Unit extends Sprite {
         this.way = way;
     }
 
-    @Override
-    public void draw(Graphics2D g2) {
-
-        g2.drawImage(img, x, y, height, width, null);
-        g2.setColor(color);
-        g2.drawLine(x +3, y + height - 2, x +3+ (int)hpLineWidth(), y + height - 2);
-        g2.drawLine(x+3 , y + height - 3, x +3+(int)hpLineWidth(), y + height - 3);
-        g2.drawLine(x +3, y + height - 4, x +3+ (int)hpLineWidth(), y + height - 4);
-
-    }
+   
 
 }
