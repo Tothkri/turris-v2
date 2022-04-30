@@ -112,25 +112,25 @@ public class GameWindow extends JPanel {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
             }
-            
+
             JTextPane text = new JTextPane() {
                 @Override
                 public String getToolTipText() {
                     return ((JComponent) getParent()).getToolTipText();
                 }
-                
+
                 @Override
                 public String getToolTipText(MouseEvent event) {
                     return ((JComponent) getParent()).getToolTipText(event);
                 }
             };
-            
+
             try {
                 text.getStyledDocument().insertString(0, ".", null);
             } catch (BadLocationException e) {
                 e.printStackTrace();
             }
-            
+
             ToolTipManager.sharedInstance().registerComponent(text);
         });
 
@@ -189,23 +189,23 @@ public class GameWindow extends JPanel {
          * PLAYER1 Unit típusok
          */
         player1UnitButtons[0].addActionListener(ae -> {
-            board.setModel(model.getPlayers()[0].sendUnits("General", "blue", 1, model));
+            model.getPlayers()[0].sendUnits("General", "blue", 1, model);
             playerDataUpdate();
         });
         player1UnitButtons[1].addActionListener(ae -> {
-            board.setModel(model.getPlayers()[0].sendUnits("Fighter", "blue", 1, model));
+            model.getPlayers()[0].sendUnits("Fighter", "blue", 1, model);
             playerDataUpdate();
         });
         player1UnitButtons[2].addActionListener(ae -> {
-            board.setModel(model.getPlayers()[0].sendUnits("Climber", "blue", 1, model));
+            model.getPlayers()[0].sendUnits("Climber", "blue", 1, model);
             playerDataUpdate();
         });
         player1UnitButtons[3].addActionListener(ae -> {
-            board.setModel(model.getPlayers()[0].sendUnits("Diver", "blue", 1, model));
+            model.getPlayers()[0].sendUnits("Diver", "blue", 1, model);
             playerDataUpdate();
         });
         player1UnitButtons[4].addActionListener(ae -> {
-            board.setModel(model.getPlayers()[0].sendUnits("Destroyer", "blue", 1, model));
+            model.getPlayers()[0].sendUnits("Destroyer", "blue", 1, model);
             playerDataUpdate();
         });
         ////////////////////////////////////////////////////////////////////////
@@ -249,23 +249,23 @@ public class GameWindow extends JPanel {
          * PLAYER2 Unit típusok
          */
         player2UnitButtons[0].addActionListener(ae -> {
-            board.setModel(model.getPlayers()[1].sendUnits("General", "red", 1, model));
+            model.getPlayers()[1].sendUnits("General", "red", 1, model);
             playerDataUpdate();
         });
         player2UnitButtons[1].addActionListener(ae -> {
-            board.setModel(model.getPlayers()[1].sendUnits("Fighter", "red", 1, model));
+            model.getPlayers()[1].sendUnits("Fighter", "red", 1, model);
             playerDataUpdate();
         });
         player2UnitButtons[2].addActionListener(ae -> {
-            board.setModel(model.getPlayers()[1].sendUnits("Climber", "red", 1, model));
+            model.getPlayers()[1].sendUnits("Climber", "red", 1, model);
             playerDataUpdate();
         });
         player2UnitButtons[3].addActionListener(ae -> {
-            board.setModel(model.getPlayers()[1].sendUnits("Diver", "red", 1, model));
+            model.getPlayers()[1].sendUnits("Diver", "red", 1, model);
             playerDataUpdate();
         });
         player2UnitButtons[4].addActionListener(ae -> {
-            board.setModel(model.getPlayers()[1].sendUnits("Destroyer", "red", 1, model));
+            model.getPlayers()[1].sendUnits("Destroyer", "red", 1, model);
             playerDataUpdate();
         });
 
@@ -311,14 +311,21 @@ public class GameWindow extends JPanel {
 
             int boardPositionX = (int) hoveredPoint.getX() - 500;
             int matrixPositionX = boardPositionX / fieldSize;
-            int boardPositionY = (int) hoveredPoint.getY() - 75;
+            int boardPositionY = (int) hoveredPoint.getY() - 65;
             int matrixPositionY = boardPositionY / fieldSize;
 
             if (!model.getInfo(matrixPositionX, matrixPositionY).equals("")) {
                 ToolTipManager.sharedInstance().setEnabled(true);
                 board.setToolTipText(model.getInfo(matrixPositionX, matrixPositionY));
+               
             } else {
                 ToolTipManager.sharedInstance().setEnabled(false);
+                String sss="";
+                for (Unit u : model.getPlayers()[model.getActivePlayer()].getUnits()){
+                    sss+=(u.getX()/31)+"-"+(u.getY()/31);
+                }
+                 board.setToolTipText(matrixPositionX +";"+ matrixPositionY+" "+sss);
+                
             }
 
             if (simulationTime) {
@@ -380,8 +387,8 @@ public class GameWindow extends JPanel {
                             Player actualPlayer = model.getPlayers()[playerIndex];
                             ArrayList<String> bestWayString = actualPlayer.findBestWay(u.getX() / fieldSize, u.getY() / fieldSize,
                                     model.getCastleCoordinates()[castleCoordinateIndex + defendingPlayer][0],
-                                    model.getCastleCoordinates()[castleCoordinateIndex + defendingPlayer][1], actualPlayer.getDifficulty(model, u.getType(), playerIndex));
-                            int actualWayDifficulty = model.wayDifficulty(playerIndex, actualPlayer.convertWay(bestWayString), u.getType());
+                                    model.getCastleCoordinates()[castleCoordinateIndex + defendingPlayer][1], actualPlayer.getDifficulty(model, u.getType()));
+                            int actualWayDifficulty = actualPlayer.convertWay(bestWayString).size();
                             if (minWayDifficulty > actualWayDifficulty) {
                                 minWayDifficulty = actualWayDifficulty;
                                 bestWayNode = actualPlayer.convertWay(bestWayString);
@@ -412,9 +419,11 @@ public class GameWindow extends JPanel {
         timer.start();
         activePlayerPanelSetter();
     }
-    
+
     /**
-     * 1 szimulációs menet: egységek lépnek, harcos sebez, romboló rombol, tornyok sebeznek
+     * 1 szimulációs menet: egységek lépnek, harcos sebez, romboló rombol,
+     * tornyok sebeznek
+     *
      * @return
      */
     public boolean simulation() {
@@ -437,7 +446,7 @@ public class GameWindow extends JPanel {
                     if (units.get(unitIndex).getWay() != null && !units.get(unitIndex).getWay().isEmpty()) {
                         ArrayList<Node> unitWay = units.get(unitIndex).getWay();
                         Node next = unitWay.get(0);
-                        units.get(unitIndex).move(next.getX() * fieldSize,next.getY() * fieldSize);
+                        units.get(unitIndex).move(next.getX() * fieldSize, next.getY() * fieldSize);
                         board.repaint();
                         unitWay.remove(0);
                         units.get(unitIndex).setWay(unitWay);
@@ -454,7 +463,7 @@ public class GameWindow extends JPanel {
                             moreDistance = true;
                         }
                     }
-                    //Fighter sebzi az elhaladó ellenséges egységeket, ha azonos mezőre értek
+                    //Fighter sebez egy elhaladó ellenséges egységet, ha azonos mezőre értek
                     ArrayList<Unit> enemyUnitsNearby = model.enemyUnitsNearby(playerIndex, units.get(unitIndex));
                     if ("Fighter".equals(units.get(unitIndex).getType()) && enemyUnitsNearby.size() > 0) {
                         int randomEnemyUnit = (int) (Math.random() * enemyUnitsNearby.size());
@@ -492,78 +501,80 @@ public class GameWindow extends JPanel {
                                 break;
                             }
                         }
-                    }
-                    else if(!enemyUnitsNearby.isEmpty()){
-                        for(int enemyUnitIndex = 0; enemyUnitIndex < enemyUnitsNearby.size();enemyUnitIndex++){
+                    } else if (!enemyUnitsNearby.isEmpty()) {
+                        for (int enemyUnitIndex = 0; enemyUnitIndex < enemyUnitsNearby.size(); enemyUnitIndex++) {
                             Unit enemyUnit = enemyUnitsNearby.get(enemyUnitIndex);
-                            if(enemyUnit.getType().equals("Fighter")){
+                            if (enemyUnit.getType().equals("Fighter")) {
                                 units.get(unitIndex).setBlood(true);
-                                if(units.get(unitIndex).getHp() < enemyUnit.getPower()){
+                                if (units.get(unitIndex).getHp() < enemyUnit.getPower()) {
                                     model.getPlayers()[Math.abs(playerIndex - 1)].setMoney(model.getPlayers()[Math.abs(playerIndex - 1)].getMoney() + units.get(unitIndex).getMaxHp() * 2);
                                     model.getPlayers()[playerIndex].deleteUnit(units.get(unitIndex));
                                     if (unitIndex > 0) {
-                                    unitIndex--;
+                                        unitIndex--;
                                     } else {
                                         break;
                                     }
                                     model.getPlayers()[Math.abs(playerIndex - 1)].setMoney(model.getPlayers()[Math.abs(playerIndex - 1)].getMoney() + units.get(unitIndex).getMaxHp() * 2);
-                                }else{
+                                } else {
                                     units.get(unitIndex).setHp(units.get(unitIndex).getHp() - enemyUnit.getPower());
                                 }
-                                
+
                             }
                         }
                     }
-                    ArrayList<Tower> towersNearby = model.towersNearby(playerIndex, units.get(unitIndex));
+                    if (units.size() > 0) {
+                        //Destroyer támadja a mellette lévő tornyot
+                        ArrayList<Tower> towersNearby = model.towersNearby(playerIndex, units.get(unitIndex));
+                        if ("Destroyer".equals(units.get(unitIndex).getType()) && towersNearby.size() > 0) {
+                            int attackTower = (int) (Math.random() * 2); //a támadás esélye 50% (randomizált)
+                            if (RNDPROTECTION != 0) {
+                                attackTower = RNDPROTECTION;
+                            }
+                            if (attackTower == 1) {
+                                //Destroyer 50-et sebez a toronyba, majd mesemmisül
+                                for (int towerIndex = 0; towerIndex < towersNearby.size(); towerIndex++) {
 
-                    //Destroyer támadja a mellette lévő tornyot
-                    if ("Destroyer".equals(units.get(unitIndex).getType()) && towersNearby.size() > 0) {
-                        int attackTower = (int) (Math.random() * 2); //a támadás esélye 50% (randomizált)
-                        if (RNDPROTECTION != 0) {
-                            attackTower = RNDPROTECTION;
-                        }
-                        if (attackTower == 1) {
-                            //Destroyer 50-et sebez a toronyba, majd mesemmisül
-                            for (int towerIndex = 0; towerIndex < towersNearby.size(); towerIndex++) {
+                                    if (towersNearby.get(towerIndex).getDemolishedIn() != -1) {
+                                        continue;
+                                    }
+                                    Tower towerToDemolish = towersNearby.get(towerIndex);
+                                    if (towerToDemolish.getHp() > 50) {
+                                        towerToDemolish.setHp(towersNearby.get(towerIndex).getHp() - 50);
+                                        int towerToDemolishIndex = model.getPlayers()[Math.abs(playerIndex - 1)].getTowerIndex(towersNearby.get(towerIndex));
+                                        if (towerToDemolishIndex != -1) {
+                                            model.getPlayers()[Math.abs(playerIndex - 1)].getTowers().get(towerToDemolishIndex).setExploded(true);
+                                        }
+                                        model.getPlayers()[playerIndex].deleteUnit(units.get(unitIndex));
+                                        if (unitIndex > 0) {
+                                            unitIndex--;
+                                        }
+                                        break;
+                                    } else //torony megsemmisül
+                                    {
+                                        towerToDemolish.setHp(0);
+                                        towerToDemolish.setPower(0);
+                                        towerToDemolish.setRange(0);
+                                        towerToDemolish.setAttackFrequency(0);
+                                        model.setPosition(towerToDemolish.getX() / fieldSize, towerToDemolish.getY() / fieldSize, 'D');
+                                        model.getPlayers()[(playerIndex + 1) % 2].demolish(towersNearby.get(towerIndex).getX() / fieldSize,
+                                                towersNearby.get(towerIndex).getY() / fieldSize, model.getBoardSize());
+                                        model.getPlayers()[playerIndex].setMoney(model.getPlayers()[playerIndex].getMoney() + towersNearby.get(towerIndex).getMaxHp() * 3);
+                                        int towerToDemolishIndex = model.getPlayers()[playerIndex].getTowerIndex(towersNearby.get(towerIndex));
 
-                                if (towersNearby.get(towerIndex).getDemolishedIn() != -1) {
-                                    continue;
-                                }
-
-                                if (towersNearby.get(towerIndex).getHp() > 50) {
-                                    towersNearby.get(towerIndex).setHp(towersNearby.get(towerIndex).getHp() - 50);
-                                    int towerToDemolishIndex = model.getPlayers()[Math.abs(playerIndex - 1)].getTowerIndex(towersNearby.get(towerIndex));
-                                    if (towerToDemolishIndex != -1) {
-                                        model.getPlayers()[Math.abs(playerIndex - 1)].getTowers().get(towerToDemolishIndex).setExploded(true);
+                                        if (towerToDemolishIndex != -1) {
+                                            model.getPlayers()[playerIndex].getTowers().get(towerToDemolishIndex).setExploded(true);
+                                        }
+                                        model.getPlayers()[playerIndex].deleteUnit(units.get(unitIndex));
+                                        if (unitIndex > 0) {
+                                            unitIndex--;
+                                        }
+                                        break;
                                     }
-                                    model.getPlayers()[playerIndex].deleteUnit(units.get(unitIndex));
-                                    if (unitIndex > 0) {
-                                        unitIndex--;
-                                    }
-                                    break;
-                                } else if (towersNearby.get(towerIndex).getHp() > 0) //torony megsemmisül
-                                {
-                                    towersNearby.get(towerIndex).setHp(0);
-                                    towersNearby.get(towerIndex).setPower(0);
-                                    towersNearby.get(towerIndex).setRange(0);
-                                    towersNearby.get(towerIndex).setAttackFrequency(0);
-                                    model.getPlayers()[(playerIndex + 1) % 2].demolish(towersNearby.get(towerIndex).getX() / fieldSize,
-                                            towersNearby.get(towerIndex).getY() / fieldSize, model.getBoardSize());
-                                    model.getPlayers()[playerIndex].setMoney(model.getPlayers()[playerIndex].getMoney() + towersNearby.get(towerIndex).getMaxHp() * 3);
-                                    int towerToDemolishIndex = model.getPlayers()[playerIndex].getTowerIndex(towersNearby.get(towerIndex));
-
-                                    if (towerToDemolishIndex != -1) {
-                                        model.getPlayers()[playerIndex].getTowers().get(towerToDemolishIndex).setExploded(true);
-                                    }
-                                    model.getPlayers()[playerIndex].deleteUnit(units.get(unitIndex));
-                                    if (unitIndex > 0) {
-                                        unitIndex--;
-                                    }
-                                    break;
                                 }
                             }
                         }
                     }
+
                     board.repaint();
                 }
             }
@@ -601,7 +612,9 @@ public class GameWindow extends JPanel {
     }
 
     /**
-     * torony építés során elérhető helyek megjelenítése, ha van elég pénz a toronyra
+     * torony építés során elérhető helyek megjelenítése, ha van elég pénz a
+     * toronyra
+     *
      * @param towerType
      */
     public void towerPlaceAction(String towerType) {
@@ -611,14 +624,15 @@ public class GameWindow extends JPanel {
         } else {
             selectedTower = towerType;
             buttonAction = "placeTower";
-            if(model.getPlayers()[model.getActivePlayer()].getMoney()>=model.towerBuildMoney(towerType)){
+            if (model.getPlayers()[model.getActivePlayer()].getMoney() >= model.towerBuildMoney(towerType)) {
                 model.setSelectables();
             }
         }
     }
 
     /**
-     *játékosok körönként váltják egymást, minden szimuláció 2 körönként történik - ezután kap mindkét játékos 100-100 aranyat
+     * játékosok körönként váltják egymást, minden szimuláció 2 körönként
+     * történik - ezután kap mindkét játékos 100-100 aranyat
      */
     public void newRound() {
         model.setSelectables(new ArrayList<>());
@@ -680,10 +694,9 @@ public class GameWindow extends JPanel {
     }
 
     /**
-     *játék végén felugró üzenet
+     * játék végén felugró üzenet
      */
-    public void gameOver() 
-    {
+    public void gameOver() {
         JFrame newFrame = new JFrame();
         if (model.getPlayers()[0].getCastle().getHp() == 0 && model.getPlayers()[1].getCastle().getHp() == 0) {
             JOptionPane.showMessageDialog(newFrame, "The game ended in a draw.");
@@ -698,10 +711,9 @@ public class GameWindow extends JPanel {
     }
 
     /**
-     *játék mentése txt fájlba
+     * játék mentése txt fájlba
      */
-    public void saveGame() 
-    {
+    public void saveGame() {
         String filename;
         filename = JOptionPane.showInputDialog(null, "Filename: ", "Save to file (click cancel to not save)", JOptionPane.QUESTION_MESSAGE);
         if (filename == null || filename.length() == 0) {
@@ -712,6 +724,7 @@ public class GameWindow extends JPanel {
 
     /**
      * grafikus rész
+     *
      * @param grph
      */
     @Override
@@ -1432,7 +1445,8 @@ public class GameWindow extends JPanel {
 
     /**
      * Getterek, setterek
-     * @return 
+     *
+     * @return
      */
     public Board getBoard() {
         return board;
@@ -1489,7 +1503,8 @@ public class GameWindow extends JPanel {
     public void setTestMode(boolean isTestMode) {
         testMode = isTestMode;
     }
-    public JButton getBackToMenuButton(){
+
+    public JButton getBackToMenuButton() {
         return backToMenuButton;
     }
 }

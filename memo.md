@@ -74,7 +74,7 @@ Ki mit csinált:
 
 9. hét (04.27 - 05.04.)
 
-    Tóth Kristóf (SONXZF): bug fix, javadoc
+    Tóth Kristóf (SONXZF): bug fix, javadoc, osztályleírás
 
     Tóth Kristóf (YPENKF): 
     

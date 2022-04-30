@@ -1,6 +1,5 @@
 package model;
 
-
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -35,7 +34,7 @@ public abstract class Tower extends Sprite {
     public Tower(String scolor, int x, int y, int height, int width, Image img) {
         super(x, y, height, width, img);
         exploded = false;
-        shootCords = new Node(-1,-1);
+        shootCords = new Node(-1, -1);
         this.demolishedIn = -1;
         level = 1;
         if (scolor == "red") {
@@ -44,7 +43,7 @@ public abstract class Tower extends Sprite {
             this.color = Color.blue;
         }
     }
-    
+
     /**
      * torony fejlesztése
      */
@@ -57,29 +56,31 @@ public abstract class Tower extends Sprite {
         demolishedIn = 4;//2 whole round
         img = new ImageIcon("src/res/Destroyed.png").getImage();
     }
-    
-     /**
+
+    /**
      * hp csík hossza
      */
-     private double hpLineWidth() {
-        double d = (double) hp / maxHp;
-            return d * width;
+    private double hpLineWidth() {
+        return ((double) hp / (double) maxHp) * 25;
 
     }
-    
-      /**
+
+    /**
      * torony kirajzolása
+     *
      * @param g2
      */
     @Override
     public void draw(Graphics2D g2) {
-        if(demolishedIn != -1) img = new ImageIcon("src/res/Destroyed.png").getImage();
+        if (demolishedIn != -1) {
+            img = new ImageIcon("src/res/Destroyed.png").getImage();
+        }
         g2.drawImage(img, x, y, height, width, null);
-        if (demolishedIn <=0) {
+        if (demolishedIn <= 0) {
             g2.setColor(color);
-            g2.drawLine(x + 2, y + height - 2, x + (int) hpLineWidth() - 2, y + height - 2);
-            g2.drawLine(x + 2, y + height - 3, x + (int) hpLineWidth() - 2, y + height - 3);
-            g2.drawLine(x + 2, y + height - 4, x + (int) hpLineWidth() - 2, y + height - 4);
+            g2.drawLine(x + 3, y + height - 2, x + 3 + (int) hpLineWidth(), y + height - 2);
+            g2.drawLine(x + 3, y + height - 3, x + 3 + (int) hpLineWidth(), y + height - 3);
+            g2.drawLine(x + 3, y + height - 4, x + 3 + (int) hpLineWidth(), y + height - 4);
         }
 
     }
@@ -132,12 +133,12 @@ public abstract class Tower extends Sprite {
         this.exploded = exploded;
     }
 
-    public void setShootCords(int x, int y){
+    public void setShootCords(int x, int y) {
         shootCords.setX(x);
         shootCords.setY(y);
     }
 
-    public Node getShootCords(){
+    public Node getShootCords() {
         return shootCords;
     }
 
@@ -152,9 +153,9 @@ public abstract class Tower extends Sprite {
     public int getPrice() {
         return price;
     }
-    
-    public void setColor(String colorString){
-        if (colorString.equals("red") ) {
+
+    public void setColor(String colorString) {
+        if (colorString.equals("red")) {
             this.color = Color.red;
         } else {
             this.color = Color.blue;
@@ -168,7 +169,7 @@ public abstract class Tower extends Sprite {
     public int getLevel() {
         return level;
     }
-    
+
     public int getMaxHp() {
         return maxHp;
     }

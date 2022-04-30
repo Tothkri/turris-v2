@@ -23,30 +23,30 @@ public class MainTest {
             gw.simulation();
         }
     }
-    
-    public void towerSimulate(int count,int simulationticks){
+
+    public void towerSimulate(int count, int simulationticks) {
         for (int c = 0; c < count; c++) {
-        gw.simulation();
-        for (int i = 0; i < 2; i++) {
-            ArrayList<Tower> towers = gw.getBoard().getModel().getPlayers()[i].getNotDemolishedTowers();
-            for (int j = 0; j < towers.size(); j++) {
-                double tickPerAttack = towers.get(j).getAttackFrequency() / 0.25;
-                if (simulationticks % tickPerAttack == 0) {
-                    ArrayList<Unit> enemyUnitsNearby = gw.getBoard().getModel().enemyUnitsNearby(i, towers.get(j));
-                    if (enemyUnitsNearby.size() > 0) {
-                        int rand = (int) (Math.random() * enemyUnitsNearby.size());
-                        towers.get(j).setShootCords(enemyUnitsNearby.get(rand).getX(), enemyUnitsNearby.get(rand).getY());
-                        if (enemyUnitsNearby.get(rand).getHp() > towers.get(j).getPower()) {
-                            enemyUnitsNearby.get(rand).setHp(enemyUnitsNearby.get(rand).getHp() - towers.get(j).getPower());
-                        } else {
-                            gw.getBoard().getModel().getPlayers()[(i + 1) % 2].deleteUnit(enemyUnitsNearby.get(rand));
-                            gw.getBoard().getModel().getPlayers()[i].setMoney(gw.getBoard().getModel().getPlayers()[i].getMoney() + enemyUnitsNearby.get(rand).getMaxHp() * 2);
+            gw.simulation();
+            for (int i = 0; i < 2; i++) {
+                ArrayList<Tower> towers = gw.getBoard().getModel().getPlayers()[i].getNotDemolishedTowers();
+                for (int j = 0; j < towers.size(); j++) {
+                    double tickPerAttack = towers.get(j).getAttackFrequency() / 0.25;
+                    if (simulationticks % tickPerAttack == 0) {
+                        ArrayList<Unit> enemyUnitsNearby = gw.getBoard().getModel().enemyUnitsNearby(i, towers.get(j));
+                        if (enemyUnitsNearby.size() > 0) {
+                            int rand = (int) (Math.random() * enemyUnitsNearby.size());
+                            towers.get(j).setShootCords(enemyUnitsNearby.get(rand).getX(), enemyUnitsNearby.get(rand).getY());
+                            if (enemyUnitsNearby.get(rand).getHp() > towers.get(j).getPower()) {
+                                enemyUnitsNearby.get(rand).setHp(enemyUnitsNearby.get(rand).getHp() - towers.get(j).getPower());
+                            } else {
+                                gw.getBoard().getModel().getPlayers()[(i + 1) % 2].deleteUnit(enemyUnitsNearby.get(rand));
+                                gw.getBoard().getModel().getPlayers()[i].setMoney(gw.getBoard().getModel().getPlayers()[i].getMoney() + enemyUnitsNearby.get(rand).getMaxHp() * 2);
+                            }
                         }
                     }
                 }
             }
-        }
-        simulationticks++;
+            simulationticks++;
         }
     }
 
@@ -305,8 +305,8 @@ public class MainTest {
                 for (int i = 0; i < 4; i++) {
                     ArrayList<String> wayString = m.getPlayers()[q].findBestWay(u.getX() / fieldSize,
                             u.getY() / fieldSize, m.getCastleCoordinates()[i + defender][0],
-                            m.getCastleCoordinates()[i + defender][1], m.getPlayers()[q].getDifficulty(m, u.getType(), q));
-                    int currentDiffculty = m.wayDifficulty(q, m.getPlayers()[q].convertWay(wayString), u.getType());
+                            m.getCastleCoordinates()[i + defender][1], m.getPlayers()[q].getDifficulty(m, u.getType()));
+                    int currentDiffculty = m.getPlayers()[q].convertWay(wayString).size();
                     if (minWayDiff > currentDiffculty) {
                         bestWayNode = m.getPlayers()[q].convertWay(wayString);
                         minWayDiff = currentDiffculty;
@@ -322,7 +322,7 @@ public class MainTest {
         }
 
         simulate(6);
-        
+
         gw.getPlayer1distances().clear();
         gw.getPlayer2distances().clear();
 
@@ -337,7 +337,7 @@ public class MainTest {
                     }
                 }
             }
-             simulate(6);
+            simulate(6);
             gw.getPlayer1distances().clear();
             gw.getPlayer2distances().clear();
         }
@@ -372,8 +372,8 @@ public class MainTest {
                 for (int i = 0; i < 4; i++) {
                     ArrayList<String> wayString = m.getPlayers()[q].findBestWay(u.getX() / fieldSize,
                             u.getY() / fieldSize, m.getCastleCoordinates()[i + defender][0],
-                            m.getCastleCoordinates()[i + defender][1], m.getPlayers()[q].getDifficulty(m, u.getType(), q));
-                    int currentDiffculty = m.wayDifficulty(q, m.getPlayers()[q].convertWay(wayString), u.getType());
+                            m.getCastleCoordinates()[i + defender][1], m.getPlayers()[q].getDifficulty(m, u.getType()));
+                    int currentDiffculty = m.getPlayers()[q].convertWay(wayString).size();
                     if (minWayDiff > currentDiffculty) {
                         bestWayNode = m.getPlayers()[q].convertWay(wayString);
                         minWayDiff = currentDiffculty;
@@ -388,7 +388,7 @@ public class MainTest {
             }
         }
         gw.setModel(m);
-         simulate(5);
+        simulate(5);
         int x = gw.getBoard().getModel().getPlayers()[0].getUnits().get(0).getX();
         int y = gw.getBoard().getModel().getPlayers()[0].getUnits().get(0).getY();
         gw.simulation();
@@ -418,8 +418,8 @@ public class MainTest {
                 for (int i = 0; i < 4; i++) {
                     ArrayList<String> wayString = m.getPlayers()[q].findBestWay(u.getX() / fieldSize,
                             u.getY() / fieldSize, m.getCastleCoordinates()[i + defender][0],
-                            m.getCastleCoordinates()[i + defender][1], m.getPlayers()[q].getDifficulty(m, u.getType(), q));
-                    int currentDiffculty = m.wayDifficulty(q, m.getPlayers()[q].convertWay(wayString), u.getType());
+                            m.getCastleCoordinates()[i + defender][1], m.getPlayers()[q].getDifficulty(m, u.getType()));
+                    int currentDiffculty = m.getPlayers()[q].convertWay(wayString).size();
                     if (minWayDiff > currentDiffculty) {
                         bestWayNode = m.getPlayers()[q].convertWay(wayString);
                         minWayDiff = currentDiffculty;
@@ -462,8 +462,8 @@ public class MainTest {
                 for (int i = 0; i < 4; i++) {
                     ArrayList<String> wayString = m.getPlayers()[q].findBestWay(u.getX() / fieldSize,
                             u.getY() / fieldSize, m.getCastleCoordinates()[i + defender][0],
-                            m.getCastleCoordinates()[i + defender][1], m.getPlayers()[q].getDifficulty(m, u.getType(), q));
-                    int currentDiffculty = m.wayDifficulty(q, m.getPlayers()[q].convertWay(wayString), u.getType());
+                            m.getCastleCoordinates()[i + defender][1], m.getPlayers()[q].getDifficulty(m, u.getType()));
+                    int currentDiffculty = m.getPlayers()[q].convertWay(wayString).size();
                     if (minWayDiff > currentDiffculty) {
                         bestWayNode = m.getPlayers()[q].convertWay(wayString);
                         minWayDiff = currentDiffculty;
@@ -481,7 +481,7 @@ public class MainTest {
         gw.setModel(m);
 
         assertTrue(m.getPlayers()[1].getTowers().get(0).getHp() == m.getPlayers()[1].getTowers().get(0).getMaxHp());
-         simulate(3);
+        simulate(3);
         m = gw.getBoard().getModel();
 
         assertTrue(m.getPlayers()[1].getTowers().get(0).getHp() == m.getPlayers()[1].getTowers().get(0).getMaxHp() - 50);
@@ -509,8 +509,8 @@ public class MainTest {
                 for (int i = 0; i < 4; i++) {
                     ArrayList<String> wayString = m.getPlayers()[q].findBestWay(u.getX() / fieldSize,
                             u.getY() / fieldSize, m.getCastleCoordinates()[i + defender][0],
-                            m.getCastleCoordinates()[i + defender][1], m.getPlayers()[q].getDifficulty(m, u.getType(), q));
-                    int currentDiffculty = m.wayDifficulty(q, m.getPlayers()[q].convertWay(wayString), u.getType());
+                            m.getCastleCoordinates()[i + defender][1], m.getPlayers()[q].getDifficulty(m, u.getType()));
+                    int currentDiffculty = m.getPlayers()[q].convertWay(wayString).size();
                     if (minWayDiff > currentDiffculty) {
                         bestWayNode = m.getPlayers()[q].convertWay(wayString);
                         minWayDiff = currentDiffculty;
@@ -525,7 +525,7 @@ public class MainTest {
         }
         gw.setRNDPROTECTION(1);
         gw.setModel(m);
-         simulate(3);
+        simulate(3);
         m = gw.getBoard().getModel();
         assertTrue(!m.getPlayers()[0].getUnits().isEmpty());
     }
@@ -551,8 +551,8 @@ public class MainTest {
                 for (int i = 0; i < 4; i++) {
                     ArrayList<String> wayString = m.getPlayers()[q].findBestWay(u.getX() / fieldSize,
                             u.getY() / fieldSize, m.getCastleCoordinates()[i + defender][0],
-                            m.getCastleCoordinates()[i + defender][1], m.getPlayers()[q].getDifficulty(m, u.getType(), q));
-                    int currentDiffculty = m.wayDifficulty(q, m.getPlayers()[q].convertWay(wayString), u.getType());
+                            m.getCastleCoordinates()[i + defender][1], m.getPlayers()[q].getDifficulty(m, u.getType()));
+                    int currentDiffculty = m.getPlayers()[q].convertWay(wayString).size();
                     if (minWayDiff > currentDiffculty) {
                         bestWayNode = m.getPlayers()[q].convertWay(wayString);
                         minWayDiff = currentDiffculty;
@@ -600,8 +600,8 @@ public class MainTest {
                 for (int i = 0; i < 4; i++) {
                     ArrayList<String> wayString = m.getPlayers()[q].findBestWay(u.getX() / fieldSize,
                             u.getY() / fieldSize, m.getCastleCoordinates()[i + defender][0],
-                            m.getCastleCoordinates()[i + defender][1], m.getPlayers()[q].getDifficulty(m, u.getType(), q));
-                    int currentDiffculty = m.wayDifficulty(q, m.getPlayers()[q].convertWay(wayString), u.getType());
+                            m.getCastleCoordinates()[i + defender][1], m.getPlayers()[q].getDifficulty(m, u.getType()));
+                    int currentDiffculty = m.getPlayers()[q].convertWay(wayString).size();
                     if (minWayDiff > currentDiffculty) {
                         bestWayNode = m.getPlayers()[q].convertWay(wayString);
                         minWayDiff = currentDiffculty;
@@ -619,7 +619,7 @@ public class MainTest {
 
         gw.getBoard().getModel().getPlayers()[1].getCastle().setHp(1);
         gw.setTestMode(true);
-         simulate(4);
+        simulate(4);
         assertTrue(gw.getBoard().getModel().getPlayers()[1].getCastle().getHp() == 0);
     }
 
@@ -644,8 +644,8 @@ public class MainTest {
                 for (int i = 0; i < 4; i++) {
                     ArrayList<String> wayString = m.getPlayers()[q].findBestWay(u.getX() / fieldSize,
                             u.getY() / fieldSize, m.getCastleCoordinates()[i + defender][0],
-                            m.getCastleCoordinates()[i + defender][1], m.getPlayers()[q].getDifficulty(m, u.getType(), q));
-                    int currentDiffculty = m.wayDifficulty(q, m.getPlayers()[q].convertWay(wayString), u.getType());
+                            m.getCastleCoordinates()[i + defender][1], m.getPlayers()[q].getDifficulty(m, u.getType()));
+                    int currentDiffculty = m.getPlayers()[q].convertWay(wayString).size();
                     if (minWayDiff > currentDiffculty) {
                         bestWayNode = m.getPlayers()[q].convertWay(wayString);
                         minWayDiff = currentDiffculty;
@@ -664,7 +664,7 @@ public class MainTest {
         gw.getBoard().getModel().getPlayers()[1].getCastle().setHp(1);
         gw.getBoard().getModel().getPlayers()[0].getCastle().setHp(1);
         gw.setTestMode(true);
-         simulate(4);
+        simulate(4);
         assertTrue(gw.getBoard().getModel().getPlayers()[1].getCastle().getHp() == 0);
         assertTrue(gw.getBoard().getModel().getPlayers()[0].getCastle().getHp() == 0);
     }
@@ -690,8 +690,8 @@ public class MainTest {
                 for (int i = 0; i < 4; i++) {
                     ArrayList<String> wayString = m.getPlayers()[q].findBestWay(u.getX() / fieldSize,
                             u.getY() / fieldSize, m.getCastleCoordinates()[i + defender][0],
-                            m.getCastleCoordinates()[i + defender][1], m.getPlayers()[q].getDifficulty(m, u.getType(), q));
-                    int currentDiffculty = m.wayDifficulty(q, m.getPlayers()[q].convertWay(wayString), u.getType());
+                            m.getCastleCoordinates()[i + defender][1], m.getPlayers()[q].getDifficulty(m, u.getType()));
+                    int currentDiffculty = m.getPlayers()[q].convertWay(wayString).size();
                     if (minWayDiff > currentDiffculty) {
                         bestWayNode = m.getPlayers()[q].convertWay(wayString);
                         minWayDiff = currentDiffculty;
@@ -709,7 +709,7 @@ public class MainTest {
         int simulationticks = 0;
         assertTrue(m.getPlayers()[0].getUnits().get(0).getHp() == m.getPlayers()[0].getUnits().get(0).getMaxHp());
 
-        towerSimulate(5,simulationticks);
+        towerSimulate(5, simulationticks);
         m = gw.getBoard().getModel();
         assertTrue(m.getPlayers()[0].getUnits().get(0).getHp() == m.getPlayers()[0].getUnits().get(0).getMaxHp() - m.getPlayers()[1].getTowers().get(0).getPower());
 
@@ -728,7 +728,7 @@ public class MainTest {
                     }
                 }
             }
-            towerSimulate(6,simulationticks);
+            towerSimulate(6, simulationticks);
             gw.getPlayer1distances().clear();
             gw.getPlayer2distances().clear();
         }

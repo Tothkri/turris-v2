@@ -4,7 +4,7 @@ public class Node {
 
     private int x;
     private int y;
-    Node parent;
+    private Node parent;
 
     /**
      * szülővel (előző mező) rendelkező elem
@@ -49,6 +49,10 @@ public class Node {
         this.y = y;
     }
 
+    public Node getParent() {
+        return parent;
+    }
+    
     @Override
     public String toString() {
         return x + ";" + y;
