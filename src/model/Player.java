@@ -31,17 +31,17 @@ public class Player {
 
     /**
      * torony lerakása adott koordinátán (adott típussal)
+     *
      * @param matrixPositionX
      * @param matrixPositionY
-     * @param UnitType
+     * @param towerType
      * @param model
      */
-    public void build(int matrixPositionX, int matrixPositionY, String UnitType, Model model) {
+    public void build(int matrixPositionX, int matrixPositionY, String towerType, Model model) {
 
         int fieldSize = model.getBoardSize() / 30;
-        difficultyMatrix = getDifficulty(model, UnitType, model.getActivePlayer());
         model.setSelectables(new ArrayList<>());
-
+        difficultyMatrix = getDifficulty(model, "General");
         if (isValid(matrixPositionX, matrixPositionY) && matrixPositionY >= model.getActivePlayer() * 15
                 && matrixPositionY < (model.getActivePlayer() + 1) * 15) /*
                         annak eldöntése, hogy a kattintott mező rajta van-e a játéktéren
@@ -50,11 +50,10 @@ public class Player {
                          player 2 területe (y): 15-29
          */ {
 
-            if (model.getPosition()[matrixPositionX][matrixPositionY] == 'F' && model.placable(matrixPositionX, matrixPositionY, difficultyMatrix)) //deciding if player clicked to a Field or not
-            {
+            if (model.getPosition()[matrixPositionX][matrixPositionY] == 'F' && model.placable(matrixPositionX, matrixPositionY, difficultyMatrix)) {
                 //kiválasztott torony létrehozása és hozzáadása a toronylistához
 
-                if (!UnitType.equals("")) {
+                if (!towerType.equals("")) {
                     Tower newTower;
                     String color;
                     if (model.getActivePlayer() == 0) {
@@ -63,16 +62,16 @@ public class Player {
                         color = "red";
                     }
 
-                    if (UnitType.equals("Fortified")) {
+                    if (towerType.equals("Fortified")) {
                         newTower = new Fortified(color, matrixPositionX * fieldSize, matrixPositionY * fieldSize, fieldSize, fieldSize,
-                                new ImageIcon("src/res/" + UnitType + "1" + color + ".png").getImage());
-                    } else if (UnitType.equals("Sniper")) {
+                                new ImageIcon("src/res/" + towerType + "1" + color + ".png").getImage());
+                    } else if (towerType.equals("Sniper")) {
                         newTower = new Sniper(color, matrixPositionX * fieldSize, matrixPositionY * fieldSize, fieldSize, fieldSize,
-                                new ImageIcon("src/res/" + UnitType + "1" + color + ".png").getImage());
+                                new ImageIcon("src/res/" + towerType + "1" + color + ".png").getImage());
                     } else //Rapid
                     {
                         newTower = new Rapid(color, matrixPositionX * fieldSize, matrixPositionY * fieldSize, fieldSize, fieldSize,
-                                new ImageIcon("src/res/" + UnitType + "1" + color + ".png").getImage());
+                                new ImageIcon("src/res/" + towerType + "1" + color + ".png").getImage());
                     }
 
                     //ellenőrzés, hogy van-e elegendő pénz
@@ -82,34 +81,36 @@ public class Player {
                         model.setPosition(matrixPositionX, matrixPositionY, 'T');
                         model.addTerrainElement(newTower);
                         addTower(newTower);
+
+                        //legjobb út kiszámítása minden egység számára
+                        for (int actualPlayerIndex = 0; actualPlayerIndex < 2; actualPlayerIndex++) {
+                            Player actualPlayer = model.getPlayers()[actualPlayerIndex];
+                            int defender = Math.abs(actualPlayerIndex * 4 - 4);
+                            ArrayList<Unit> updateUnits = model.getPlayers()[actualPlayerIndex].getUnits();
+                            for (Unit u : updateUnits) {
+                                int minWayDifficulty = 10000;
+                                ArrayList<Node> bestWayNode = new ArrayList<>();
+
+                                for (int i = 0; i < 4; i++) {
+                                    ArrayList<String> bestWayString = actualPlayer.findBestWay(u.getX() / fieldSize,
+                                            u.getY() / (fieldSize), model.getCastleCoordinates()[i + defender][0],
+                                            model.getCastleCoordinates()[i + defender][1], model.getPlayers()[actualPlayerIndex].getDifficulty(model, u.getType()));
+                                    int sizeOfNodeWay=actualPlayer.convertWay(bestWayString).size();
+
+                                    if (minWayDifficulty > sizeOfNodeWay) {
+                                        minWayDifficulty = sizeOfNodeWay;
+                                        bestWayNode = actualPlayer.convertWay(bestWayString);
+                                    }
+                                }
+                                u.setWay(bestWayNode);
+
+                                model.getPlayers()[actualPlayerIndex].setUnits(updateUnits);
+                            }
+
+                        }
                     }
 
                 }
-            }
-
-        }
-        //legjobb út kiszámítása minden egység számára
-        for (int actualPlayerIndex = 0; actualPlayerIndex < 2; actualPlayerIndex++) {
-            Player actualPlayer = model.getPlayers()[actualPlayerIndex];
-            int defender = Math.abs(actualPlayerIndex * 4 - 4);
-            ArrayList<Unit> updateUnits = model.getPlayers()[actualPlayerIndex].getUnits();
-            for (Unit u : updateUnits) {
-                int minWayDifficulty = 10000;
-                ArrayList<Node> bestWayNode = new ArrayList<>();
-
-                for (int i = 0; i < 4; i++) {
-                    ArrayList<String> bestWayString = actualPlayer.findBestWay(u.getX() / fieldSize,
-                            u.getY() / (fieldSize), model.getCastleCoordinates()[i + defender][0],
-                            model.getCastleCoordinates()[i + defender][1], model.getPlayers()[actualPlayerIndex].getDifficulty(model, u.getType(), actualPlayerIndex));
-
-                    if (minWayDifficulty > model.wayDifficulty(actualPlayerIndex, actualPlayer.convertWay(bestWayString), u.getType())) {
-                        minWayDifficulty = model.wayDifficulty(actualPlayerIndex, bestWayNode, u.getType());
-                        bestWayNode = actualPlayer.convertWay(bestWayString);
-                    }
-                }
-                u.setWay(bestWayNode);
-
-                model.getPlayers()[actualPlayerIndex].setUnits(updateUnits);
             }
 
         }
@@ -118,6 +119,7 @@ public class Player {
 
     /**
      * torony fejlesztése adott koordinátán
+     *
      * @param matrixPositionX
      * @param matrixPositionY
      * @param size
@@ -125,12 +127,11 @@ public class Player {
     public void upgrade(int matrixPositionX, int matrixPositionY, int size) {
         int boardPositionX = matrixPositionX * (size / 30);
         int boardPositionY = matrixPositionY * (size / 30);
-        boolean towerIsUpgradable;
         for (Tower t : playerTowers) {
             if (t.getX() == boardPositionX && t.getY() == boardPositionY) //kattintott torony kiválasztása
             {
-                towerIsUpgradable = (playerMoney >= t.getUpgradePrice() && t.getLevel() < 3); //annak ellenőrzése, hogy fejleszthető-e
-                if (towerIsUpgradable) {
+                if ((playerMoney >= t.getUpgradePrice() && t.getLevel() < 3)&&t.demolishedIn==-1) //annak ellenőrzése, hogy fejleszthető-e
+                {
                     //torony fejlesztése
                     playerMoney -= t.getUpgradePrice();
                     t.upgrade();
@@ -140,6 +141,7 @@ public class Player {
                     }
                     t.setImg(new ImageIcon("src/res/" + t.type + t.level + towerColor + ".png").getImage());
                 }
+                break;
             }
 
         }
@@ -147,6 +149,7 @@ public class Player {
 
     /**
      * torony lerombolása adott koordinátán
+     *
      * @param matrixPositionX
      * @param matrixPositionY
      * @param size
@@ -155,89 +158,91 @@ public class Player {
         int boardPositionX = matrixPositionX * (size / 30);
         int boardPositionY = matrixPositionY * (size / 30);
         for (Tower t : playerTowers) {
-            if (t.getX() == boardPositionX && t.getY() == boardPositionY && t.demolishedIn == -1) {
-                playerMoney += t.getMoneySpentOn() / 2; //játékos visszakapja az összes toronyba költött pénz felét
-                t.demolish();
+            if (t.getX() == boardPositionX && t.getY() == boardPositionY) {
+                if (t.demolishedIn == -1) {
+                    playerMoney += t.getMoneySpentOn() / 2; //játékos visszakapja az összes toronyba költött pénz felét
+                    t.demolish();
+                }
+                break;
             }
         }
     }
 
-     /**
+    /**
      * annak eldöntése, hogy a játéktéren van-e egy mező
      */
-    private boolean isValid(int x, int y) 
-    {
-        return (x >= 0 && x < 30) && (y >= 0 && y < 30);
+    private boolean isValid(int matrixPositionX, int matrixPositionY) {
+        return (matrixPositionX >= 0 && matrixPositionX < 30) && (matrixPositionY >= 0 && matrixPositionY < 30);
     }
 
     /**
      * egységek küldése
+     *
      * @param type
      * @param playerColor
      * @param amount
      * @param model
      * @return
      */
-    public Model sendUnits(String type, String playerColor, int amount, Model model) {
+    public void sendUnits(String type, String playerColor, int amount, Model model) {
         int fieldSize = model.getBoardSize() / 30;
-        if ((type.equals("General") || type.equals("Diver") || type.equals("Climber")) && amount * 20 > playerMoney) {
-            return model;
-        } else if ((type.equals("Fighter") || type.equals("Destroyer")) && amount * 40 > playerMoney) {
-            return model;
-        }
-        int minDifficulty = 10000;
-        ArrayList<Node> bestWayNode = new ArrayList<>();
+        if (!((type.equals("General") || type.equals("Diver") || type.equals("Climber")) && amount * 20 > playerMoney) && !((type.equals("Fighter") || type.equals("Destroyer")) && amount * 40 > playerMoney)) {
+            int minWayDifficulty = 10000;
+            ArrayList<Node> bestWayNode = new ArrayList<>();
 
-        //minden lehetséges (4*4) kastélykoordináta között kiszámoljuk a legjobb utak, és azok közül is a legjobbat kiválasztjuk
-        difficultyMatrix = getDifficulty(model, type, model.getActivePlayer());
-        //annak eltárolása, hogy át tud-e menni az adott mezőkön az egység
+            //minden lehetséges (4*4) kastélykoordináta között kiszámoljuk a legjobb utak, és azok közül is a legjobbat kiválasztjuk
+            difficultyMatrix = getDifficulty(model, type);
+            //annak eltárolása, hogy át tud-e menni az adott mezőkön az egység
 
-        for (int i = 0; i < amount; i++) {
+            for (int i = 0; i < amount; i++) {
 
-            int attacker = model.getActivePlayer() * 4;
-            int defender = Math.abs(model.getActivePlayer() * 4 - 4);
-            for (int j = 0; j < 4; j++) {
-                for (int k = 0; k < 4; k++) {
-                    ArrayList<String> bestWayString = findBestWay(model.getCastleCoordinates()[j + attacker][0], model.getCastleCoordinates()[j + attacker][1],
-                            model.getCastleCoordinates()[k + defender][0], model.getCastleCoordinates()[k + defender][1], difficultyMatrix);
-                    int actualWayDifficulty = model.wayDifficulty(model.getActivePlayer(), convertWay(bestWayString), type);
-                    if (actualWayDifficulty < minDifficulty) {
-                        minDifficulty = actualWayDifficulty;
-                        bestWayNode = convertWay(bestWayString);
+                int attacker = model.getActivePlayer() * 4;
+                int defender = Math.abs(model.getActivePlayer() * 4 - 4);
+                for (int j = 0; j < 4; j++) {
+                    for (int k = 0; k < 4; k++) {
+                        ArrayList<String> bestWayString = findBestWay(model.getCastleCoordinates()[j + attacker][0], model.getCastleCoordinates()[j + attacker][1],
+                                model.getCastleCoordinates()[k + defender][0], model.getCastleCoordinates()[k + defender][1], difficultyMatrix);
+                        int sizeOfNodeWay=convertWay(bestWayString).size();
+                                    if (minWayDifficulty > sizeOfNodeWay) {
+                                        minWayDifficulty = sizeOfNodeWay;
+                                        bestWayNode = convertWay(bestWayString);
+                                    }
                     }
                 }
-            }
 
-            if (bestWayNode != null && !bestWayNode.isEmpty()) {
+                if (bestWayNode != null && !bestWayNode.isEmpty()) {
 
-                Unit newUnit;
-                if (type.equals("General")) {
-                    newUnit = new General(playerColor, playerCastle.x, playerCastle.y, fieldSize, fieldSize, new ImageIcon("src/res/" + type + playerColor + ".png").getImage(), bestWayNode);
-                } else if (type.equals("Climber")) {
-                    newUnit = new Climber(playerColor, playerCastle.x, playerCastle.y, fieldSize, fieldSize, new ImageIcon("src/res/" + type + playerColor + ".png").getImage(), bestWayNode);
-                } else if (type.equals("Diver")) {
-                    newUnit = new Diver(playerColor, playerCastle.x, playerCastle.y, fieldSize, fieldSize, new ImageIcon("src/res/" + type + playerColor + ".png").getImage(), bestWayNode);
-                } else if (type.equals("Fighter")) {
-                    newUnit = new Fighter(playerColor, playerCastle.x, playerCastle.y, fieldSize, fieldSize, new ImageIcon("src/res/" + type + playerColor + ".png").getImage(), bestWayNode);
-                } else //Destroyer
-                {
-                    newUnit = new Destroyer(playerColor, playerCastle.x, playerCastle.y, fieldSize, fieldSize, new ImageIcon("src/res/" + type + playerColor + ".png").getImage(), bestWayNode);
-                }
-                //annak ellenőrzése, hogy a játékosnak van-e elég pénze
-                if (newUnit.price <= playerMoney) {
+                    Unit newUnit;
+                    if (type.equals("General")) {
+                        newUnit = new General(playerColor, playerCastle.x, playerCastle.y, fieldSize, fieldSize,
+                                new ImageIcon("src/res/" + type + playerColor + ".png").getImage(), bestWayNode);
+                    } else if (type.equals("Climber")) {
+                        newUnit = new Climber(playerColor, playerCastle.x, playerCastle.y, fieldSize, fieldSize,
+                                new ImageIcon("src/res/" + type + playerColor + ".png").getImage(), bestWayNode);
+                    } else if (type.equals("Diver")) {
+                        newUnit = new Diver(playerColor, playerCastle.x, playerCastle.y, fieldSize, fieldSize,
+                                new ImageIcon("src/res/" + type + playerColor + ".png").getImage(), bestWayNode);
+                    } else if (type.equals("Fighter")) {
+                        newUnit = new Fighter(playerColor, playerCastle.x, playerCastle.y, fieldSize, fieldSize,
+                                new ImageIcon("src/res/" + type + playerColor + ".png").getImage(), bestWayNode);
+                    } else //Destroyer
+                    {
+                        newUnit = new Destroyer(playerColor, playerCastle.x, playerCastle.y, fieldSize, fieldSize,
+                                new ImageIcon("src/res/" + type + playerColor + ".png").getImage(), bestWayNode);
+                    }
                     playerMoney -= newUnit.price;
                     addUnits(newUnit);
                 }
             }
-        }
 
-        return model;
+        }
 
     }
 
     /**
-     * kezdő és cél mezők között legjobb út kiszámítása
-     * ez a legjobb út fordulópontjait adja vissza
+     * kezdő és cél mezők között legjobb út kiszámítása ez a legjobb út
+     * fordulópontjait adja vissza
+     *
      * @param fromX
      * @param fromY
      * @param toX
@@ -245,7 +250,7 @@ public class Player {
      * @param difficultyMatrix
      * @return
      */
-    public ArrayList<String> findBestWay(int fromX, int fromY, int toX, int toY, int difficultyMatrix[][])  {
+    public ArrayList<String> findBestWay(int fromX, int fromY, int toX, int toY, int difficultyMatrix[][]) {
 
         ArrayList<String> bestWayString = new ArrayList<>();
         int currentX = fromX;
@@ -281,8 +286,8 @@ public class Player {
                 {
                     Node next = new Node(currentX, currentY, current);
 
-                    if (!visited.contains(next.toString())) //ha még nem jártunk a mezőn, hozzáadjuk azokhoz, amin már jártunk + a sorhoz is
-                    {
+                    if (!visited.contains(next.toString())) {
+                        //ha még nem jártunk a mezőn, hozzáadjuk azokhoz, amin már jártunk + a sorhoz is
                         queue.add(next);
                         visited.add(next.toString());
                     }
@@ -293,34 +298,17 @@ public class Player {
     }
 
     /**
-     * a megadott torony toronylista indexének visszaadása
-     * lerombolásnál használatos
-     * @param t
-     * @return
-     */
-    public int getTowerIndex(Tower t) {
-        int index = 0;
-        for (Tower x : playerTowers) {
-            if (x.getX() == t.getX() && x.getY() == t.getY()) {
-                return index;
-            }
-            index++;
-        }
-        return -1; //nincs ilyen torony a listában
-    }
-
-    /**
      * String típusú legjobb utat Node típusban adjuk vissza
+     *
      * @param bestWayString
      * @return
      */
-    public ArrayList<Node> convertWay(ArrayList<String> bestWayString) 
-    {
+    public ArrayList<Node> convertWay(ArrayList<String> bestWayString) {
 
-        ArrayList<Node> bestWayNode = new ArrayList<Node>();
+        ArrayList<Node> bestWayNode = new ArrayList<>();
 
         if (bestWayString.isEmpty() || bestWayString == null) {
-            return new ArrayList<Node>();
+            return new ArrayList<>();
         }
 
         for (int i = 1; i < bestWayString.size(); i++) {
@@ -368,20 +356,40 @@ public class Player {
     }
 
     /**
-     * segédfüggvény, rekurzívan hozzáadjuk a mezők szülőjét (előző mező) az úthoz
-     * 
+     * segédfüggvény, rekurzívan hozzáadjuk a mezők szülőjét (előző mező) az
+     * úthoz
+     *
      */
-    private void findNodeWay(Node currentNode, ArrayList<String> bestWayNode) 
-    {
+    private void findNodeWay(Node currentNode, ArrayList<String> bestWayNode) {
         if (currentNode != null) //ha nincs szülő, akkor visszakaptuk a kezdő mezőt
         {
-            findNodeWay(currentNode.parent, bestWayNode);
+            findNodeWay(currentNode.getParent(), bestWayNode);
             bestWayNode.add(currentNode.toString());
         }
     }
 
     /**
+     * a megadott torony toronylista indexének visszaadása lerombolásnál
+     * használatos
+     *
+     * @param t
+     * @return
+     */
+    public int getTowerIndex(Tower towerToFind) {
+        int index = 0;
+        for (Tower actualTower : playerTowers) {
+            if (actualTower.getX() == towerToFind.getX()
+                    && actualTower.getY() == towerToFind.getY()) {
+                return index;
+            }
+            index++;
+        }
+        return -1; //nincs ilyen torony a listában
+    }
+
+    /**
      * egység törlése
+     *
      * @param unitToDelete
      */
     public void deleteUnit(Unit unitToDelete) {
@@ -390,12 +398,13 @@ public class Player {
 
     /**
      * nehézségi mátrix visszaadása adott játékos adott típusú egységére
+     *
      * @param model
      * @param UnitType
      * @param activePlayer
      * @return
      */
-    public int[][] getDifficulty(Model model, String UnitType, int activePlayer) {
+    public int[][] getDifficulty(Model model, String UnitType) {
         for (int i = 0; i < 30; i++) {
             for (int j = 0; j < 30; j++) {
                 if (UnitType.equals("Diver")) //átmehet a tavakon
@@ -429,6 +438,7 @@ public class Player {
 
     /**
      * még nem lerombolt tornyok listájának visszaadása
+     *
      * @return
      */
     public ArrayList<Tower> getNotDemolishedTowers() {

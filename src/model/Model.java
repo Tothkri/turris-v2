@@ -48,14 +48,6 @@ public class Model {
         generateTerrain(selectedMap);
     }
 
-    public Model() {
-        this.terrain = new ArrayList<>();
-        this.selectables = new ArrayList<>();
-        this.terrainElementPositions = new char[30][30];
-        this.castleCoordinates = new int[8][2];
-        this.players = new Player[2];
-    }
-
     public Model(int boardSize) {
         this.terrain = new ArrayList<>();
         this.selectables = new ArrayList<>();
@@ -93,7 +85,8 @@ public class Model {
         terrainElementPositions[randomMatrixPosition + 1][3] = 'C';
 
         //a kastélyok 2x2 mező méretűek
-        Castle castle1 = new Castle("blue", randomMatrixPosition * (boardSize / 30), 2 * (boardSize / 30), (boardSize / 15), (boardSize / 15), Castle, 300);
+        Castle castle1 = new Castle("blue", randomMatrixPosition
+                * (boardSize / 30), 2 * (boardSize / 30), (boardSize / 15), (boardSize / 15), Castle, 300);
         terrain.add(castle1);
         players[0].setCastle(castle1);
 
@@ -103,7 +96,8 @@ public class Model {
         terrainElementPositions[randomMatrixPosition][26] = 'C';
         terrainElementPositions[randomMatrixPosition + 1][26] = 'C';
 
-        Castle castle2 = new Castle("red", randomMatrixPosition * (boardSize / 30), 26 * (boardSize / 30), (boardSize / 15), (boardSize / 15), Castle, 300);
+        Castle castle2 = new Castle("red", randomMatrixPosition
+                * (boardSize / 30), 26 * (boardSize / 30), (boardSize / 15), (boardSize / 15), Castle, 300);
         terrain.add(castle2);
         players[1].setCastle(castle2);
 
@@ -275,7 +269,7 @@ public class Model {
                 writer.write(System.getProperty("line.separator"));
             }
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "File not foundElement!", "Warning", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "File not found!", "Warning", JOptionPane.INFORMATION_MESSAGE);
         }
 
     }
@@ -298,25 +292,13 @@ public class Model {
      * @param unitType
      * @return
      */
-    public int wayDifficulty(int actualPlayer, ArrayList<Node> bestWay, String unitType) {
-        int difficultySum = 0;
-        int difficultyMatrix[][] = players[actualPlayer].getDifficulty(this, unitType, actualPlayer);
-
-        for (Node nextNode : bestWay) {
-            difficultySum += difficultyMatrix[nextNode.getX()][nextNode.getY()];
-        }
-
-        return difficultySum;
-    }
-
     /**
      * torony lerakásának lehetséges helyei
      */
     public void setSelectables() {
         for (int i = 0; i < 30; i++) {
             for (int j = (activePlayer + 1) * 15 - 1; j >= activePlayer * 15; j--) {
-                if (terrainElementPositions[i][j] == 'F' && placable(i, j, players[activePlayer].getDifficulty(this, "General", activePlayer))) 
-                //generalra számoljuk, mivel így a tavat és hegyet is akadálynak veszi, hogy ne tudjunk rájuk rakni tornyot
+                if (terrainElementPositions[i][j] == 'F' && placable(i, j, players[activePlayer].getDifficulty(this, "General"))) //generalra számoljuk, mivel így a tavat és hegyet is akadálynak veszi, hogy ne tudjunk rájuk rakni tornyot
                 {
                     selectables.add(new Selectable(i * (boardSize / 30), j * (boardSize / 30),
                             (boardSize / 30), (boardSize / 30)));
@@ -327,6 +309,7 @@ public class Model {
 
     /**
      * torony lerakásának összese
+     *
      * @param towerType
      * @return
      */
@@ -342,8 +325,8 @@ public class Model {
     }
 
     /**
-     * ellenséges kastély koordinátája-e
-     * egység célba éréséhez használandó
+     * ellenséges kastély koordinátája-e egység célba éréséhez használandó
+     *
      * @param actualPlayer
      * @param matrixPositionX
      * @param matrixPositionY
@@ -362,8 +345,7 @@ public class Model {
     /**
      * van-e egység (bármelyik játékosé) az adott mezőn
      */
-    private boolean isThereUnit(int matrixPositionX, int matrixPositionY) ////0<=x,y<30
-    {
+    private boolean isThereUnit(int matrixPositionX, int matrixPositionY) {
         for (int q = 0; q < 2; q++) {
             ArrayList<Unit> units = players[q].getUnits();
             for (int i = 0; i < units.size(); i++) {
@@ -377,6 +359,7 @@ public class Model {
 
     /**
      * adott pénzből az aktuális játékos számára fejleszthető tornyok kijelölése
+     *
      * @param money
      */
     public void setSelectableTowersToUpgrade(int money) {
@@ -415,15 +398,12 @@ public class Model {
      */
     public String getInfo(int matrixPositionX, int matrixPositionY) {
         String information = "";
-        boolean foundElement = false;
-
-        for (int i = 0; i < players[activePlayer].getNotDemolishedTowers().size() && !foundElement; i++) {
+        for (int i = 0; i < players[activePlayer].getNotDemolishedTowers().size(); i++) {
             Tower t = players[activePlayer].getNotDemolishedTowers().get(i);
             if (t.x / (boardSize / 30) == matrixPositionX && t.y / (boardSize / 30) == matrixPositionY) {
                 information = "<html><font face=\"sansserif\" color=\"black\">Tower type: " + t.type + "<br>level: " + t.level + "<br>hp: " + t.hp + ""
                         + "<br>attack speed: " + t.attackFrequency + "<br>power: " + t.power + "<br>range: " + t.range + "</font></html>";
-                foundElement = true;
-
+                return information;
             }
         }
 
@@ -448,7 +428,7 @@ public class Model {
                 units.get(i).setX(matrixPositionX * (boardSize / 30) + i);
             }
             ArrayList<String> unitTypes = new ArrayList<>();
-            String typesString = "";
+            String typesString;
             int sumPower = 0;
             int sumHp = 0;
             for (Unit actualUnit : units) {
@@ -473,18 +453,19 @@ public class Model {
             if (matrixPositionX == castleCoordinates[i][0] && matrixPositionY == castleCoordinates[i][1]) {
                 information = "<html><font face=\"sansserif\" color=\"black\">" + players[0].getName() + "'s castle<br>hp: "
                         + players[0].getCastle().getHp() + "</font></html>";
+                return information;
             } else if (matrixPositionX == castleCoordinates[i + 4][0] && matrixPositionY == castleCoordinates[i + 4][1]) {
                 information = "<html><font face=\"sansserif\" color=\"black\">" + players[1].getName() + "'s castle<br>hp: "
                         + players[1].getCastle().getHp() + "</font></html>";
+                return information;
             }
         }
-
         return information;
     }
 
     /**
      * megadott egység szomszédos mezőin lévő ellenséges tornyok listájának
-     * cisszaadása romboló egységhez kell
+     * visszaadása romboló egységhez kell
      *
      * @param actualPlayer
      * @param actualUnit
