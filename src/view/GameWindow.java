@@ -16,6 +16,7 @@ import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.PointerInfo;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -215,15 +216,15 @@ public class GameWindow extends JPanel {
 
         //PLAYER1 Unit Deploy
         player1UnitDeploy.addActionListener(ae -> {
-            board.setModel(model.getPlayers()[0].sendUnits("General", "blue", player1GeneralCount, model));
+            model.getPlayers()[0].sendUnits("General", "blue", player1GeneralCount, model);
             playerDataUpdate();
-            board.setModel(model.getPlayers()[0].sendUnits("Fighter", "blue", player1FighterCount, model));
+            model.getPlayers()[0].sendUnits("Fighter", "blue", player1FighterCount, model);
             playerDataUpdate();
-            board.setModel(model.getPlayers()[0].sendUnits("Climber", "blue", player1ClimberCount, model));
+            model.getPlayers()[0].sendUnits("Climber", "blue", player1ClimberCount, model);
             playerDataUpdate();
-            board.setModel(model.getPlayers()[0].sendUnits("Diver", "blue", player1DiverCount, model));
+            model.getPlayers()[0].sendUnits("Diver", "blue", player1DiverCount, model);
             playerDataUpdate();
-            board.setModel(model.getPlayers()[0].sendUnits("Destroyer", "blue", player1DestroyerCount, model));
+            model.getPlayers()[0].sendUnits("Destroyer", "blue", player1DestroyerCount, model);
             playerDataUpdate();
         });
         ////////////////////////////////////////////////////////////////////////
@@ -265,15 +266,15 @@ public class GameWindow extends JPanel {
 
         //PLAYER2 Unit Deploy
         player2UnitDeploy.addActionListener(ae -> {
-            board.setModel(model.getPlayers()[1].sendUnits("General", "red", player2GeneralCount, model));
+            model.getPlayers()[1].sendUnits("General", "red", player2GeneralCount, model);
             playerDataUpdate();
-            board.setModel(model.getPlayers()[1].sendUnits("Fighter", "red", player2FighterCount, model));
+            model.getPlayers()[1].sendUnits("Fighter", "red", player2FighterCount, model);
             playerDataUpdate();
-            board.setModel(model.getPlayers()[1].sendUnits("Climber", "red", player2ClimberCount, model));
+            model.getPlayers()[1].sendUnits("Climber", "red", player2ClimberCount, model);
             playerDataUpdate();
-            board.setModel(model.getPlayers()[1].sendUnits("Diver", "red", player2DiverCount, model));
+            model.getPlayers()[1].sendUnits("Diver", "red", player2DiverCount, model);
             playerDataUpdate();
-            board.setModel(model.getPlayers()[1].sendUnits("Destroyer", "red", player2DestroyerCount, model));
+            model.getPlayers()[1].sendUnits("Destroyer", "red", player2DestroyerCount, model);
             playerDataUpdate();
         });
 
@@ -933,14 +934,14 @@ public class GameWindow extends JPanel {
 
 
             //Exit game BUTTON
-            exitButton.setPreferredSize(new Dimension(260, 40));
-            exitButton.setFont(nunitoLight.deriveFont(25f));
-            exitButton.setMargin(new Insets(0, 0, 0, 0));
-            exitButton.setFocusPainted(false);
+            backToMenuButton.setPreferredSize(new Dimension(260, 40));
+            backToMenuButton.setFont(nunitoLight.deriveFont(25f));
+            backToMenuButton.setMargin(new Insets(0, 0, 0, 0));
+            backToMenuButton.setFocusPainted(false);
             gbc.insets = new Insets(0, 0, -22, 0);
             gbc.gridx = 2;
             gbc.gridy = 0;
-            this.add(exitButton, gbc);
+            this.add(backToMenuButton, gbc);
 
 
             //Finish round BUTTON
