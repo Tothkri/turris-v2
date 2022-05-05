@@ -51,10 +51,8 @@ public class StartScreen extends JPanel {
 
     /**
      * Játék kezdőképernyője
-     *
      * @param width
      * @param height
-     * @return
      */
     public StartScreen(int width, int height) {
         super();
@@ -73,7 +71,6 @@ public class StartScreen extends JPanel {
 
     /**
      * Játék betöltése
-     *
      * @param gw
      * @param fileName
      * @throws java.io.IOException
@@ -426,8 +423,8 @@ public class StartScreen extends JPanel {
         try {
             //számoknak: poppins
             //szavaknak: nunito
-            Font poppinsLightLabel = Font.createFont(Font.TRUETYPE_FONT, new File("src/res/fonts/Poppins-Light.ttf"));
-            Font nunitoLightLabel = Font.createFont(Font.TRUETYPE_FONT, new File("src/res/fonts/Nunito-Light.ttf"));
+            Font poppinsLight = Font.createFont(Font.TRUETYPE_FONT, new File("src/res/fonts/Poppins-Light.ttf"));
+            Font nunitoLight = Font.createFont(Font.TRUETYPE_FONT, new File("src/res/fonts/Nunito-Light.ttf"));
             
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
             ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("src/res/fonts/Poppins-Light.ttf")));
@@ -438,23 +435,19 @@ public class StartScreen extends JPanel {
             gameNameRow.add(gameName);
             gameNameRow.setBorder(new EmptyBorder(30, 0, 0, 0));
             gameNameRow.setBackground(Color.LIGHT_GRAY);
-
             gameName.setFont(new Font("Calibri", Font.BOLD, 80));
 
             gridBConts.insets = new Insets(0, 0, 60, -705);
             gridBConts.gridx = 0;
             gridBConts.gridy = 0;
-
             this.add(gameNameRow, gridBConts);
             
             
             //Player Name LABEL
-            playerNames.setFont(new Font("Calibri", Font.PLAIN, 70));
-            //playerNames.setFont(poppinsLight.deriveFont(70f));
-
+            playerNames.setFont(nunitoLight.deriveFont(70f));
             playerNameLabelRow.add(playerNames);
-            playerNameLabelRow.setPreferredSize(new Dimension(700, 100));   //LABEL HEIGHT: 100
-            playerNameLabelRow.setBorder(new EmptyBorder(10, -260, 0, 0));
+            playerNameLabelRow.setPreferredSize(new Dimension(700, 100));  //LABEL HEIGHT: 100
+            playerNameLabelRow.setBorder(new EmptyBorder(0, -240, 0, 0));
             playerNameLabelRow.setBackground(Color.LIGHT_GRAY);
 
             gridBConts.insets = new Insets(0, -100, 0, 100);
@@ -468,14 +461,14 @@ public class StartScreen extends JPanel {
             playerNameInputRow.setBackground(veryLightGray);
 
             //p1 LABEL
-            p1NameLabel.setFont(new Font("Calibri", Font.PLAIN, 50));
-            gridBContsPlr.insets = new Insets(20, 0, 0, 0);
+            p1NameLabel.setFont(nunitoLight.deriveFont(45f));
+            gridBContsPlr.insets = new Insets(5, -20, 0, 0);
             gridBContsPlr.gridx = 0;
             gridBContsPlr.gridy = 0;
             playerNameInputRow.add(p1NameLabel, gridBContsPlr);
 
             //p1 INPUT
-            p1Name.setFont(new Font("Calibri", Font.PLAIN, 30));
+            p1Name.setFont(nunitoLight.deriveFont(25f));
             p1Name.setPreferredSize(new Dimension(200, 50));
             p1Name.setHorizontalAlignment(JTextField.CENTER);
             gridBContsPlr.insets = new Insets(5, 0, 0, 0);
@@ -484,17 +477,17 @@ public class StartScreen extends JPanel {
             playerNameInputRow.add(p1Name, gridBContsPlr);
 
             //p2 LABEL
-            p2NameLabel.setFont(new Font("Calibri", Font.PLAIN, 50));
-            gridBContsPlr.insets = new Insets(15, 0, 0, 0);
+            p2NameLabel.setFont(nunitoLight.deriveFont(45f));
+            gridBContsPlr.insets = new Insets(10, -20, 0, 0);
             gridBContsPlr.gridx = 0;
             gridBContsPlr.gridy = 1;
             playerNameInputRow.add(p2NameLabel, gridBContsPlr);
 
             //p2 INPUT
-            p2Name.setFont(new Font("Calibri", Font.PLAIN, 30));
+            p2Name.setFont(nunitoLight.deriveFont(25f));
             p2Name.setPreferredSize(new Dimension(200, 50));
             p2Name.setHorizontalAlignment(JTextField.CENTER);
-            gridBContsPlr.insets = new Insets(5, 0, 0, 0);
+            gridBContsPlr.insets = new Insets(10, 0, 0, 0);
             gridBContsPlr.gridx = 1;
             gridBContsPlr.gridy = 1;
             playerNameInputRow.add(p2Name, gridBContsPlr);
@@ -506,11 +499,10 @@ public class StartScreen extends JPanel {
 
 
             //Map LABEL
-            pickMap.setFont(new Font("Calibri", Font.PLAIN, 70));
-
+            pickMap.setFont(nunitoLight.deriveFont(70f));
             pickMapLabelRow.add(pickMap);
             pickMapLabelRow.setPreferredSize(new Dimension(700, 100));
-            pickMapLabelRow.setBorder(new EmptyBorder(10, -295, 0, 0));
+            pickMapLabelRow.setBorder(new EmptyBorder(0, -300, 0, 0));
             pickMapLabelRow.setBackground(Color.LIGHT_GRAY);
 
             gridBConts.insets = new Insets(0, -100, 0, 100);
@@ -519,7 +511,7 @@ public class StartScreen extends JPanel {
             this.add(pickMapLabelRow, gridBConts);
 
 
-            //Map selection RADIO
+            ///Map selection RADIO
             pickMapRadioRow.setPreferredSize(new Dimension(700, 240));
             pickMapRadioRow.setBackground(veryLightGray);
 
@@ -532,7 +524,7 @@ public class StartScreen extends JPanel {
             group.add(map3);
 
             //map1
-            map1.setFont(new Font("Calibri", Font.PLAIN, 50));
+            map1.setFont(nunitoLight.deriveFont(45f));
             map1.setFocusPainted(false);
             map1.setBackground(veryLightGray);
 
@@ -544,13 +536,13 @@ public class StartScreen extends JPanel {
                 }
             });
 
-            gridBContsMap.insets = new Insets(0, -20, 0, 0);
+            gridBContsMap.insets = new Insets(0, -50, 0, 0);
             gridBContsMap.gridx = 0;
             gridBContsMap.gridy = 0;
             pickMapRadioRow.add(map1, gridBContsMap);
 
             //map2
-            map2.setFont(new Font("Calibri", Font.PLAIN, 50));
+            map2.setFont(nunitoLight.deriveFont(45f));
             map2.setFocusPainted(false);
             map2.setBackground(veryLightGray);
 
@@ -562,13 +554,13 @@ public class StartScreen extends JPanel {
                 }
             });
 
-            gridBContsMap.insets = new Insets(10, -30, 0, 0);
+            gridBContsMap.insets = new Insets(10, -60, 0, 0);
             gridBContsMap.gridx = 0;
             gridBContsMap.gridy = 1;
             pickMapRadioRow.add(map2, gridBContsMap);
 
             //map3
-            map3.setFont(new Font("Calibri", Font.PLAIN, 50));
+            map3.setFont(nunitoLight.deriveFont(45f));
             map3.setFocusPainted(false);
             map3.setBackground(veryLightGray);
 
@@ -580,7 +572,7 @@ public class StartScreen extends JPanel {
                 }
             });
 
-            gridBContsMap.insets = new Insets(10, -137, 0, 0);
+            gridBContsMap.insets = new Insets(10, -153, 0, 0);  //10, -137, 0, 0
             gridBContsMap.gridx = 0;
             gridBContsMap.gridy = 2;
             pickMapRadioRow.add(map3, gridBContsMap);
@@ -591,10 +583,10 @@ public class StartScreen extends JPanel {
 
 
             //Load game LABEL
-            loadGameLabel.setFont(new Font("Calibri", Font.PLAIN, 70));
+            loadGameLabel.setFont(nunitoLight.deriveFont(70f));
 
             loadGameLabelRow.setPreferredSize(new Dimension(700, 100));
-            loadGameLabelRow.setBorder(new EmptyBorder(10, -145, 0, 0));
+            loadGameLabelRow.setBorder(new EmptyBorder(-10, -115, 0, 0));
             loadGameLabelRow.setBackground(Color.LIGHT_GRAY);
             loadGameLabelRow.add(loadGameLabel);
 
@@ -607,9 +599,9 @@ public class StartScreen extends JPanel {
             //Load game BUTTON
             Border loadBorder = BorderFactory.createLineBorder(Color.DARK_GRAY, 3);
             loadButton.setBorder(loadBorder);
-            loadButton.setFont(new Font("Calibri", Font.PLAIN, 35));
+            loadButton.setFont(nunitoLight.deriveFont(30f));
             loadButton.setPreferredSize(new Dimension(400, 55));
-            loadButton.setVerticalAlignment(SwingConstants.BOTTOM);
+            loadButton.setVerticalAlignment(SwingConstants.CENTER);
             loadButton.setFocusPainted(false);
 
             loadGameButtonRow.setPreferredSize(new Dimension(700, 80)); //INPUT HEIGHT: 80 (PER INP.)
@@ -624,10 +616,9 @@ public class StartScreen extends JPanel {
 
 
             //StEx LABEL
-            startGameLabel.setFont(new Font("Calibri", Font.PLAIN, 70));
-
+            startGameLabel.setFont(nunitoLight.deriveFont(66f));
             stexLabelRow.setPreferredSize(new Dimension(700, 100));
-            stexLabelRow.setBorder(new EmptyBorder(10, 0, 0, 0));
+            stexLabelRow.setBorder(new EmptyBorder(-8, 0, 0, 0));
             stexLabelRow.setBackground(Color.LIGHT_GRAY);
             stexLabelRow.add(startGameLabel);
 
@@ -645,9 +636,9 @@ public class StartScreen extends JPanel {
             //Start BUTTON
             Border startBorder = BorderFactory.createLineBorder(algaeGreen, 3);
             startButton.setBorder(startBorder);
-            startButton.setFont(new Font("Calibri", Font.BOLD, 35));
+            startButton.setFont(nunitoLight.deriveFont(30f));
             startButton.setPreferredSize(new Dimension(300, 55));
-            startButton.setVerticalAlignment(SwingConstants.BOTTOM);
+            startButton.setVerticalAlignment(SwingConstants.CENTER);
             startButton.setFocusPainted(false);
 
             gridBContsStex.insets = new Insets(0, 0, 0, 0);
@@ -658,9 +649,9 @@ public class StartScreen extends JPanel {
             //Exit BUTTON
             Border exitBorder = BorderFactory.createLineBorder(cinnabar, 3);
             exitButton.setBorder(exitBorder);
-            exitButton.setFont(new Font("Calibri", Font.BOLD, 35));
+            exitButton.setFont(nunitoLight.deriveFont(30f));
             exitButton.setPreferredSize(new Dimension(300, 55));
-            exitButton.setVerticalAlignment(SwingConstants.BOTTOM);
+            exitButton.setVerticalAlignment(SwingConstants.CENTER);
             exitButton.setFocusPainted(false);
 
             exitButton.addActionListener(new ActionListener() {
@@ -681,37 +672,45 @@ public class StartScreen extends JPanel {
             this.add(stexButtonRow, gridBConts);
             
         } catch(IOException | FontFormatException e) {
+            //System.out.println("Exception thrown :" + e);
         }
     }
 
     /**
      * nevek helyesek-e
-     *
      * @param
-     * @return correct or not
+     * @return f
      */
     public boolean isCorrect() {
+        Color pastelRed = new Color(255, 105, 97);
         boolean f = true;
+        
         if (p1Name.getText().equals("")) {
-            p1Name.setBackground(Color.red);
+            p1Name.setBackground(pastelRed);
+            Border border = BorderFactory.createLineBorder(Color.RED, 3);
+            p1Name.setBorder(border);
             p1Name.setText("");
             f = false;
-        } else {
-            p1Name.setBackground(Color.white);
         }
 
         if (p2Name.getText().equals("")) {
-            p2Name.setBackground(Color.red);
+            p2Name.setBackground(pastelRed);
+            Border border = BorderFactory.createLineBorder(Color.RED, 3);
+            p2Name.setBorder(border);
             p2Name.setText("");
             f = false;
-        } else if (p1Name.getText().equals(p2Name.getText())) {
-            p1Name.setBackground(Color.red);
-            p2Name.setBackground(Color.red);
-            return false;
-        } else {
-            p2Name.setBackground(Color.white);
         }
-
+        
+        if (p1Name.getText().equals(p2Name.getText())) {
+            p1Name.setBackground(pastelRed);
+            Border p1Border = BorderFactory.createLineBorder(Color.RED, 3);
+            p1Name.setBorder(p1Border);
+            p2Name.setBackground(pastelRed);
+            Border p2Border = BorderFactory.createLineBorder(Color.RED, 3);
+            p2Name.setBorder(p2Border);
+            return false;
+        }
+        
         return f;
     }
 
