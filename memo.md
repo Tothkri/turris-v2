@@ -6,7 +6,9 @@ Scrummaster rotáció:
 5. hét (03.30 - 04.06): Szálkai Olivér Dávid
 6. hét -
 7. hét (04.13 - 04.20): Tóth Kristóf (YPENKF)
-7. hét (04.20 - 04.27): Tóth Kristóf (SONXZF)
+8. hét (04.20 - 04.27): Tóth Kristóf (SONXZF)
+9. hét (04.27 - 05.04.): Szálkai Olivér Dávid
+10. hét (05.04 - 05.11.): Tóth Kristóf (YPENKF)
 
 Ki mit csinált:
 1. hét (03.02 - 03.09)
@@ -76,21 +78,12 @@ Ki mit csinált:
 
     Tóth Kristóf (SONXZF): bug fix, javadoc, osztályleírás
 
-    Tóth Kristóf (YPENKF): 
+    Tóth Kristóf (YPENKF): user guide, osztálydiagram
     
-    Szálkai Olivér Dávid (ONLQ05): 
+    Szálkai Olivér Dávid (ONLQ05): több egység küldése egyszerre, egyéb UI változtatások
 
-to-do list:
+10. hét (04.27 - 05.04.): kész vagyunk mindennel, bemutatás hete
 
--bug keresés
-
--több unit küldése gomb
-
--végleges képek
-
--bug: unit hover text (plain2F.txt)
-
-dokumentáció (diagramok frissítése, osztályleírások, user guide): wiki oldalra
 
 
 
