@@ -75,17 +75,17 @@ public class MainTest {
         assertTrue(p1.getMoney() == 1000 && p2.getMoney() == 1000);
         assertTrue(p1.getCastle().getHp() == 300 && p2.getCastle().getHp() == 300);
         if (activePlayer == 0) {
-            for (var button : gw.getP2TowerButtons()) {
+            for (var button : gw.getPlayer2TowerButtons()) {
                 assertTrue(!button.isEnabled());
             }
-            for (var button : gw.getP2UnitButtons()) {
+            for (var button : gw.getPlayer2UnitSpinners()) {
                 assertTrue(!button.isEnabled());
             }
         } else {
-            for (var button : gw.getP1TowerButtons()) {
+           for (var button : gw.getPlayer1TowerButtons()) {
                 assertTrue(!button.isEnabled());
             }
-            for (var button : gw.getP1UnitButtons()) {
+            for (var button : gw.getPlayer1UnitSpinners()) {
                 assertTrue(!button.isEnabled());
             }
         }

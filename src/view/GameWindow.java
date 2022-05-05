@@ -53,12 +53,13 @@ public class GameWindow extends JPanel {
     private JButton backToMenuButton;
     private JButton newRoundButton;
     private JButton saveButton;
+    /**
+     * PLAYER1 gombok
+     */
     private JButton[] player1TowerButtons;
-    private JButton[] player1UnitButtons;
     private JSpinner[] player1UnitSpinners;
     private JButton player1UnitDeploy;
     private JButton[] player2TowerButtons;
-    private JButton[] player2UnitButtons;
     private JSpinner[] player2UnitSpinners;
     private JButton player2UnitDeploy;
     private JLabel player1Data;
@@ -82,7 +83,7 @@ public class GameWindow extends JPanel {
     private int player1ClimberCount = 0;
     private int player1DiverCount = 0;
     private int player1DestroyerCount = 0;
-    
+
     private int player2GeneralCount = 0;
     private int player2FighterCount = 0;
     private int player2ClimberCount = 0;
@@ -166,14 +167,9 @@ public class GameWindow extends JPanel {
 
         this.setLayout(new GridBagLayout());
 
-        /**
-         * PLAYER1 gombok
-         */
-        player1TowerButtons = new JButton[5];
-        player1UnitButtons = new JButton[5];
+ 	player1TowerButtons = new JButton[5];
         player1UnitSpinners = new JSpinner[5];
         player2TowerButtons = new JButton[5];
-        player2UnitButtons = new JButton[5];
         player2UnitSpinners = new JSpinner[5];
 
         setPanels();
@@ -326,15 +322,9 @@ public class GameWindow extends JPanel {
             if (!model.getInfo(matrixPositionX, matrixPositionY).equals("")) {
                 ToolTipManager.sharedInstance().setEnabled(true);
                 board.setToolTipText(model.getInfo(matrixPositionX, matrixPositionY));
-               
+
             } else {
                 ToolTipManager.sharedInstance().setEnabled(false);
-                String sss="";
-                for (Unit u : model.getPlayers()[model.getActivePlayer()].getUnits()){
-                    sss+=(u.getX()/31)+"-"+(u.getY()/31);
-                }
-                 board.setToolTipText(matrixPositionX +";"+ matrixPositionY+" "+sss);
-                
             }
 
             if (simulationTime) {
@@ -815,7 +805,6 @@ public class GameWindow extends JPanel {
         JLabel player1DivStat = new JLabel("0 coins");
         JLabel player1DesStat = new JLabel("0 coins");
 
-
         JPanel player2Panel = new JPanel();
         JPanel player2Stats = new JPanel();
         JPanel player2TwrLabelRow = new JPanel();
@@ -832,7 +821,7 @@ public class GameWindow extends JPanel {
         JLabel player2RapStat = new JLabel("250 c / tower");
         JLabel player2SnipStat = new JLabel("300 c / tower");
         JLabel player2TwrMan = new JLabel("Tower Management");
-        JLabel player2UnitLab = new JLabel("Units");  
+        JLabel player2UnitLab = new JLabel("Units");
         JLabel player2GenStat = new JLabel("0 coins");
         JLabel player2DivStat = new JLabel("0 coins");
         JLabel player2ClimStat = new JLabel("0 coins");
@@ -847,15 +836,14 @@ public class GameWindow extends JPanel {
         player1TowerButtons[3] = new JButton("Upgrade");
         player1TowerButtons[4] = new JButton("Demolish");
 
-        JLabel player1General   = new JLabel("General");
-        JLabel player1Fighter   = new JLabel("Fighter");
-        JLabel player1Climber   = new JLabel("Climber");
-        JLabel player1Diver     = new JLabel("Diver");
+        JLabel player1General = new JLabel("General");
+        JLabel player1Fighter = new JLabel("Fighter");
+        JLabel player1Climber = new JLabel("Climber");
+        JLabel player1Diver = new JLabel("Diver");
         JLabel player1Destroyer = new JLabel("Destroyer");
 
         player1UnitDeploy = new JButton("Deploy");
         JLabel player1UnitTotal = new JLabel("Total: 0");
-
 
         player2TowerButtons[0] = new JButton("Fortified");
         player2TowerButtons[1] = new JButton("Rapid");
@@ -863,10 +851,10 @@ public class GameWindow extends JPanel {
         player2TowerButtons[3] = new JButton("Upgrade");
         player2TowerButtons[4] = new JButton("Demolish");
 
-        JLabel player2General   = new JLabel("General");
-        JLabel player2Fighter   = new JLabel("Fighter");
-        JLabel player2Climber   = new JLabel("Climber");
-        JLabel player2Diver     = new JLabel("Diver");
+        JLabel player2General = new JLabel("General");
+        JLabel player2Fighter = new JLabel("Fighter");
+        JLabel player2Climber = new JLabel("Climber");
+        JLabel player2Diver = new JLabel("Diver");
         JLabel player2Destroyer = new JLabel("Destroyer");
 
         player2UnitDeploy = new JButton("Deploy");
@@ -912,8 +900,7 @@ public class GameWindow extends JPanel {
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
             ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("src/res/fonts/Poppins-Light.ttf")));
             ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("src/res/fonts/Nunito-Light.ttf")));
-            
-            
+
             //Játéktér
             gbc.anchor = GridBagConstraints.CENTER;
             gbc.insets = new Insets(0, 45, 0, 45);
@@ -921,7 +908,6 @@ public class GameWindow extends JPanel {
             gbc.gridy = 1;
             this.add(board, gbc);
 
-            
             //Save game BUTTON
             saveButton.setPreferredSize(new Dimension(260, 40));
             saveButton.setFont(nunitoLight.deriveFont(25f));
@@ -931,7 +917,6 @@ public class GameWindow extends JPanel {
             gbc.gridx = 0;
             gbc.gridy = 0;
             this.add(saveButton, gbc);
-
 
             //Exit game BUTTON
             backToMenuButton.setPreferredSize(new Dimension(260, 40));
@@ -943,17 +928,16 @@ public class GameWindow extends JPanel {
             gbc.gridy = 0;
             this.add(backToMenuButton, gbc);
 
-
             //Finish round BUTTON
             newRoundButton.setPreferredSize(new Dimension(932, 50));
             newRoundButton.setFont(nunitoLight.deriveFont(32f));
             newRoundButton.setMargin(new Insets(0, 0, 0, 0));
             newRoundButton.setFocusPainted(false);
-            
+
             newRoundButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    for(int i = 0; i < 5; i++){
+                    for (int i = 0; i < 5; i++) {
                         player1UnitSpinners[i].setValue(0);
                     }
                     player1GenStat.setText("0 coins");
@@ -964,12 +948,11 @@ public class GameWindow extends JPanel {
                     player1UnitTotal.setText("Total: 0");
                 }
             });
-            
+
             gbc.insets = new Insets(15, 0, -10, 0);
             gbc.gridx = 1;
             gbc.gridy = 2;
             this.add(newRoundButton, gbc);
-
 
             //Round time & count LABEL
             timeAndRoundLabel.setFont(new Font("Calibri", Font.BOLD, 30));
@@ -978,7 +961,6 @@ public class GameWindow extends JPanel {
             gbc.gridy = 0;
             this.add(timeAndRoundLabel, gbc);
 
-            
             /**
              * Player 1 UI - player1Panel MAIN
              */
@@ -998,7 +980,6 @@ public class GameWindow extends JPanel {
             gbl.gridy = 0;
             player1Panel.add(player1Stats, gbl);
 
-
             //Tower LABEL
             player1TwrLabelRow.add(player1Twr);
             player1TwrLabelRow.setBorder(new EmptyBorder(8, -245, 0, 0));
@@ -1011,7 +992,6 @@ public class GameWindow extends JPanel {
             gbl.gridx = 0;
             gbl.gridy = 1;
             player1Panel.add(player1TwrLabelRow, gbl);
-            
 
             //Tower BUTTONS
             player1TowerButtons[0].setPreferredSize(new Dimension(180, 40));
@@ -1067,7 +1047,6 @@ public class GameWindow extends JPanel {
             gbl.gridy = 2;
             player1Panel.add(player1TowerOptionRow, gbl);
 
-            
             //Tower management LABEL
             player1TwrManLabelRow.add(player1TwrMan);
             player1TwrManLabelRow.setBorder(new EmptyBorder(8, 0, 0, 30));
@@ -1081,7 +1060,6 @@ public class GameWindow extends JPanel {
             gbl.gridy = 3;
             player1Panel.add(player1TwrManLabelRow, gbl);
 
-            
             //Tower management BUTTONS
             player1TowerButtons[3].setPreferredSize(new Dimension(260, 40));
             player1TowerButtons[3].setFont(nunitoLight.deriveFont(25f));
@@ -1109,7 +1087,6 @@ public class GameWindow extends JPanel {
             gbl.gridy = 4;
             player1Panel.add(player1TowerManagementOptionRow, gbl);
 
-            
             //Units LABEL
             player1UnitLabelRow.add(player1UnitLab);
             player1UnitLabelRow.setBorder(new EmptyBorder(8, -280, 0, 0));
@@ -1122,8 +1099,7 @@ public class GameWindow extends JPanel {
             gbl.gridx = 0;
             gbl.gridy = 5;
             player1Panel.add(player1UnitLabelRow, gbl);
-            
-            
+
             //Units BUTTONS
             //General
             player1General.setFont(nunitoLight.deriveFont(30f));
@@ -1131,7 +1107,7 @@ public class GameWindow extends JPanel {
             gbul.gridx = 0;
             gbul.gridy = 0;
             player1UnitOptRow.add(player1General, gbul);
-            
+
             player1UnitSpinners[0] = new JSpinner(new SpinnerNumberModel(0, 0, 20, 1));
             player1UnitSpinners[0].setPreferredSize(new Dimension(50, 30));
             player1UnitSpinners[0].setFont(poppinsLight.deriveFont(15f));
@@ -1141,39 +1117,38 @@ public class GameWindow extends JPanel {
             gbul.gridx = 1;
             gbul.gridy = 0;
             player1UnitOptRow.add(player1UnitSpinners[0], gbul);
-            
+
             player1GenStat.setFont(poppinsLight.deriveFont(26f));
-            player1UnitSpinners[0].addChangeListener(new ChangeListener(){
+            player1UnitSpinners[0].addChangeListener(new ChangeListener() {
                 @Override
                 public void stateChanged(ChangeEvent e) {
                     player1GenStat.setFont(poppinsLight.deriveFont(26f));
-                    player1GenStat.setText(Integer.toString((Integer)player1UnitSpinners[0].getValue() * 20) + " coins");
+                    player1GenStat.setText(Integer.toString((Integer) player1UnitSpinners[0].getValue() * 20) + " coins");
                     player1UnitTotal.setText(
-                            "Total: " +
-                            Integer.toString(
-                                (Integer)player1UnitSpinners[0].getValue() * 20 +
-                                (Integer)player1UnitSpinners[1].getValue() * 40 +
-                                (Integer)player1UnitSpinners[2].getValue() * 20 +
-                                (Integer)player1UnitSpinners[3].getValue() * 20 +
-                                (Integer)player1UnitSpinners[4].getValue() * 40
+                            "Total: "
+                            + Integer.toString(
+                                    (Integer) player1UnitSpinners[0].getValue() * 20
+                                    + (Integer) player1UnitSpinners[1].getValue() * 40
+                                    + (Integer) player1UnitSpinners[2].getValue() * 20
+                                    + (Integer) player1UnitSpinners[3].getValue() * 20
+                                    + (Integer) player1UnitSpinners[4].getValue() * 40
                             )
                     );
-                    player1GeneralCount = (Integer)player1UnitSpinners[0].getValue();
+                    player1GeneralCount = (Integer) player1UnitSpinners[0].getValue();
                 }
             });
             gbul.insets = new Insets(5, 0, 0, -170);
             gbul.gridx = 2;
             gbul.gridy = 0;
             player1UnitOptRow.add(player1GenStat, gbul);
-            
-            
+
             //Fighter
             player1Fighter.setFont(nunitoLight.deriveFont(30f));
             gbul.insets = new Insets(0, -192, 0, 0);
             gbul.gridx = 0;
             gbul.gridy = 1;
             player1UnitOptRow.add(player1Fighter, gbul);
-            
+
             player1UnitSpinners[1] = new JSpinner(new SpinnerNumberModel(0, 0, 20, 1));
             player1UnitSpinners[1].setPreferredSize(new Dimension(50, 30));
             player1UnitSpinners[1].setFont(poppinsLight.deriveFont(15f));
@@ -1183,39 +1158,38 @@ public class GameWindow extends JPanel {
             gbul.gridx = 1;
             gbul.gridy = 1;
             player1UnitOptRow.add(player1UnitSpinners[1], gbul);
-            
+
             player1FigStat.setFont(poppinsLight.deriveFont(26f));
-            player1UnitSpinners[1].addChangeListener(new ChangeListener(){
+            player1UnitSpinners[1].addChangeListener(new ChangeListener() {
                 @Override
                 public void stateChanged(ChangeEvent e) {
                     player1FigStat.setFont(poppinsLight.deriveFont(26f));
-                    player1FigStat.setText(Integer.toString((Integer)player1UnitSpinners[1].getValue() * 40) + " coins");
+                    player1FigStat.setText(Integer.toString((Integer) player1UnitSpinners[1].getValue() * 40) + " coins");
                     player1UnitTotal.setText(
-                            "Total: " +
-                            Integer.toString(
-                                (Integer)player1UnitSpinners[0].getValue() * 20 +
-                                (Integer)player1UnitSpinners[1].getValue() * 40 +
-                                (Integer)player1UnitSpinners[2].getValue() * 20 +
-                                (Integer)player1UnitSpinners[3].getValue() * 20 +
-                                (Integer)player1UnitSpinners[4].getValue() * 40
+                            "Total: "
+                            + Integer.toString(
+                                    (Integer) player1UnitSpinners[0].getValue() * 20
+                                    + (Integer) player1UnitSpinners[1].getValue() * 40
+                                    + (Integer) player1UnitSpinners[2].getValue() * 20
+                                    + (Integer) player1UnitSpinners[3].getValue() * 20
+                                    + (Integer) player1UnitSpinners[4].getValue() * 40
                             )
                     );
-                    player1FighterCount = (Integer)player1UnitSpinners[1].getValue();
+                    player1FighterCount = (Integer) player1UnitSpinners[1].getValue();
                 }
             });
             gbul.insets = new Insets(5, 0, 0, -170);
             gbul.gridx = 2;
             gbul.gridy = 1;
             player1UnitOptRow.add(player1FigStat, gbul);
-            
-            
+
             //Climber
             player1Climber.setFont(nunitoLight.deriveFont(30f));
             gbul.insets = new Insets(0, -185, 0, 0);
             gbul.gridx = 0;
             gbul.gridy = 2;
             player1UnitOptRow.add(player1Climber, gbul);
-            
+
             player1UnitSpinners[2] = new JSpinner(new SpinnerNumberModel(0, 0, 20, 1));
             player1UnitSpinners[2].setPreferredSize(new Dimension(50, 30));
             player1UnitSpinners[2].setFont(poppinsLight.deriveFont(15f));
@@ -1225,39 +1199,38 @@ public class GameWindow extends JPanel {
             gbul.gridx = 1;
             gbul.gridy = 2;
             player1UnitOptRow.add(player1UnitSpinners[2], gbul);
-            
+
             player1ClimStat.setFont(poppinsLight.deriveFont(26f));
-            player1UnitSpinners[2].addChangeListener(new ChangeListener(){
+            player1UnitSpinners[2].addChangeListener(new ChangeListener() {
                 @Override
                 public void stateChanged(ChangeEvent e) {
                     player1ClimStat.setFont(poppinsLight.deriveFont(26f));
-                    player1ClimStat.setText(Integer.toString((Integer)player1UnitSpinners[2].getValue() * 20) + " coins");
+                    player1ClimStat.setText(Integer.toString((Integer) player1UnitSpinners[2].getValue() * 20) + " coins");
                     player1UnitTotal.setText(
-                            "Total: " +
-                            Integer.toString(
-                                (Integer)player1UnitSpinners[0].getValue() * 20 +
-                                (Integer)player1UnitSpinners[1].getValue() * 40 +
-                                (Integer)player1UnitSpinners[2].getValue() * 20 +
-                                (Integer)player1UnitSpinners[3].getValue() * 20 +
-                                (Integer)player1UnitSpinners[4].getValue() * 40
+                            "Total: "
+                            + Integer.toString(
+                                    (Integer) player1UnitSpinners[0].getValue() * 20
+                                    + (Integer) player1UnitSpinners[1].getValue() * 40
+                                    + (Integer) player1UnitSpinners[2].getValue() * 20
+                                    + (Integer) player1UnitSpinners[3].getValue() * 20
+                                    + (Integer) player1UnitSpinners[4].getValue() * 40
                             )
                     );
-                    player1ClimberCount = (Integer)player1UnitSpinners[2].getValue();
+                    player1ClimberCount = (Integer) player1UnitSpinners[2].getValue();
                 }
             });
             gbul.insets = new Insets(5, 0, 0, -170);
             gbul.gridx = 2;
             gbul.gridy = 2;
             player1UnitOptRow.add(player1ClimStat, gbul);
-            
-            
+
             //Diver
             player1Diver.setFont(nunitoLight.deriveFont(30f));
             gbul.insets = new Insets(0, -220, 0, 0);
             gbul.gridx = 0;
             gbul.gridy = 3;
             player1UnitOptRow.add(player1Diver, gbul);
-            
+
             player1UnitSpinners[3] = new JSpinner(new SpinnerNumberModel(0, 0, 20, 1));
             player1UnitSpinners[3].setPreferredSize(new Dimension(50, 30));
             player1UnitSpinners[3].setFont(poppinsLight.deriveFont(15f));
@@ -1267,39 +1240,38 @@ public class GameWindow extends JPanel {
             gbul.gridx = 1;
             gbul.gridy = 3;
             player1UnitOptRow.add(player1UnitSpinners[3], gbul);
-            
+
             player1DivStat.setFont(poppinsLight.deriveFont(26f));
-            player1UnitSpinners[3].addChangeListener(new ChangeListener(){
+            player1UnitSpinners[3].addChangeListener(new ChangeListener() {
                 @Override
                 public void stateChanged(ChangeEvent e) {
                     player1DivStat.setFont(poppinsLight.deriveFont(26f));
-                    player1DivStat.setText(Integer.toString((Integer)player1UnitSpinners[3].getValue() * 20) + " coins");
+                    player1DivStat.setText(Integer.toString((Integer) player1UnitSpinners[3].getValue() * 20) + " coins");
                     player1UnitTotal.setText(
-                            "Total: " +
-                            Integer.toString(
-                                (Integer)player1UnitSpinners[0].getValue() * 20 +
-                                (Integer)player1UnitSpinners[1].getValue() * 40 +
-                                (Integer)player1UnitSpinners[2].getValue() * 20 +
-                                (Integer)player1UnitSpinners[3].getValue() * 20 +
-                                (Integer)player1UnitSpinners[4].getValue() * 40
+                            "Total: "
+                            + Integer.toString(
+                                    (Integer) player1UnitSpinners[0].getValue() * 20
+                                    + (Integer) player1UnitSpinners[1].getValue() * 40
+                                    + (Integer) player1UnitSpinners[2].getValue() * 20
+                                    + (Integer) player1UnitSpinners[3].getValue() * 20
+                                    + (Integer) player1UnitSpinners[4].getValue() * 40
                             )
                     );
-                    player1DiverCount = (Integer)player1UnitSpinners[3].getValue();
+                    player1DiverCount = (Integer) player1UnitSpinners[3].getValue();
                 }
             });
             gbul.insets = new Insets(5, 0, 0, -170);
             gbul.gridx = 2;
             gbul.gridy = 3;
             player1UnitOptRow.add(player1DivStat, gbul);
-            
-            
+
             //Destroyer
             player1Destroyer.setFont(nunitoLight.deriveFont(30f));
             gbul.insets = new Insets(0, -160, 0, 0);
             gbul.gridx = 0;
             gbul.gridy = 4;
             player1UnitOptRow.add(player1Destroyer, gbul);
-            
+
             player1UnitSpinners[4] = new JSpinner(new SpinnerNumberModel(0, 0, 20, 1));
             player1UnitSpinners[4].setPreferredSize(new Dimension(50, 30));
             player1UnitSpinners[4].setFont(poppinsLight.deriveFont(15f));
@@ -1309,24 +1281,24 @@ public class GameWindow extends JPanel {
             gbul.gridx = 1;
             gbul.gridy = 4;
             player1UnitOptRow.add(player1UnitSpinners[4], gbul);
-            
+
             player1DesStat.setFont(poppinsLight.deriveFont(26f));
-            player1UnitSpinners[4].addChangeListener(new ChangeListener(){
+            player1UnitSpinners[4].addChangeListener(new ChangeListener() {
                 @Override
                 public void stateChanged(ChangeEvent e) {
                     player1DesStat.setFont(poppinsLight.deriveFont(26f));
-                    player1DesStat.setText(Integer.toString((Integer)player1UnitSpinners[4].getValue() * 40) + " coins");
+                    player1DesStat.setText(Integer.toString((Integer) player1UnitSpinners[4].getValue() * 40) + " coins");
                     player1UnitTotal.setText(
-                            "Total: " +
-                            Integer.toString(
-                                (Integer)player1UnitSpinners[0].getValue() * 20 +
-                                (Integer)player1UnitSpinners[1].getValue() * 40 +
-                                (Integer)player1UnitSpinners[2].getValue() * 20 +
-                                (Integer)player1UnitSpinners[3].getValue() * 20 +
-                                (Integer)player1UnitSpinners[4].getValue() * 40
+                            "Total: "
+                            + Integer.toString(
+                                    (Integer) player1UnitSpinners[0].getValue() * 20
+                                    + (Integer) player1UnitSpinners[1].getValue() * 40
+                                    + (Integer) player1UnitSpinners[2].getValue() * 20
+                                    + (Integer) player1UnitSpinners[3].getValue() * 20
+                                    + (Integer) player1UnitSpinners[4].getValue() * 40
                             )
                     );
-                    player1DestroyerCount = (Integer)player1UnitSpinners[4].getValue();
+                    player1DestroyerCount = (Integer) player1UnitSpinners[4].getValue();
                 }
             });
             gbul.insets = new Insets(5, 0, 0, -170);
@@ -1342,20 +1314,19 @@ public class GameWindow extends JPanel {
             gbl.gridy = 6;
             player1Panel.add(player1UnitOptRow, gbl);
 
-
             //Unit deploy
             player1UnitDepRow.setBackground(veryLightGray);
             player1UnitDepRow.setPreferredSize(new Dimension(390, 50));
-            
+
             player1UnitDeploy.setPreferredSize(new Dimension(140, 30));
             player1UnitDeploy.setFont(nunitoLight.deriveFont(22f));
             player1UnitDeploy.setMargin(new Insets(0, 0, 0, 0));
             player1UnitDeploy.setFocusPainted(false);
-            
+
             player1UnitDeploy.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    for(int i = 0; i < 5; i++){
+                    for (int i = 0; i < 5; i++) {
                         player1UnitSpinners[i].setValue(0);
                     }
                     player1GenStat.setText("0 coins");
@@ -1366,32 +1337,29 @@ public class GameWindow extends JPanel {
                     player1UnitTotal.setText("Total: 0");
                 }
             });
-            
+
             gbudl.insets = new Insets(0, -90, 0, 10);
             gbudl.gridx = 0;
             gbudl.gridy = 0;
             player1UnitDepRow.add(player1UnitDeploy, gbudl);
-            
+
             player1UnitTotal.setFont(poppinsLight.deriveFont(26f));
             gbudl.insets = new Insets(3, 10, 0, -50);
             gbudl.gridx = 1;
             gbudl.gridy = 0;
             player1UnitDepRow.add(player1UnitTotal, gbudl);
-            
+
             gbl.insets = new Insets(30, 0, -300, 0);
             gbl.gridx = 0;
             gbl.gridy = 7;
             player1Panel.add(player1UnitDepRow, gbl);
-            
-            
+
             //player1Panel elhelyezkedése
             gbc.insets = new Insets(0, 0, -95, 5);
             gbc.gridx = 0;
             gbc.gridy = 1;
             this.add(player1Panel, gbc);
 
-            
-            
             //Player 2 UI
             player2Panel.setPreferredSize(new Dimension(400, 908));
             player2Panel.setBackground(Color.DARK_GRAY);
@@ -1409,7 +1377,6 @@ public class GameWindow extends JPanel {
             gbr.gridy = 0;
             player2Panel.add(player2Stats, gbr);
 
-
             //Tower LABEL
             player2TwrLabelRow.add(player2Twr);
             player2TwrLabelRow.setBorder(new EmptyBorder(8, -245, 0, 0));
@@ -1422,7 +1389,6 @@ public class GameWindow extends JPanel {
             gbr.gridx = 0;
             gbr.gridy = 1;
             player2Panel.add(player2TwrLabelRow, gbr);
-            
 
             //Tower BUTTONS
             player2TowerButtons[0].setPreferredSize(new Dimension(180, 40));
@@ -1478,7 +1444,6 @@ public class GameWindow extends JPanel {
             gbr.gridy = 2;
             player2Panel.add(player2TowerOptionRow, gbr);
 
-
             //Tower management LABEL
             player2TwrManLabelRow.add(player2TwrMan);
             player2TwrManLabelRow.setBorder(new EmptyBorder(8, 0, 0, 30));
@@ -1491,7 +1456,6 @@ public class GameWindow extends JPanel {
             gbr.gridx = 0;
             gbr.gridy = 3;
             player2Panel.add(player2TwrManLabelRow, gbr);
-
 
             //Tower management BUTTONS
             player2TowerButtons[3].setPreferredSize(new Dimension(260, 40));
@@ -1520,7 +1484,6 @@ public class GameWindow extends JPanel {
             gbr.gridy = 4;
             player2Panel.add(player2TowerManagementOptionRow, gbr);
 
-
             //Units LABEL
             player2UnitLabelRow.add(player2UnitLab);
             player2UnitLabelRow.setBorder(new EmptyBorder(8, -280, 0, 0));
@@ -1533,7 +1496,6 @@ public class GameWindow extends JPanel {
             gbr.gridx = 0;
             gbr.gridy = 5;
             player2Panel.add(player2UnitLabelRow, gbr);
-            
 
             //Units BUTTONS
             //General
@@ -1542,7 +1504,7 @@ public class GameWindow extends JPanel {
             gbur.gridx = 0;
             gbur.gridy = 0;
             player2UnitOptRow.add(player2General, gbur);
-            
+
             player2UnitSpinners[0] = new JSpinner(new SpinnerNumberModel(0, 0, 20, 1));
             player2UnitSpinners[0].setPreferredSize(new Dimension(50, 30));
             player2UnitSpinners[0].setFont(poppinsLight.deriveFont(15f));
@@ -1552,38 +1514,38 @@ public class GameWindow extends JPanel {
             gbur.gridx = 1;
             gbur.gridy = 0;
             player2UnitOptRow.add(player2UnitSpinners[0], gbur);
-            
+
             player2GenStat.setFont(poppinsLight.deriveFont(26f));
-            player2UnitSpinners[0].addChangeListener(new ChangeListener(){
+            player2UnitSpinners[0].addChangeListener(new ChangeListener() {
                 @Override
                 public void stateChanged(ChangeEvent e) {
                     player2GenStat.setFont(poppinsLight.deriveFont(26f));
-                    player2GenStat.setText(Integer.toString((Integer)player2UnitSpinners[0].getValue() * 20) + " coins");
+                    player2GenStat.setText(Integer.toString((Integer) player2UnitSpinners[0].getValue() * 20) + " coins");
                     player2UnitTotal.setText(
-                            "Total: " +
-                            Integer.toString(
-                                (Integer)player2UnitSpinners[0].getValue() * 20 +
-                                (Integer)player2UnitSpinners[1].getValue() * 40 +
-                                (Integer)player2UnitSpinners[2].getValue() * 20 +
-                                (Integer)player2UnitSpinners[3].getValue() * 20 +
-                                (Integer)player2UnitSpinners[4].getValue() * 40
+                            "Total: "
+                            + Integer.toString(
+                                    (Integer) player2UnitSpinners[0].getValue() * 20
+                                    + (Integer) player2UnitSpinners[1].getValue() * 40
+                                    + (Integer) player2UnitSpinners[2].getValue() * 20
+                                    + (Integer) player2UnitSpinners[3].getValue() * 20
+                                    + (Integer) player2UnitSpinners[4].getValue() * 40
                             )
                     );
-                    player2GeneralCount = (Integer)player2UnitSpinners[0].getValue();
+                    player2GeneralCount = (Integer) player2UnitSpinners[0].getValue();
                 }
             });
             gbur.insets = new Insets(5, 0, 0, -170);
             gbur.gridx = 2;
             gbur.gridy = 0;
-            player2UnitOptRow.add(player2GenStat, gbur);            
-            
+            player2UnitOptRow.add(player2GenStat, gbur);
+
             //Fighter
             player2Fighter.setFont(nunitoLight.deriveFont(30f));
             gbur.insets = new Insets(0, -192, 0, 0);
             gbur.gridx = 0;
             gbur.gridy = 1;
             player2UnitOptRow.add(player2Fighter, gbur);
-            
+
             player2UnitSpinners[1] = new JSpinner(new SpinnerNumberModel(0, 0, 20, 1));
             player2UnitSpinners[1].setPreferredSize(new Dimension(50, 30));
             player2UnitSpinners[1].setFont(poppinsLight.deriveFont(15f));
@@ -1593,39 +1555,38 @@ public class GameWindow extends JPanel {
             gbur.gridx = 1;
             gbur.gridy = 1;
             player2UnitOptRow.add(player2UnitSpinners[1], gbur);
-            
+
             player2FigStat.setFont(poppinsLight.deriveFont(26f));
-            player2UnitSpinners[1].addChangeListener(new ChangeListener(){
+            player2UnitSpinners[1].addChangeListener(new ChangeListener() {
                 @Override
                 public void stateChanged(ChangeEvent e) {
                     player2FigStat.setFont(poppinsLight.deriveFont(26f));
-                    player2FigStat.setText(Integer.toString((Integer)player2UnitSpinners[1].getValue() * 40) + " coins");
+                    player2FigStat.setText(Integer.toString((Integer) player2UnitSpinners[1].getValue() * 40) + " coins");
                     player2UnitTotal.setText(
-                            "Total: " +
-                            Integer.toString(
-                                (Integer)player2UnitSpinners[0].getValue() * 20 +
-                                (Integer)player2UnitSpinners[1].getValue() * 40 +
-                                (Integer)player2UnitSpinners[2].getValue() * 20 +
-                                (Integer)player2UnitSpinners[3].getValue() * 20 +
-                                (Integer)player2UnitSpinners[4].getValue() * 40
+                            "Total: "
+                            + Integer.toString(
+                                    (Integer) player2UnitSpinners[0].getValue() * 20
+                                    + (Integer) player2UnitSpinners[1].getValue() * 40
+                                    + (Integer) player2UnitSpinners[2].getValue() * 20
+                                    + (Integer) player2UnitSpinners[3].getValue() * 20
+                                    + (Integer) player2UnitSpinners[4].getValue() * 40
                             )
                     );
-                    player2FighterCount = (Integer)player2UnitSpinners[1].getValue();
+                    player2FighterCount = (Integer) player2UnitSpinners[1].getValue();
                 }
             });
             gbur.insets = new Insets(5, 0, 0, -170);
             gbur.gridx = 2;
             gbur.gridy = 1;
             player2UnitOptRow.add(player2FigStat, gbur);
-            
-            
+
             //Climber
             player2Climber.setFont(nunitoLight.deriveFont(30f));
             gbur.insets = new Insets(0, -185, 0, 0);
             gbur.gridx = 0;
             gbur.gridy = 2;
             player2UnitOptRow.add(player2Climber, gbur);
-            
+
             player2UnitSpinners[2] = new JSpinner(new SpinnerNumberModel(0, 0, 20, 1));
             player2UnitSpinners[2].setPreferredSize(new Dimension(50, 30));
             player2UnitSpinners[2].setFont(poppinsLight.deriveFont(15f));
@@ -1635,38 +1596,38 @@ public class GameWindow extends JPanel {
             gbur.gridx = 1;
             gbur.gridy = 2;
             player2UnitOptRow.add(player2UnitSpinners[2], gbur);
-            
+
             player2ClimStat.setFont(poppinsLight.deriveFont(26f));
-            player2UnitSpinners[2].addChangeListener(new ChangeListener(){
+            player2UnitSpinners[2].addChangeListener(new ChangeListener() {
                 @Override
                 public void stateChanged(ChangeEvent e) {
                     player2ClimStat.setFont(poppinsLight.deriveFont(26f));
-                    player2ClimStat.setText(Integer.toString((Integer)player2UnitSpinners[2].getValue() * 20) + " coins");
+                    player2ClimStat.setText(Integer.toString((Integer) player2UnitSpinners[2].getValue() * 20) + " coins");
                     player2UnitTotal.setText(
-                            "Total: " +
-                            Integer.toString(
-                                (Integer)player2UnitSpinners[0].getValue() * 20 +
-                                (Integer)player2UnitSpinners[1].getValue() * 40 +
-                                (Integer)player2UnitSpinners[2].getValue() * 20 +
-                                (Integer)player2UnitSpinners[3].getValue() * 20 +
-                                (Integer)player2UnitSpinners[4].getValue() * 40
+                            "Total: "
+                            + Integer.toString(
+                                    (Integer) player2UnitSpinners[0].getValue() * 20
+                                    + (Integer) player2UnitSpinners[1].getValue() * 40
+                                    + (Integer) player2UnitSpinners[2].getValue() * 20
+                                    + (Integer) player2UnitSpinners[3].getValue() * 20
+                                    + (Integer) player2UnitSpinners[4].getValue() * 40
                             )
                     );
-                    player2ClimberCount = (Integer)player2UnitSpinners[2].getValue();
+                    player2ClimberCount = (Integer) player2UnitSpinners[2].getValue();
                 }
             });
             gbur.insets = new Insets(5, 0, 0, -170);
             gbur.gridx = 2;
             gbur.gridy = 2;
-            player2UnitOptRow.add(player2ClimStat, gbur);            
-            
+            player2UnitOptRow.add(player2ClimStat, gbur);
+
             //Diver
             player2Diver.setFont(nunitoLight.deriveFont(30f));
             gbur.insets = new Insets(0, -220, 0, 0);
             gbur.gridx = 0;
             gbur.gridy = 3;
             player2UnitOptRow.add(player2Diver, gbur);
-            
+
             player2UnitSpinners[3] = new JSpinner(new SpinnerNumberModel(0, 0, 20, 1));
             player2UnitSpinners[3].setPreferredSize(new Dimension(50, 30));
             player2UnitSpinners[3].setFont(poppinsLight.deriveFont(15f));
@@ -1676,38 +1637,38 @@ public class GameWindow extends JPanel {
             gbur.gridx = 1;
             gbur.gridy = 3;
             player2UnitOptRow.add(player2UnitSpinners[3], gbur);
-            
+
             player2DivStat.setFont(poppinsLight.deriveFont(26f));
-            player2UnitSpinners[3].addChangeListener(new ChangeListener(){
+            player2UnitSpinners[3].addChangeListener(new ChangeListener() {
                 @Override
                 public void stateChanged(ChangeEvent e) {
                     player2DivStat.setFont(poppinsLight.deriveFont(26f));
-                    player2DivStat.setText(Integer.toString((Integer)player2UnitSpinners[3].getValue() * 20) + " coins");
+                    player2DivStat.setText(Integer.toString((Integer) player2UnitSpinners[3].getValue() * 20) + " coins");
                     player2UnitTotal.setText(
-                            "Total: " +
-                            Integer.toString(
-                                (Integer)player2UnitSpinners[0].getValue() * 20 +
-                                (Integer)player2UnitSpinners[1].getValue() * 40 +
-                                (Integer)player2UnitSpinners[2].getValue() * 20 +
-                                (Integer)player2UnitSpinners[3].getValue() * 20 +
-                                (Integer)player2UnitSpinners[4].getValue() * 40
+                            "Total: "
+                            + Integer.toString(
+                                    (Integer) player2UnitSpinners[0].getValue() * 20
+                                    + (Integer) player2UnitSpinners[1].getValue() * 40
+                                    + (Integer) player2UnitSpinners[2].getValue() * 20
+                                    + (Integer) player2UnitSpinners[3].getValue() * 20
+                                    + (Integer) player2UnitSpinners[4].getValue() * 40
                             )
                     );
-                    player2DiverCount = (Integer)player2UnitSpinners[3].getValue();
+                    player2DiverCount = (Integer) player2UnitSpinners[3].getValue();
                 }
             });
             gbur.insets = new Insets(5, 0, 0, -170);
             gbur.gridx = 2;
             gbur.gridy = 3;
             player2UnitOptRow.add(player2DivStat, gbur);
-            
+
             //Destroyer
             player2Destroyer.setFont(nunitoLight.deriveFont(30f));
             gbur.insets = new Insets(0, -160, 0, 0);
             gbur.gridx = 0;
             gbur.gridy = 4;
             player2UnitOptRow.add(player2Destroyer, gbur);
-            
+
             player2UnitSpinners[4] = new JSpinner(new SpinnerNumberModel(0, 0, 20, 1));
             player2UnitSpinners[4].setPreferredSize(new Dimension(50, 30));
             player2UnitSpinners[4].setFont(poppinsLight.deriveFont(15f));
@@ -1717,24 +1678,24 @@ public class GameWindow extends JPanel {
             gbur.gridx = 1;
             gbur.gridy = 4;
             player2UnitOptRow.add(player2UnitSpinners[4], gbur);
-            
+
             player2DesStat.setFont(poppinsLight.deriveFont(26f));
-            player2UnitSpinners[4].addChangeListener(new ChangeListener(){
+            player2UnitSpinners[4].addChangeListener(new ChangeListener() {
                 @Override
                 public void stateChanged(ChangeEvent e) {
                     player2DesStat.setFont(poppinsLight.deriveFont(26f));
-                    player2DesStat.setText(Integer.toString((Integer)player2UnitSpinners[4].getValue() * 40) + " coins");
+                    player2DesStat.setText(Integer.toString((Integer) player2UnitSpinners[4].getValue() * 40) + " coins");
                     player2UnitTotal.setText(
-                            "Total: " +
-                            Integer.toString(
-                                (Integer)player2UnitSpinners[0].getValue() * 20 +
-                                (Integer)player2UnitSpinners[1].getValue() * 40 +
-                                (Integer)player2UnitSpinners[2].getValue() * 20 +
-                                (Integer)player2UnitSpinners[3].getValue() * 20 +
-                                (Integer)player2UnitSpinners[4].getValue() * 40
+                            "Total: "
+                            + Integer.toString(
+                                    (Integer) player2UnitSpinners[0].getValue() * 20
+                                    + (Integer) player2UnitSpinners[1].getValue() * 40
+                                    + (Integer) player2UnitSpinners[2].getValue() * 20
+                                    + (Integer) player2UnitSpinners[3].getValue() * 20
+                                    + (Integer) player2UnitSpinners[4].getValue() * 40
                             )
                     );
-                    player2DestroyerCount = (Integer)player2UnitSpinners[4].getValue();
+                    player2DestroyerCount = (Integer) player2UnitSpinners[4].getValue();
                 }
             });
             gbur.insets = new Insets(5, 0, 0, -170);
@@ -1747,23 +1708,22 @@ public class GameWindow extends JPanel {
 
             gbr.insets = new Insets(0, 0, -140, 0);
             gbr.gridx = 0;
-            gbr.gridy = 6; 
+            gbr.gridy = 6;
             player2Panel.add(player2UnitOptRow, gbr);
-            
-            
+
             //Unit deploy
             player2UnitDepRow.setBackground(veryLightGray);
             player2UnitDepRow.setPreferredSize(new Dimension(390, 50));
-            
+
             player2UnitDeploy.setPreferredSize(new Dimension(140, 30));
             player2UnitDeploy.setFont(nunitoLight.deriveFont(22f));
             player2UnitDeploy.setMargin(new Insets(0, 0, 0, 0));
             player2UnitDeploy.setFocusPainted(false);
-            
+
             player2UnitDeploy.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    for(int i = 0; i < 5; i++){
+                    for (int i = 0; i < 5; i++) {
                         player2UnitSpinners[i].setValue(0);
                     }
                     player2GenStat.setText("0 coins");
@@ -1774,31 +1734,29 @@ public class GameWindow extends JPanel {
                     player2UnitTotal.setText("Total: 0");
                 }
             });
-            
+
             gbudr.insets = new Insets(0, -90, 0, 10);
             gbudr.gridx = 0;
             gbudr.gridy = 0;
             player2UnitDepRow.add(player2UnitDeploy, gbudr);
-            
+
             player2UnitTotal.setFont(poppinsLight.deriveFont(26f));
             gbudr.insets = new Insets(3, 10, 0, -50);
             gbudr.gridx = 1;
             gbudr.gridy = 0;
             player2UnitDepRow.add(player2UnitTotal, gbudr);
-            
+
             gbr.insets = new Insets(30, 0, -300, 0);
             gbr.gridx = 0;
             gbr.gridy = 7;
             player2Panel.add(player2UnitDepRow, gbr);
-            
 
             //player2Panel elhelyezkedése
             gbc.insets = new Insets(0, 5, -95, 0);
             gbc.gridx = 2;
             gbc.gridy = 1;
             this.add(player2Panel, gbc);
-        } catch(IOException | FontFormatException e) {
-            //System.out.println("Exception thrown :" + e);
+        } catch (IOException | FontFormatException e) {
         }
     }
 
@@ -1810,15 +1768,15 @@ public class GameWindow extends JPanel {
             for (var button : player2TowerButtons) {
                 button.setEnabled(false);
             }
-            for (var spinner : player2UnitSpinners){
+            for (var spinner : player2UnitSpinners) {
                 spinner.setEnabled(false);
             }
             player2UnitDeploy.setEnabled(false);
-            
+
             for (var button : player1TowerButtons) {
                 button.setEnabled(true);
             }
-            for (var spinner : player1UnitSpinners){
+            for (var spinner : player1UnitSpinners) {
                 spinner.setEnabled(true);
             }
             player1UnitDeploy.setEnabled(true);
@@ -1826,15 +1784,15 @@ public class GameWindow extends JPanel {
             for (var button : player1TowerButtons) {
                 button.setEnabled(false);
             }
-            for (var spinner : player1UnitSpinners){
+            for (var spinner : player1UnitSpinners) {
                 spinner.setEnabled(false);
             }
             player1UnitDeploy.setEnabled(false);
-            
+
             for (var button : player2TowerButtons) {
                 button.setEnabled(true);
             }
-            for (var spinner : player2UnitSpinners){
+            for (var spinner : player2UnitSpinners) {
                 spinner.setEnabled(true);
             }
             player2UnitDeploy.setEnabled(true);
@@ -1864,6 +1822,7 @@ public class GameWindow extends JPanel {
 
     /**
      * Getterek, setterek
+     *
      * @return
      */
     public Board getBoard() {
@@ -1890,20 +1849,20 @@ public class GameWindow extends JPanel {
         return timeAndRoundLabel;
     }
 
-    public JButton[] getP1TowerButtons() {
+    public JSpinner[] getPlayer1UnitSpinners() {
+        return player1UnitSpinners;
+    }
+
+    public JSpinner[] getPlayer2UnitSpinners() {
+        return player2UnitSpinners;
+    }
+
+    public JButton[] getPlayer1TowerButtons() {
         return player1TowerButtons;
     }
 
-    public JButton[] getP1UnitButtons() {
-        return player1UnitButtons;
-    }
-
-    public JButton[] getP2TowerButtons() {
+    public JButton[] getPlayer2TowerButtons() {
         return player2TowerButtons;
-    }
-
-    public JButton[] getP2UnitButtons() {
-        return player2UnitButtons;
     }
 
     public ArrayList<Integer> getPlayer1distances() {
